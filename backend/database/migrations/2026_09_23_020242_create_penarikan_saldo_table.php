@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('audit_log', function (Blueprint $table) {
+        Schema::create('penarikan_saldo', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('restrict');
-            $table->string('aksi');
-            $table->text('detail')->nullable();
+            $table->foreignId('nasabah_id')->constrained('nasabah')->onDelete('restrict');
+            $table->unsignedBigInteger('jumlah');
+            $table->enum('status', ['pending', 'selesai'])->default('pending');
+            $table->foreignId('diproses_oleh')->nullable()->constrained('users')->onDelete('restrict');
             $table->timestamps();
         });
     }
