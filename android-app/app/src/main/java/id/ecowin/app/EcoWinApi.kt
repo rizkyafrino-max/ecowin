@@ -10,11 +10,18 @@ import retrofit2.http.Query
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
-data class LoginRequest(val no_hp: String, val pin: String)
+data class LoginRequest(val username: String, val pin: String)
+data class ChangePinRequest(val pin_lama: String, val pin_baru: String)
 
 interface EcoWinApi {
     @POST("api/auth/nasabah-login")
     suspend fun login(@Body request: LoginRequest): LoginResponse
+
+    @POST("api/auth/logout")
+    suspend fun logout(@Header("Authorization") token: String)
+
+    @retrofit2.http.PATCH("api/auth/nasabah-pin")
+    suspend fun changePin(@Header("Authorization") token: String, @Body request: ChangePinRequest)
 
     @GET("api/dashboard/ringkasan")
     suspend fun dashboard(@Header("Authorization") token: String): DashboardResponse

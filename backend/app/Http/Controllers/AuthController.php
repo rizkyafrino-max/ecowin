@@ -39,11 +39,11 @@ class AuthController extends Controller
     public function loginNasabah(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'no_hp' => ['required', 'string'],
+            'username' => ['required', 'string'],
             'pin' => ['required', 'string'],
         ]);
 
-        $nasabah = Nasabah::where('no_hp', $validated['no_hp'])->first();
+        $nasabah = Nasabah::where('username', $validated['username'])->first();
 
         if (! $nasabah || ! Hash::check($validated['pin'], $nasabah->pin)) {
             return response()->json(['message' => 'Nomor HP atau PIN salah.'], 422);

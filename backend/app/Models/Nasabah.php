@@ -15,6 +15,7 @@ class Nasabah extends Authenticatable
 
     protected $fillable = [
         'bank_sampah_id',
+        'username',
         'nama',
         'no_hp',
         'alamat_rt_rw',

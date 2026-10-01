@@ -15,6 +15,10 @@ class NasabahForm
             ->components([
                 TextInput::make('nama')
                     ->required(),
+                TextInput::make('username')
+                    ->required()
+                    ->alphaDash()
+                    ->unique(ignoreRecord: true),
                 TextInput::make('no_hp')
                     ->required(),
                 TextInput::make('alamat_rt_rw')

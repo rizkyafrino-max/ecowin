@@ -25,19 +25,23 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private enum class Screen { DASHBOARD, TRANSAKSI, BIOPORI }
+private enum class Screen { DASHBOARD, TRANSAKSI, BIOPORI, AKUN }
 
 @Composable
 private fun EcoWinApp() {
-    var token by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
+    var token by remember { mutableStateOf(SessionStore.readToken(context)) }
     Surface(Modifier.fillMaxSize()) {
-        if (token == null) LoginScreen { token = it } else MainScreen(token!!)
+        if (token == null) LoginScreen { SessionStore.saveToken(context, it); token = it } else MainScreen(token!!) {
+            SessionStore.clear(context)
+            token = null
+        }
     }
 }
 
 @Composable
 private fun LoginScreen(onLoggedIn: (String) -> Unit) {
-    var phone by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var pin by remember { mutableStateOf("") }
     var message by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(false) }
@@ -46,14 +50,14 @@ private fun LoginScreen(onLoggedIn: (String) -> Unit) {
         Text("EcoWin", style = MaterialTheme.typography.headlineLarge)
         Text("Login Nasabah")
         Spacer(Modifier.height(20.dp))
-        OutlinedTextField(phone, { phone = it }, label = { Text("Nomor HP") }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(username, { username = it }, label = { Text("Username dari petugas") }, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(pin, { pin = it }, label = { Text("PIN") }, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(12.dp))
         Button(enabled = !loading, modifier = Modifier.fillMaxWidth(), onClick = {
             scope.launch {
                 loading = true
-                runCatching { ApiClient.api.login(LoginRequest(phone, pin)).token }
-                    .onSuccess(onLoggedIn).onFailure { message = "Login gagal. Periksa nomor HP dan PIN." }
+                runCatching { ApiClient.api.login(LoginRequest(username, pin)).token }
+                    .onSuccess(onLoggedIn).onFailure { message = "Login gagal. Periksa username dan PIN." }
                 loading = false
             }
         }) { Text(if (loading) "Memuat..." else "Masuk") }
@@ -62,7 +66,7 @@ private fun LoginScreen(onLoggedIn: (String) -> Unit) {
 }
 
 @Composable
-private fun MainScreen(token: String) {
+private fun MainScreen(token: String, onLogout: () -> Unit) {
     var screen by remember { mutableStateOf(Screen.DASHBOARD) }
     Column(Modifier.fillMaxSize()) {
         Box(Modifier.weight(1f)) {
@@ -70,12 +74,14 @@ private fun MainScreen(token: String) {
                 Screen.DASHBOARD -> DashboardScreen(token)
                 Screen.TRANSAKSI -> TransactionScreen(token)
                 Screen.BIOPORI -> BioporiScreen(token)
+                Screen.AKUN -> AccountScreen(token, onLogout)
             }
         }
         NavigationBar {
             NavigationBarItem(screen == Screen.DASHBOARD, { screen = Screen.DASHBOARD }, label = { Text("Beranda") }, icon = {})
             NavigationBarItem(screen == Screen.TRANSAKSI, { screen = Screen.TRANSAKSI }, label = { Text("Transaksi") }, icon = {})
             NavigationBarItem(screen == Screen.BIOPORI, { screen = Screen.BIOPORI }, label = { Text("Biopori") }, icon = {})
+            NavigationBarItem(screen == Screen.AKUN, { screen = Screen.AKUN }, label = { Text("Akun") }, icon = {})
         }
     }
 }
@@ -88,6 +94,36 @@ private fun DashboardScreen(token: String) {
     Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Dashboard EcoWin", style = MaterialTheme.typography.headlineMedium)
         data?.let { Text("Saldo: Rp ${it.total_saldo}\nAnorganik: ${it.total_berat_anorganik} kg\nOrganik: ${it.total_organik} kg\nEstimasi kompos: ${it.estimasi_kompos} kg\nBiopori menunggu: ${it.biopori_menunggu}") } ?: Text(error ?: "Memuat data...")
+    }
+}
+
+@Composable
+private fun AccountScreen(token: String, onLogout: () -> Unit) {
+    var oldPin by remember { mutableStateOf("") }
+    var newPin by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf<String?>(null) }
+    var loading by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text("Akun", style = MaterialTheme.typography.headlineMedium)
+        OutlinedTextField(oldPin, { oldPin = it }, label = { Text("PIN lama") }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(newPin, { newPin = it }, label = { Text("PIN baru (4–12 karakter)") }, modifier = Modifier.fillMaxWidth())
+        Button(enabled = !loading && oldPin.isNotBlank() && newPin.length in 4..12, onClick = {
+            scope.launch {
+                loading = true
+                runCatching { ApiClient.api.changePin("Bearer $token", ChangePinRequest(oldPin, newPin)) }
+                    .onSuccess { message = "PIN berhasil diganti."; oldPin = ""; newPin = "" }
+                    .onFailure { message = "Gagal mengganti PIN. Periksa PIN lama dan koneksi." }
+                loading = false
+            }
+        }) { Text(if (loading) "Memproses..." else "Ganti PIN") }
+        message?.let { Text(it) }
+        OutlinedButton(onClick = {
+            scope.launch {
+                runCatching { ApiClient.api.logout("Bearer $token") }
+                onLogout()
+            }
+        }) { Text("Keluar") }
     }
 }
 
