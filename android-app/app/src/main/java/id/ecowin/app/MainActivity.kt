@@ -25,6 +25,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+<<<<<<< HEAD
 private enum class Screen { DASHBOARD, TRANSAKSI, BIOPORI, AKUN }
 
 @Composable
@@ -36,12 +37,25 @@ private fun EcoWinApp() {
             SessionStore.clear(context)
             token = null
         }
+=======
+private enum class Screen { DASHBOARD, TRANSAKSI, BIOPORI }
+
+@Composable
+private fun EcoWinApp() {
+    var token by remember { mutableStateOf<String?>(null) }
+    Surface(Modifier.fillMaxSize()) {
+        if (token == null) LoginScreen { token = it } else MainScreen(token!!)
+>>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
     }
 }
 
 @Composable
 private fun LoginScreen(onLoggedIn: (String) -> Unit) {
+<<<<<<< HEAD
     var username by remember { mutableStateOf("") }
+=======
+    var phone by remember { mutableStateOf("") }
+>>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
     var pin by remember { mutableStateOf("") }
     var message by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(false) }
@@ -50,14 +64,23 @@ private fun LoginScreen(onLoggedIn: (String) -> Unit) {
         Text("EcoWin", style = MaterialTheme.typography.headlineLarge)
         Text("Login Nasabah")
         Spacer(Modifier.height(20.dp))
+<<<<<<< HEAD
         OutlinedTextField(username, { username = it }, label = { Text("Username dari petugas") }, modifier = Modifier.fillMaxWidth())
+=======
+        OutlinedTextField(phone, { phone = it }, label = { Text("Nomor HP") }, modifier = Modifier.fillMaxWidth())
+>>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
         OutlinedTextField(pin, { pin = it }, label = { Text("PIN") }, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(12.dp))
         Button(enabled = !loading, modifier = Modifier.fillMaxWidth(), onClick = {
             scope.launch {
                 loading = true
+<<<<<<< HEAD
                 runCatching { ApiClient.api.login(LoginRequest(username, pin)).token }
                     .onSuccess(onLoggedIn).onFailure { message = "Login gagal. Periksa username dan PIN." }
+=======
+                runCatching { ApiClient.api.login(LoginRequest(phone, pin)).token }
+                    .onSuccess(onLoggedIn).onFailure { message = "Login gagal. Periksa nomor HP dan PIN." }
+>>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
                 loading = false
             }
         }) { Text(if (loading) "Memuat..." else "Masuk") }
@@ -66,7 +89,11 @@ private fun LoginScreen(onLoggedIn: (String) -> Unit) {
 }
 
 @Composable
+<<<<<<< HEAD
 private fun MainScreen(token: String, onLogout: () -> Unit) {
+=======
+private fun MainScreen(token: String) {
+>>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
     var screen by remember { mutableStateOf(Screen.DASHBOARD) }
     Column(Modifier.fillMaxSize()) {
         Box(Modifier.weight(1f)) {
@@ -74,14 +101,20 @@ private fun MainScreen(token: String, onLogout: () -> Unit) {
                 Screen.DASHBOARD -> DashboardScreen(token)
                 Screen.TRANSAKSI -> TransactionScreen(token)
                 Screen.BIOPORI -> BioporiScreen(token)
+<<<<<<< HEAD
                 Screen.AKUN -> AccountScreen(token, onLogout)
+=======
+>>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
             }
         }
         NavigationBar {
             NavigationBarItem(screen == Screen.DASHBOARD, { screen = Screen.DASHBOARD }, label = { Text("Beranda") }, icon = {})
             NavigationBarItem(screen == Screen.TRANSAKSI, { screen = Screen.TRANSAKSI }, label = { Text("Transaksi") }, icon = {})
             NavigationBarItem(screen == Screen.BIOPORI, { screen = Screen.BIOPORI }, label = { Text("Biopori") }, icon = {})
+<<<<<<< HEAD
             NavigationBarItem(screen == Screen.AKUN, { screen = Screen.AKUN }, label = { Text("Akun") }, icon = {})
+=======
+>>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
         }
     }
 }
@@ -98,6 +131,7 @@ private fun DashboardScreen(token: String) {
 }
 
 @Composable
+<<<<<<< HEAD
 private fun AccountScreen(token: String, onLogout: () -> Unit) {
     var oldPin by remember { mutableStateOf("") }
     var newPin by remember { mutableStateOf("") }
@@ -128,6 +162,8 @@ private fun AccountScreen(token: String, onLogout: () -> Unit) {
 }
 
 @Composable
+=======
+>>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
 private fun TransactionScreen(token: String) {
     var data by remember { mutableStateOf<TransactionResponse?>(null) }
     LaunchedEffect(token) { runCatching { ApiClient.api.transactions("Bearer $token") }.onSuccess { data = it } }

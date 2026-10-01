@@ -27,7 +27,10 @@ class NasabahController extends Controller
         abort_unless($actor instanceof User, 403);
         $validated = $request->validate([
             'nama' => ['required', 'string', 'max:255'],
+<<<<<<< HEAD
             'username' => ['required', 'string', 'max:50', 'alpha_dash', 'unique:nasabah,username'],
+=======
+>>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
             'no_hp' => ['required', 'string', 'unique:nasabah,no_hp'],
             'alamat_rt_rw' => ['required', 'string'],
             'nisn_atau_nik' => ['nullable', 'string'],
