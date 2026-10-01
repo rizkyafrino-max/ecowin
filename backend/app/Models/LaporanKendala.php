@@ -12,6 +12,7 @@ class LaporanKendala extends Model
     protected $table = 'laporan_kendala';
 
     protected $fillable = [
+        'bank_sampah_id',
         'dilaporkan_oleh_nasabah_id',
         'dilaporkan_oleh_user_id',
         'kategori',
@@ -20,6 +21,11 @@ class LaporanKendala extends Model
         'ditinjau_oleh',
         'catatan_admin',
     ];
+
+    public function bankSampah()
+    {
+        return $this->belongsTo(BankSampah::class, 'bank_sampah_id');
+    }
 
     public function pelaporNasabah()
     {

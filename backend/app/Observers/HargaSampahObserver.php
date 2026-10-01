@@ -13,6 +13,10 @@ class HargaSampahObserver
      */
     public function created(HargaSampah $hargaSampah): void
     {
+        if (! Auth::id()) {
+            return;
+        }
+
         AuditLog::create([
             'user_id' => Auth::id(),
             'aksi' => 'ubah_harga',

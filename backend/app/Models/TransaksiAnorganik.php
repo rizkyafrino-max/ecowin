@@ -13,6 +13,7 @@ class TransaksiAnorganik extends Model
 
     protected $fillable = [
         'nasabah_id',
+        'bank_sampah_id',
         'harga_sampah_id',
         'berat_kg',
         'nilai_rupiah',
@@ -24,12 +25,18 @@ class TransaksiAnorganik extends Model
     {
         return [
             'berat_kg' => 'decimal:2',
+            'nilai_rupiah' => 'integer',
         ];
     }
 
     public function nasabah()
     {
         return $this->belongsTo(Nasabah::class, 'nasabah_id');
+    }
+
+    public function bankSampah()
+    {
+        return $this->belongsTo(BankSampah::class, 'bank_sampah_id');
     }
 
     public function hargaSampah()
@@ -40,5 +47,11 @@ class TransaksiAnorganik extends Model
     public function pencatat()
     {
         return $this->belongsTo(User::class, 'dicatat_oleh');
+    }
+
+    // Scope per bank sampah
+    public function scopeUntukBankSampah($query, int $bankSampahId)
+    {
+        return $query->where('bank_sampah_id', $bankSampahId);
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Nasabah;
 use App\Models\User;
 
 return [
@@ -42,6 +43,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Guard untuk nasabah — digunakan oleh Sanctum dengan provider 'nasabah'
+        'nasabah' => [
+            'driver' => 'sanctum',
+            'provider' => 'nasabah',
+        ],
     ],
 
     /*
@@ -65,6 +72,12 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
+        ],
+
+        // Provider untuk nasabah — login dengan no_hp + PIN
+        'nasabah' => [
+            'driver' => 'eloquent',
+            'model' => Nasabah::class,
         ],
 
         // 'users' => [

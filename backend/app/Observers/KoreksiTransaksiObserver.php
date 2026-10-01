@@ -10,6 +10,10 @@ class KoreksiTransaksiObserver
 {
     public function created(KoreksiTransaksi $koreksi): void
     {
+        if (! Auth::id()) {
+            return;
+        }
+
         AuditLog::create([
             'user_id' => Auth::id(),
             'aksi' => 'ajukan_koreksi_transaksi',
@@ -24,10 +28,10 @@ class KoreksiTransaksiObserver
     public function updated(KoreksiTransaksi $koreksi): void
     {
         // Cuma catat kalau statusnya berubah jadi disetujui/ditolak
-        if ($koreksi->isDirty('status') && $koreksi->status !== 'menunggu') {
+        if ($koreksi->isDirty('status') && $koreksi->status !== 'menunggu' && Auth::id()) {
             AuditLog::create([
                 'user_id' => Auth::id(),
-                'aksi' => 'koreksi_transaksi_' . $koreksi->status,
+                'aksi' => 'koreksi_transaksi_'.$koreksi->status,
                 'detail' => json_encode([
                     'koreksi_id' => $koreksi->id,
                     'disetujui_oleh' => $koreksi->disetujui_oleh,

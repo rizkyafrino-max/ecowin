@@ -11,8 +11,12 @@ class AuditLog extends Model
 
     protected $table = 'audit_log';
 
+    // Audit log tidak punya updated_at
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'user_id',
+        'bank_sampah_id',
         'aksi',
         'detail',
     ];
@@ -20,5 +24,10 @@ class AuditLog extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function bankSampah()
+    {
+        return $this->belongsTo(BankSampah::class, 'bank_sampah_id');
     }
 }

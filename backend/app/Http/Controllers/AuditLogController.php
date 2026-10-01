@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AuditLogController extends Controller
 {
     public function index(Request $request)
     {
+        abort_unless($request->user() instanceof User && $request->user()->isAdmin(), 403);
         $query = AuditLog::with('user');
 
         if ($request->has('user_id')) {

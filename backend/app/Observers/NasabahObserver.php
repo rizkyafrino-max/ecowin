@@ -10,6 +10,10 @@ class NasabahObserver
 {
     public function created(Nasabah $nasabah): void
     {
+        if (! Auth::id()) {
+            return;
+        }
+
         AuditLog::create([
             'user_id' => Auth::id(),
             'aksi' => 'buat_akun_nasabah',

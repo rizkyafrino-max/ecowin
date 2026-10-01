@@ -3,45 +3,72 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class Nasabah extends Model
+class Nasabah extends Authenticatable
 {
-    use HasFactory;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = 'nasabah';
 
     protected $fillable = [
+        'bank_sampah_id',
         'nama',
         'no_hp',
         'alamat_rt_rw',
         'nisn_atau_nik',
+        'pin',
         'kartu_qr_token',
         'foto_ktp_kk_path',
         'status_verifikasi',
         'dibuat_oleh',
     ];
 
-    // Relasi: Nasabah dibuat oleh satu User (admin/petugas)
+    protected $hidden = [
+        'pin',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'pin' => 'hashed',
+        ];
+    }
+
+    // Relasi ke bank sampah
+    public function bankSampah()
+    {
+        return $this->belongsTo(BankSampah::class, 'bank_sampah_id');
+    }
+
+    // Nasabah dibuat oleh satu User (admin/petugas)
     public function pembuat()
     {
         return $this->belongsTo(User::class, 'dibuat_oleh');
     }
 
-    // Relasi: satu Nasabah punya banyak transaksi anorganik
+    // Transaksi anorganik milik nasabah ini
     public function transaksiAnorganik()
     {
         return $this->hasMany(TransaksiAnorganik::class, 'nasabah_id');
     }
 
-    // Relasi: satu Nasabah punya banyak transaksi organik
+    // Transaksi organik milik nasabah ini
     public function transaksiOrganik()
     {
         return $this->hasMany(TransaksiOrganik::class, 'nasabah_id');
     }
 
+    // Aktivitas biopori milik nasabah ini
+    public function aktivitasBiopori()
+    {
+        return $this->hasMany(AktivitasBiopori::class, 'nasabah_id');
+    }
+
     // Accessor: hitung saldo dari transaksi anorganik dikurangi penarikan yang selesai
-    public function getSaldoAttribute()
+    public function getSaldoAttribute(): float
     {
         $totalMasuk = $this->transaksiAnorganik()->sum('nilai_rupiah');
         $totalKeluar = $this->hasMany(PenarikanSaldo::class, 'nasabah_id')
