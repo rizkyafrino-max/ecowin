@@ -12,6 +12,9 @@ class HargaSampahSeeder extends Seeder
     public function run(): void
     {
         $admin = User::where('role', 'admin')->first();
+        if (! $admin) {
+            return;
+        }
 
         $hargaData = [
             'Bening' => 4000,
@@ -29,13 +32,10 @@ class HargaSampahSeeder extends Seeder
             $jenis = JenisSampah::where('nama_jenis', $namaJenis)->first();
 
             if ($jenis) {
-                HargaSampah::create([
-                    'jenis_sampah_id' => $jenis->id,
-                    'kondisi' => 'Utuh',
-                    'harga_per_kg' => $harga,
-                    'berlaku_mulai' => now(),
-                    'dibuat_oleh' => $admin->id,
-                ]);
+                HargaSampah::firstOrCreate(
+                    ['jenis_sampah_id' => $jenis->id, 'kondisi' => 'Utuh', 'berlaku_mulai' => now()->startOfMinute()],
+                    ['harga_per_kg' => $harga, 'dibuat_oleh' => $admin->id],
+                );
             }
         }
     }

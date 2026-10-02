@@ -11,19 +11,26 @@ class KategoriJenisSampahSeeder extends Seeder
     public function run(): void
     {
         $data = [
-            'Botol PET' => ['Bening', 'Bokong Putih', 'Warna'],
-            'Kertas' => ['HVS', 'Koran', 'Kardus'],
-            'Logam' => ['Besi', 'Aluminium', 'Kaleng'],
+            'Anorganik' => [
+                'Botol PET' => ['Bening', 'Bokong Putih', 'Warna'],
+                'Kertas' => ['HVS', 'Koran', 'Kardus'],
+                'Logam' => ['Besi', 'Aluminium', 'Kaleng'],
+            ],
+            'Organik' => [
+                'Organik Rumah Tangga' => ['Sisa makanan', 'Daun kering', 'Sampah kebun'],
+            ],
         ];
 
-        foreach ($data as $namaKategori => $jenisList) {
-            $kategori = KategoriSampah::create(['nama_kategori' => $namaKategori]);
+        foreach ($data as $jalur => $kategoriData) {
+            foreach ($kategoriData as $namaKategori => $jenisList) {
+                $kategori = KategoriSampah::firstOrCreate(['nama_kategori' => $jalur.' · '.$namaKategori]);
 
-            foreach ($jenisList as $namaJenis) {
-                JenisSampah::create([
-                    'kategori_sampah_id' => $kategori->id,
-                    'nama_jenis' => $namaJenis,
-                ]);
+                foreach ($jenisList as $namaJenis) {
+                    JenisSampah::firstOrCreate([
+                        'kategori_sampah_id' => $kategori->id,
+                        'nama_jenis' => $namaJenis,
+                    ]);
+                }
             }
         }
     }

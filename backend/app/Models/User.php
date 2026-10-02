@@ -63,6 +63,11 @@ class User extends Authenticatable implements FilamentUser, HasName
         return $this->belongsTo(BankSampah::class, 'bank_sampah_id');
     }
 
+    public function bankSampahDikelola()
+    {
+        return $this->belongsTo(BankSampah::class, 'bank_sampah_id');
+    }
+
     public function nasabahDibuat()
     {
         return $this->hasMany(Nasabah::class, 'dibuat_oleh');

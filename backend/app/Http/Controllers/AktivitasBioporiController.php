@@ -12,6 +12,7 @@ class AktivitasBioporiController extends Controller
     public function index(Request $request)
     {
         $actor = $request->user();
+        abort_unless($actor instanceof Nasabah || ($actor instanceof User && ($actor->isAdmin() || $actor->isPetugas())), 403);
         $query = AktivitasBiopori::with('nasabah')->latest();
         if ($actor instanceof Nasabah) {
             $query->where('nasabah_id', $actor->id);
@@ -45,6 +46,7 @@ class AktivitasBioporiController extends Controller
         $actor = $request->user();
         abort_unless($actor instanceof User && ($actor->isAdmin() || ($actor->isPetugas() && $actor->bank_sampah_id === $aktivitas->bank_sampah_id)), 403);
         $data = $request->validate(['status' => ['required', 'in:disetujui,ditolak'], 'catatan_petugas' => ['nullable', 'string']]);
+        abort_if($aktivitas->status !== 'menunggu', 422, 'Laporan ini sudah diverifikasi.');
         $aktivitas->update([...$data, 'diperiksa_oleh' => $actor->id, 'waktu_diperiksa' => now()]);
 
         return response()->json($aktivitas->fresh());

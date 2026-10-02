@@ -26,6 +26,7 @@ class DashboardController extends Controller
                 'biopori_menunggu' => $actor->aktivitasBiopori()->where('status', 'menunggu')->count(),
             ]);
         }
+        abort_unless($actor instanceof User && ($actor->isAdmin() || $actor->isPetugas()), 403);
         $bankId = $actor instanceof User && $actor->isPetugas() ? $actor->bank_sampah_id : null;
         $scope = fn ($q) => $bankId ? $q->where('bank_sampah_id', $bankId) : $q;
         $nasabah = Nasabah::when($bankId, fn ($q) => $q->where('bank_sampah_id', $bankId));

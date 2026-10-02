@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources\BankSampahs\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class BankSampahsTable
@@ -13,7 +12,11 @@ class BankSampahsTable
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('nama_bank_sampah')->searchable()->sortable(),
+                TextColumn::make('rt')->label('RT'),
+                TextColumn::make('rw')->label('RW'),
+                TextColumn::make('status')->badge(),
+                TextColumn::make('petugas.nama')->label('Petugas'),
             ])
             ->filters([
                 //
@@ -21,10 +24,6 @@ class BankSampahsTable
             ->recordActions([
                 EditAction::make(),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->toolbarActions([]);
     }
 }

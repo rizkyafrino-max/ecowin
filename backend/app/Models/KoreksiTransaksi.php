@@ -20,6 +20,19 @@ class KoreksiTransaksi extends Model
         'alasan',
     ];
 
+    protected $appends = ['ringkasan_transaksi'];
+
+    public function getRingkasanTransaksiAttribute(): string
+    {
+        $transaction = $this->transaksiAsli();
+
+        if (! $transaction) {
+            return 'Transaksi tidak ditemukan';
+        }
+
+        return $transaction->nasabah?->nama.' · '.$transaction->bankSampah?->nama_bank_sampah.' · '.($transaction->berat_kg ?? '');
+    }
+
     public function pengaju()
     {
         return $this->belongsTo(User::class, 'diajukan_oleh');

@@ -19,10 +19,10 @@ class BankSampah extends Model
         'status',
     ];
 
-    // Satu bank sampah punya satu petugas
+    // Satu bank sampah punya satu petugas berdasarkan penugasan pada akun user.
     public function petugas()
     {
-        return $this->hasOne(User::class, 'bank_sampah_id');
+        return $this->hasOne(User::class, 'bank_sampah_id')->where('role', 'petugas');
     }
 
     // Satu bank sampah punya banyak nasabah

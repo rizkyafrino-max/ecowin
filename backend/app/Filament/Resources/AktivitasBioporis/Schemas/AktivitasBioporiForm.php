@@ -15,13 +15,13 @@ class AktivitasBioporiForm
     {
         return $schema
             ->components([
-                TextInput::make('nasabah_id')->numeric()->required(),
-                DateTimePicker::make('tanggal_pemasukan')->required(),
-                TextInput::make('berat_kg')->numeric(),
-                Textarea::make('deskripsi'),
-                FileUpload::make('foto_bukti_path')->image()->required()->disk('public')->directory('bukti-biopori'),
-                Select::make('status')->options(['menunggu' => 'Menunggu', 'disetujui' => 'Disetujui', 'ditolak' => 'Ditolak'])->required(),
-                Textarea::make('catatan_petugas'),
+                Select::make('nasabah_id')->relationship('nasabah', 'nama')->disabled()->dehydrated(false)->visibleOn('edit'),
+                DateTimePicker::make('tanggal_pemasukan')->disabled()->dehydrated(false)->visibleOn('edit'),
+                TextInput::make('berat_kg')->numeric()->disabled()->dehydrated(false)->visibleOn('edit'),
+                Textarea::make('deskripsi')->disabled()->dehydrated(false)->visibleOn('edit'),
+                FileUpload::make('foto_bukti_path')->image()->disk('public')->directory('bukti-biopori')->disabled()->dehydrated(false)->visibleOn('edit'),
+                Select::make('status')->options(['disetujui' => 'Disetujui', 'ditolak' => 'Ditolak'])->required()->visibleOn('edit'),
+                Textarea::make('catatan_petugas')->visibleOn('edit'),
             ]);
     }
 }

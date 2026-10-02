@@ -10,10 +10,11 @@ class PenarikanSaldoObserver
 {
     public function updated(PenarikanSaldo $penarikan): void
     {
-        if ($penarikan->isDirty('status') && $penarikan->status === 'selesai' && Auth::id()) {
+        if ($penarikan->wasChanged('status') && in_array($penarikan->status, ['selesai', 'ditolak'], true) && Auth::id()) {
             AuditLog::create([
                 'user_id' => Auth::id(),
-                'aksi' => 'proses_penarikan_saldo',
+                'bank_sampah_id' => $penarikan->bank_sampah_id,
+                'aksi' => $penarikan->status === 'selesai' ? 'proses_penarikan_saldo' : 'tolak_penarikan_saldo',
                 'detail' => json_encode([
                     'penarikan_id' => $penarikan->id,
                     'nasabah_id' => $penarikan->nasabah_id,

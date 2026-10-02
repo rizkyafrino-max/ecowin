@@ -19,6 +19,7 @@ class HargaSampahObserver
 
         AuditLog::create([
             'user_id' => Auth::id(),
+            'bank_sampah_id' => Auth::user()?->bank_sampah_id,
             'aksi' => 'ubah_harga',
             'detail' => json_encode([
                 'jenis_sampah_id' => $hargaSampah->jenis_sampah_id,

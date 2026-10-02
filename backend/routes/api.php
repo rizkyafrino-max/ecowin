@@ -18,6 +18,8 @@ Route::post('/auth/nasabah-login', [AuthController::class, 'loginNasabah']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::patch('/auth/nasabah-pin', [AuthController::class, 'changeNasabahPin']);
+    Route::get('/nasabah/me', [NasabahController::class, 'me']);
+    Route::get('/nasabah/kartu', [NasabahController::class, 'kartu']);
 
     Route::get('/nasabah', [NasabahController::class, 'index']);
     Route::post('/nasabah', [NasabahController::class, 'store']);
@@ -35,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/transaksi', [TransaksiController::class, 'index']);
 
     Route::post('/penarikan', [PenarikanSaldoController::class, 'store']);
+    Route::get('/penarikan', [PenarikanSaldoController::class, 'index']);
     Route::patch('/penarikan/{penarikan}/proses', [PenarikanSaldoController::class, 'proses']);
 
     Route::post('/laporan-kendala', [LaporanKendalaController::class, 'store']);

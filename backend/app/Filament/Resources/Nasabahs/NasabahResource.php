@@ -26,7 +26,12 @@ class NasabahResource extends Resource
         $query = parent::getEloquentQuery();
         $user = auth()->user();
 
-        return $user?->isPetugas() ? $query->where('bank_sampah_id', $user->bank_sampah_id) : $query;
+        return $user?->isAdmin() ? $query : $query->where('bank_sampah_id', $user?->bank_sampah_id);
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->isAdmin() || auth()->user()?->isPetugas();
     }
 
     public static function form(Schema $schema): Schema

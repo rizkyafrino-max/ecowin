@@ -15,10 +15,7 @@ class Nasabah extends Authenticatable
 
     protected $fillable = [
         'bank_sampah_id',
-<<<<<<< HEAD
         'username',
-=======
->>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
         'nama',
         'no_hp',
         'alamat_rt_rw',
@@ -71,12 +68,12 @@ class Nasabah extends Authenticatable
         return $this->hasMany(AktivitasBiopori::class, 'nasabah_id');
     }
 
-    // Accessor: hitung saldo dari transaksi anorganik dikurangi penarikan yang selesai
-    public function getSaldoAttribute(): float
+    // Pending withdrawals reserve funds; completed withdrawals spend them.
+    public function getSaldoAttribute(): int
     {
         $totalMasuk = $this->transaksiAnorganik()->sum('nilai_rupiah');
         $totalKeluar = $this->hasMany(PenarikanSaldo::class, 'nasabah_id')
-            ->where('status', 'selesai')
+            ->whereIn('status', ['pending', 'selesai'])
             ->sum('jumlah');
 
         return $totalMasuk - $totalKeluar;

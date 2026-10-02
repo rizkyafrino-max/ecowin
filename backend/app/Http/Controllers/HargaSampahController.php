@@ -3,15 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\HargaSampah;
-use App\Models\JenisSampah;
+use App\Models\KategoriSampah;
+use App\Models\Nasabah;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class HargaSampahController extends Controller
 {
     // GET /api/harga — daftar harga aktif, grouped by kategori → jenis → kondisi
-    public function index()
+    public function index(Request $request)
     {
-        $kategoriList = \App\Models\KategoriSampah::with(['jenisSampah.hargaSampah' => function ($query) {
+        $actor = $request->user();
+        abort_unless($actor instanceof Nasabah || ($actor instanceof User && ($actor->isAdmin() || $actor->isPetugas())), 403);
+        $kategoriList = KategoriSampah::with(['jenisSampah.hargaSampah' => function ($query) {
             $query->orderByDesc('berlaku_mulai');
         }])->get();
 
@@ -40,6 +44,7 @@ class HargaSampahController extends Controller
     // GET /api/harga/riwayat/{jenis_sampah_id}
     public function riwayat($jenisSampahId)
     {
+        abort_unless(request()->user() instanceof User && (request()->user()->isAdmin() || request()->user()->isPetugas()), 403);
         $riwayat = HargaSampah::where('jenis_sampah_id', $jenisSampahId)
             ->orderByDesc('berlaku_mulai')
             ->get();
@@ -50,6 +55,7 @@ class HargaSampahController extends Controller
     // POST /api/harga — tambah harga baru (selalu INSERT, bukan UPDATE)
     public function store(Request $request)
     {
+        abort_unless($request->user() instanceof User && $request->user()->isAdmin(), 403);
         $validated = $request->validate([
             'jenis_sampah_id' => 'required|exists:jenis_sampah,id',
             'kondisi' => 'required|string',

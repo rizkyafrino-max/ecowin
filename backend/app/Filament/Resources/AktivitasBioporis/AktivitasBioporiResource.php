@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\AktivitasBioporis;
 
-use App\Filament\Resources\AktivitasBioporis\Pages\CreateAktivitasBiopori;
 use App\Filament\Resources\AktivitasBioporis\Pages\EditAktivitasBiopori;
 use App\Filament\Resources\AktivitasBioporis\Pages\ListAktivitasBioporis;
 use App\Filament\Resources\AktivitasBioporis\Schemas\AktivitasBioporiForm;
@@ -26,12 +25,22 @@ class AktivitasBioporiResource extends Resource
         $query = parent::getEloquentQuery();
         $user = auth()->user();
 
-        return $user?->isPetugas() ? $query->where('bank_sampah_id', $user->bank_sampah_id) : $query;
+        return $user?->isAdmin() ? $query : $query->where('bank_sampah_id', $user?->bank_sampah_id);
     }
 
     public static function form(Schema $schema): Schema
     {
         return AktivitasBioporiForm::configure($schema);
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->isAdmin() || auth()->user()?->isPetugas();
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 
     public static function table(Table $table): Table
@@ -50,7 +59,6 @@ class AktivitasBioporiResource extends Resource
     {
         return [
             'index' => ListAktivitasBioporis::route('/'),
-            'create' => CreateAktivitasBiopori::route('/create'),
             'edit' => EditAktivitasBiopori::route('/{record}/edit'),
         ];
     }

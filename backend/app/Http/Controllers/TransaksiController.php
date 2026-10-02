@@ -23,12 +23,14 @@ class TransaksiController extends Controller
             'nasabah_id' => ['required', 'exists:nasabah,id'],
             'harga_sampah_id' => ['required', 'exists:harga_sampah,id'],
             'berat_kg' => ['required', 'numeric', 'gt:0'],
-            'foto_dokumentasi' => ['nullable', 'image', 'max:2048'],
+            'foto_dokumentasi' => ['required', 'image', 'max:2048'],
         ]);
         $actor = $this->actor($request);
+        abort_unless($actor instanceof User && ($actor->isAdmin() || $actor->isPetugas()), 403);
         $nasabah = Nasabah::findOrFail($validated['nasabah_id']);
-        abort_if($actor instanceof Nasabah ? $nasabah->id !== $actor->id : ($actor->isPetugas() && $nasabah->bank_sampah_id !== $actor->bank_sampah_id), 403);
         $harga = HargaSampah::findOrFail($validated['harga_sampah_id']);
+        abort_if($actor->isPetugas() && $nasabah->bank_sampah_id !== $actor->bank_sampah_id, 403);
+        abort_if($harga->berlaku_mulai->isFuture(), 422, 'Harga ini belum berlaku.');
         $nilai = (int) round((float) $validated['berat_kg'] * $harga->harga_per_kg);
         $data = [
             'nasabah_id' => $nasabah->id,
@@ -58,7 +60,8 @@ class TransaksiController extends Controller
         abort_unless($validated['checklist_bebas_plastik'] && $validated['checklist_bebas_logam'], 422, 'Sampah organik wajib bebas plastik dan logam.');
         $actor = $this->actor($request);
         $nasabah = Nasabah::findOrFail($validated['nasabah_id']);
-        abort_if($actor instanceof Nasabah ? $nasabah->id !== $actor->id : ($actor->isPetugas() && $nasabah->bank_sampah_id !== $actor->bank_sampah_id), 403);
+        abort_unless($actor instanceof User && ($actor->isAdmin() || $actor->isPetugas()), 403);
+        abort_if($actor->isPetugas() && $nasabah->bank_sampah_id !== $actor->bank_sampah_id, 403);
 
         return response()->json(TransaksiOrganik::create([
             'nasabah_id' => $nasabah->id,
@@ -75,7 +78,11 @@ class TransaksiController extends Controller
     public function index(Request $request)
     {
         $actor = $request->user();
+        abort_unless($actor instanceof Nasabah || ($actor instanceof User && ($actor->isAdmin() || $actor->isPetugas())), 403);
         $nasabahId = $actor instanceof Nasabah ? $actor->id : $request->integer('nasabah_id');
+        if ($actor instanceof User && $actor->isPetugas() && $nasabahId) {
+            abort_unless(Nasabah::query()->whereKey($nasabahId)->where('bank_sampah_id', $actor->bank_sampah_id)->exists(), 403);
+        }
         $apply = function ($query) use ($actor, $nasabahId, $request) {
             if ($nasabahId) {
                 $query->where('nasabah_id', $nasabahId);

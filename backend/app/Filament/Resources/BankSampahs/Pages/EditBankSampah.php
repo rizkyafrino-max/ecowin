@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\BankSampahs\Pages;
 
 use App\Filament\Resources\BankSampahs\BankSampahResource;
-use Filament\Actions\DeleteAction;
+use App\Models\BankSampah;
 use Filament\Resources\Pages\EditRecord;
 
 class EditBankSampah extends EditRecord
@@ -12,8 +12,7 @@ class EditBankSampah extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [
-            DeleteAction::make(),
-        ];
+        return [];
     }
+
 }

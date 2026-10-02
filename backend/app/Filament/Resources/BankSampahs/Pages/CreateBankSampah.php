@@ -8,4 +8,5 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateBankSampah extends CreateRecord
 {
     protected static string $resource = BankSampahResource::class;
+
 }
