@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -103,7 +103,12 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
                 modifier = Modifier.align(Alignment.BottomCenter),
                 enter = slideInVertically { it } + fadeIn(),
                 exit = slideOutVertically { it } + fadeOut(),
-            ) { FloatingFooter(current, go) }
+            ) {
+                val density = androidx.compose.ui.platform.LocalDensity.current
+                androidx.compose.runtime.CompositionLocalProvider(
+                    androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(density.density, minOf(density.fontScale, 1.1f)),
+                ) { FloatingFooter(current, go) }
+            }
         }
     }
 }
@@ -151,7 +156,7 @@ private fun FloatingFooter(current: Tab, onSelect: (Tab) -> Unit, modifier: Modi
             color = Color.White.copy(alpha = 0.97f),
             border = BorderStroke(1.dp, Slate200),
         ) {
-            Row(Modifier.height(64.dp).padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.heightIn(min = 64.dp).padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                 FooterLeft.forEach { FooterItem(it, current == it, onSelect, Modifier.weight(1f)) }
                 Box(Modifier.weight(1f))
                 FooterRight.forEach { FooterItem(it, current == it, onSelect, Modifier.weight(1f)) }
