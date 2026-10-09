@@ -150,6 +150,30 @@ class NasabahService
         return $nasabah;
     }
 
+    /** Petugas/Admin menolak pendaftaran mandiri: akun dinonaktifkan (tidak bisa masuk), alasan tercatat di audit log. */
+    public function tolak(User $actor, Nasabah $nasabah, string $alasan): Nasabah
+    {
+        if (! $actor->isStaff() || ! $actor->canManageBankSampah($nasabah->bank_sampah_id)) {
+            throw new AuthorizationException('Anda tidak berhak menolak Nasabah ini.');
+        }
+
+        if ($nasabah->status_verifikasi !== 'pending') {
+            throw ValidationException::withMessages(['status' => ['Hanya pendaftaran yang masih menunggu yang dapat ditolak.']]);
+        }
+
+        $before = ['status' => $nasabah->status, 'status_verifikasi' => $nasabah->status_verifikasi];
+
+        DB::transaction(function () use ($nasabah): void {
+            $nasabah->forceFill(['status' => 'nonaktif'])->save();
+            $nasabah->user?->forceFill(['status' => User::STATUS_NONAKTIF])->save();
+            $nasabah->user?->tokens()->delete();
+        });
+
+        app(AuditLogger::class)->log('tolak_nasabah', $nasabah, $before, ['status' => 'nonaktif', 'alasan' => $alasan], $actor);
+
+        return $nasabah;
+    }
+
     public static function nomorNasabah(Nasabah $nasabah): string
     {
         return 'NSB-'.str_pad((string) $nasabah->id, 6, '0', STR_PAD_LEFT);

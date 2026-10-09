@@ -299,4 +299,30 @@ class UnifiedLoginTest extends TestCase
         $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
         app(\App\Services\NasabahService::class)->verifikasi($petugas, $lain);
     }
+
+    public function test_petugas_rejects_pending_registration_which_disables_the_account(): void
+    {
+        $bank = BankSampah::factory()->create();
+        $petugas = User::factory()->petugas($bank)->create();
+        $nasabah = Nasabah::factory()->forBank($bank)->create();
+        $nasabah->forceFill(['status_verifikasi' => 'pending'])->save();
+
+        app(\App\Services\NasabahService::class)->tolak($petugas, $nasabah, 'Data tidak sesuai warga RT');
+
+        $this->assertSame('nonaktif', $nasabah->fresh()->status);
+        $this->assertFalse($nasabah->user->fresh()->isActive());
+        $this->assertDatabaseHas('audit_log', ['aksi' => 'tolak_nasabah', 'model_id' => $nasabah->id, 'user_id' => $petugas->id]);
+        $this->actingAsApi($nasabah->user->fresh())->getJson('/api/auth/me')->assertForbidden();
+    }
+
+    public function test_verified_nasabah_cannot_be_rejected(): void
+    {
+        $bank = BankSampah::factory()->create();
+        $petugas = User::factory()->petugas($bank)->create();
+        $nasabah = Nasabah::factory()->forBank($bank)->create();
+        $nasabah->forceFill(['status_verifikasi' => 'verified'])->save();
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        app(\App\Services\NasabahService::class)->tolak($petugas, $nasabah, 'alasan apa saja');
+    }
 }
