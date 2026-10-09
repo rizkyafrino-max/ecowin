@@ -52,7 +52,17 @@ class BerandaHero extends Widget
             'biopori' => AktivitasBiopori::query()->visibleTo($user)->where('status', AktivitasBiopori::STATUS_PENDING)->count(),
             'penarikan' => PenarikanSaldo::query()->visibleTo($user)->where('status', PenarikanSaldo::STATUS_PENDING)->count(),
             'koreksi' => KoreksiTransaksi::query()->visibleTo($user)->where('status', KoreksiTransaksi::STATUS_PENDING)->count(),
+            'nasabah' => Nasabah::query()->visibleTo($user)->where('status_verifikasi', 'pending')->where('status', 'aktif')->count(),
         ];
+
+        // Pop-up pengingat saat membuka Beranda: hanya kategori yang punya tugas menunggu.
+        $filterNasabah = ['tableFilters' => ['status_verifikasi' => ['value' => 'pending']]];
+        $popup = array_values(array_filter([
+            ['label' => 'Pendaftaran nasabah baru', 'hint' => 'Perlu diverifikasi sebelum bisa menarik saldo', 'count' => $pending['nasabah'], 'url' => NasabahResource::getUrl('index', $filterNasabah)],
+            ['label' => 'Penarikan saldo', 'hint' => 'Menunggu persetujuan', 'count' => $pending['penarikan'], 'url' => PenarikanSaldoResource::getUrl('index')],
+            ['label' => 'Aktivitas organik', 'hint' => 'Menunggu verifikasi foto bukti', 'count' => $pending['biopori'], 'url' => AktivitasBioporiResource::getUrl('index')],
+            ['label' => 'Koreksi transaksi', 'hint' => 'Menunggu keputusan', 'count' => $pending['koreksi'], 'url' => \App\Filament\Resources\KoreksiTransaksis\KoreksiTransaksiResource::getUrl('index')],
+        ], fn (array $p): bool => $p['count'] > 0));
 
         $jam = (int) now()->format('G');
 
@@ -68,6 +78,7 @@ class BerandaHero extends Widget
                 ? ($user->bankSampah?->nama_bank_sampah ?? '-').' · RT '.($user->bankSampah?->rt ?? '-').'/RW '.($user->bankSampah?->rw ?? '-')
                 : 'Kamu mengelola seluruh Bank Sampah EcoWin',
             'pending' => $pending,
+            'popup' => $popup,
             'totalPending' => array_sum($pending),
             'urlPending' => $pending['biopori'] > 0 ? AktivitasBioporiResource::getUrl('index')
                 : ($pending['penarikan'] > 0 ? PenarikanSaldoResource::getUrl('index') : null),

@@ -1,5 +1,29 @@
 <x-filament-widgets::widget>
     <div class="eco-home">
+    @if (count($popup) > 0)
+        {{-- Pengingat tugas menunggu: muncul saat Beranda dibuka, dan muncul lagi bila jumlah tugas bertambah. --}}
+        <div x-data="{ open: false }"
+             x-init="try { const k = 'eco-popup-{{ $user->id }}'; const last = parseInt(sessionStorage.getItem(k) || '0'); if ({{ $totalPending }} > last) { open = true; sessionStorage.setItem(k, {{ $totalPending }}) } } catch (e) { open = true }"
+             x-show="open" x-cloak x-transition.opacity @keydown.escape.window="open = false"
+             class="eco-popup" role="dialog" aria-modal="true" aria-labelledby="eco-popup-title">
+            <div class="eco-popup-card" @click.outside="open = false">
+                <span class="eco-popup-ico"><x-filament::icon icon="heroicon-o-bell-alert" class="eco-ico" /></span>
+                <h2 id="eco-popup-title">Ada {{ $totalPending }} tugas menunggu</h2>
+                <p>Jangan sampai terlewat, nasabah dan petugas lain menunggu tindakan Anda.</p>
+                <ul>
+                    @foreach ($popup as $p)
+                        <li>
+                            <a href="{{ $p['url'] }}">
+                                <span><b>{{ $p['label'] }}</b><small>{{ $p['hint'] }}</small></span>
+                                <em>{{ $p['count'] }}</em>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+                <button type="button" @click="open = false">Nanti saja</button>
+            </div>
+        </div>
+    @endif
         {{-- Sapaan, pencarian, notifikasi --}}
         <header class="eco-home-top">
             <div class="eco-home-user">

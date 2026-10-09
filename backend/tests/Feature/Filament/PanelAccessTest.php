@@ -146,4 +146,20 @@ class PanelAccessTest extends TestCase
 
         $this->actingAs($petugas)->get('/admin')->assertForbidden();
     }
+
+    public function test_dashboard_popup_reminds_petugas_of_new_nasabah_to_verify(): void
+    {
+        $bank = \App\Models\BankSampah::factory()->create();
+        $petugas = \App\Models\User::factory()->petugas($bank)->create();
+        $baru = \App\Models\Nasabah::factory()->forBank($bank)->create();
+        $baru->forceFill(['status_verifikasi' => 'pending'])->save();
+        $lain = \App\Models\Nasabah::factory()->forBank(\App\Models\BankSampah::factory()->create())->create();
+        $lain->forceFill(['status_verifikasi' => 'pending'])->save();
+
+        $this->actingAs($petugas)->get('/admin')->assertOk()
+            ->assertSee('eco-popup', false)->assertSee('Ada 1 tugas menunggu')->assertSee('Pendaftaran nasabah baru');
+
+        $baru->forceFill(['status_verifikasi' => 'verified'])->save();
+        $this->get('/admin')->assertOk()->assertDontSee('eco-popup-title', false);
+    }
 }

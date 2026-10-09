@@ -242,4 +242,19 @@ html,html.dark{color-scheme:light!important;background:var(--eco-canvas)!importa
 .fi-page-has-sub-navigation .fi-wi-stats-overview-stat-description{display:none}
 .fi-page-has-sub-navigation .fi-ta-header-ctn{padding-block:.5rem 0!important}.fi-page-has-sub-navigation .fi-ta-header-toolbar{padding:.25rem .75rem!important;min-height:0!important}
 }
+/* ===== Pop-up pengingat tugas menunggu ===== */
+.eco-popup{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:1rem;background:rgba(15,23,42,.45);backdrop-filter:blur(2px)}
+.eco-popup-card{width:min(440px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:22px;padding:1.5rem;box-shadow:0 24px 60px rgba(15,23,42,.25);text-align:center}
+.eco-popup-ico{width:54px;height:54px;margin:0 auto .75rem;border-radius:16px;display:flex;align-items:center;justify-content:center;background:var(--eco-soft);color:var(--eco-primary)}
+.eco-popup-ico .eco-ico{width:28px;height:28px}
+.eco-popup-card h2{font-size:1.2rem;font-weight:800;color:var(--eco-ink)}
+.eco-popup-card>p{margin:.35rem 0 1rem;font-size:.85rem;color:var(--eco-muted)}
+.eco-popup-card ul{list-style:none;margin:0 0 1rem;padding:0;display:grid;gap:.5rem;text-align:left}
+.eco-popup-card li a{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.75rem .9rem;border:1px solid var(--eco-line);border-radius:14px;text-decoration:none;color:var(--eco-ink);transition:border-color .15s ease,background .15s ease}
+.eco-popup-card li a:hover{border-color:var(--eco-primary);background:var(--eco-soft)}
+.eco-popup-card li b{display:block;font-size:.9rem}
+.eco-popup-card li small{display:block;font-size:.75rem;color:var(--eco-muted)}
+.eco-popup-card li em{font-style:normal;min-width:30px;padding:.15rem .55rem;border-radius:999px;background:#DC2626;color:#fff;font-size:.8rem;font-weight:700;text-align:center}
+.eco-popup-card>button{width:100%;padding:.7rem;border-radius:12px;border:1px solid var(--eco-line);background:#fff;font-weight:600;color:var(--eco-muted);cursor:pointer}
+.eco-popup-card>button:hover{background:var(--eco-canvas)}
 </style>
