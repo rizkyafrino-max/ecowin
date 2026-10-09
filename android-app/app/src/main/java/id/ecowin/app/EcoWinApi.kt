@@ -15,6 +15,13 @@ interface EcoWinApi {
     @POST("auth/google")
     suspend fun loginGoogle(@Body body: GoogleLoginRequest): LoginResponse
 
+    /** Daftar Nasabah baru: ID token Google + data diri. Status awal menunggu verifikasi petugas. */
+    @POST("auth/register")
+    suspend fun register(@Body body: RegisterRequest): LoginResponse
+
+    @GET("bank-sampah/publik")
+    suspend fun bankSampahPublik(): DataWrapper<List<BankPublikDto>>
+
     /** Dipanggil dengan refresh token (bukan access token). */
     @POST("auth/refresh")
     suspend fun refresh(@Header("Authorization") bearerRefresh: String): TokenPair

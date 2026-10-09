@@ -120,6 +120,10 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
             },
             googleAuth = googleAuth,
             client = client,
+            onRegistered = { response ->
+                session.save(response.tokens())
+                state = AppState.LoggedIn(response.user)
+            },
         )
         is AppState.LoggedIn -> MainScreen(
             user = s.user,

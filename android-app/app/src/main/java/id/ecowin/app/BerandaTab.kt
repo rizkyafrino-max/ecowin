@@ -24,6 +24,12 @@ fun BerandaTab(client: ApiClient, user: UserDto, refreshKey: Int) {
         item {
             LoadableContent(state) { d ->
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (user.nasabah?.statusVerifikasi == "pending") {
+                        EcoCard {
+                            Text("Akun menunggu verifikasi petugas", fontWeight = FontWeight.Bold, color = Amber)
+                            Text("Petugas Bank Sampah Anda akan memeriksa data pendaftaran. Penarikan saldo aktif setelah akun diverifikasi.", color = Slate500, fontSize = 13.sp)
+                        }
+                    }
                     Column(
                         Modifier.fillMaxWidth().background(Emerald, RoundedCornerShape(18.dp)).padding(18.dp),
                     ) {

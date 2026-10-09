@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,7 +33,13 @@ fun LoginScreen(
     onGoogleToken: suspend (String) -> Unit,
     googleAuth: GoogleAuth,
     client: ApiClient,
+    onRegistered: (LoginResponse) -> Unit,
 ) {
+    var registering by remember { mutableStateOf(false) }
+    if (registering) {
+        RegisterScreen(googleAuth, client, onRegistered = onRegistered, onBack = { registering = false })
+        return
+    }
     var message by remember { mutableStateOf(initialMessage) }
     var loading by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -81,6 +88,11 @@ fun LoginScreen(
             fontSize = 13.sp,
             textAlign = TextAlign.Center,
         )
+
+        TextButton(onClick = { registering = true }) {
+            Text("Belum punya akun? ", color = Slate500)
+            Text("Daftar akun baru", color = Emerald, fontWeight = FontWeight.Bold)
+        }
 
         message?.let { Text(it, color = Red, fontSize = 14.sp, textAlign = TextAlign.Center) }
     }

@@ -26,8 +26,8 @@ class SecurityTest extends TestCase
 
     public function test_every_api_route_except_login_endpoints_requires_authentication(): void
     {
-        // Dua-duanya sengaja publik: keduanya memverifikasi kredensial sendiri (ID token Google / kode sekali pakai + PKCE).
-        $publik = ['api/auth/google', 'api/auth/exchange'];
+        // Sengaja publik: memverifikasi kredensial sendiri (ID token Google / kode sekali pakai + PKCE); daftar Bank Sampah aktif hanya nama dan RT/RW untuk form daftar.
+        $publik = ['api/auth/google', 'api/auth/exchange', 'api/auth/register', 'api/bank-sampah/publik'];
 
         $routes = collect(Route::getRoutes()->getRoutes())
             ->filter(fn ($r) => str_starts_with($r->uri(), 'api/') && ! in_array($r->uri(), $publik, true));

@@ -7,6 +7,18 @@ package id.ecowin.app
 
 data class GoogleLoginRequest(val idToken: String, val deviceName: String)
 
+data class RegisterRequest(
+    val idToken: String,
+    val deviceName: String,
+    val nama: String,
+    val noHp: String,
+    val alamatRtRw: String,
+    val bankSampahId: Long,
+    val setuju: Boolean,
+)
+
+data class BankPublikDto(val id: Long, val nama: String?, val rt: String?, val rw: String?)
+
 data class TokenPair(
     val tokenType: String = "Bearer",
     val accessToken: String,
@@ -50,6 +62,7 @@ data class NasabahDto(
     val alamatRtRw: String?,
     val saldo: Double = 0.0,
     val status: String?,
+    val statusVerifikasi: String? = null,
     val bankSampah: BankSampahDto?,
 )
 

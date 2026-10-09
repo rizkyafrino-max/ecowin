@@ -179,4 +179,51 @@ class GoogleApiAuthTest extends TestCase
         $this->assertNull($nasabah->user->fresh()->google_id);
         $this->postJson('/api/auth/google', ['id_token' => $this->googleToken('email.baru@gmail.com', sub: 'akun-baru')])->assertOk();
     }
+
+    private function dataDiri(array $override = []): array
+    {
+        return [
+            'nama' => 'Warga Baru', 'no_hp' => '0812-3456-7890', 'alamat_rt_rw' => 'Jl. Melati No. 7 RT 01/05',
+            'bank_sampah_id' => \App\Models\BankSampah::factory()->create()->id, 'setuju' => true, ...$override,
+        ];
+    }
+
+    public function test_register_with_google_token_creates_pending_nasabah_and_returns_tokens(): void
+    {
+        $data = $this->dataDiri();
+
+        $response = $this->postJson('/api/auth/register', ['id_token' => $this->googleToken('warga.baru@gmail.com'), 'device_name' => 'Infinix', 'role' => 'admin', 'email' => 'admin@x.id'] + $data)
+            ->assertCreated()
+            ->assertJsonPath('user.role', 'nasabah')
+            ->assertJsonPath('user.nasabah.status_verifikasi', 'pending');
+
+        $user = User::where('email', 'warga.baru@gmail.com')->firstOrFail();
+        $this->assertSame('081234567890', $user->nasabah->no_hp);
+        $this->assertDatabaseMissing('users', ['email' => 'admin@x.id']);
+        $this->assertDatabaseHas('audit_log', ['aksi' => 'daftar_mandiri', 'user_id' => $user->id]);
+        $this->withToken($response->json('access_token'))->getJson('/api/auth/me')->assertOk();
+    }
+
+    public function test_register_rejects_invalid_data_unverified_email_and_existing_accounts(): void
+    {
+        $this->postJson('/api/auth/register', ['id_token' => $this->googleToken('a@gmail.com')] + $this->dataDiri(['no_hp' => '123', 'setuju' => false]))
+            ->assertStatus(422)->assertJsonValidationErrors(['no_hp', 'setuju']);
+
+        $this->postJson('/api/auth/register', ['id_token' => $this->googleToken('b@gmail.com', verified: false)] + $this->dataDiri())
+            ->assertStatus(422);
+
+        $ada = Nasabah::factory()->create();
+        $this->postJson('/api/auth/register', ['id_token' => $this->googleToken($ada->user->email)] + $this->dataDiri())->assertStatus(422);
+        $this->postJson('/api/auth/register', ['id_token' => str_repeat('a', 200)] + $this->dataDiri())->assertStatus(401);
+    }
+
+    public function test_public_bank_list_exposes_only_active_banks_without_sensitive_data(): void
+    {
+        $aktif = \App\Models\BankSampah::factory()->create();
+        \App\Models\BankSampah::factory()->create(['status' => 'nonaktif']);
+
+        $res = $this->getJson('/api/bank-sampah/publik')->assertOk();
+        $this->assertSame([$aktif->id], collect($res->json('data'))->pluck('id')->all());
+        $this->assertSame(['id', 'nama', 'rt', 'rw'], array_keys($res->json('data.0')));
+    }
 }

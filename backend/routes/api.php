@@ -20,6 +20,9 @@ use Illuminate\Support\Facades\Route;
 */
 Route::post('/auth/google', [AuthController::class, 'google'])->middleware('throttle:auth')->name('api.auth.google');
 
+Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:auth')->name('api.auth.register');
+Route::get('/bank-sampah/publik', [AuthController::class, 'bankSampahPublik'])->middleware('throttle:auth')->name('api.bank-sampah.publik');
+
 // Serah-terima login web Nasabah: kode sekali pakai + PKCE verifier -> token.
 Route::post('/auth/exchange', [WebLoginController::class, 'exchange'])->middleware('throttle:auth')->name('api.auth.exchange');
 
