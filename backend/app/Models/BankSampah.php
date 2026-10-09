@@ -13,16 +13,25 @@ class BankSampah extends Model
 
     protected $fillable = [
         'nama_bank_sampah',
+        'kode',
         'rt',
         'rw',
         'alamat',
+        'kelurahan',
+        'kecamatan',
+        'kota',
         'status',
     ];
 
-    // Satu bank sampah punya satu petugas
+    // Satu bank sampah dapat memiliki beberapa petugas
     public function petugas()
     {
-        return $this->hasOne(User::class, 'bank_sampah_id');
+        return $this->hasMany(User::class, 'bank_sampah_id')->where('role', 'petugas');
+    }
+
+    public function petugasAktif()
+    {
+        return $this->petugas();
     }
 
     // Satu bank sampah punya banyak nasabah
@@ -53,5 +62,15 @@ class BankSampah extends Model
     public function getLabelAttribute(): string
     {
         return "RT {$this->rt}/RW {$this->rw} — {$this->nama_bank_sampah}";
+    }
+
+    public function penarikanSaldo()
+    {
+        return $this->hasMany(PenarikanSaldo::class, 'bank_sampah_id');
+    }
+
+    public function titikBiopori()
+    {
+        return $this->hasMany(TitikBiopori::class, 'bank_sampah_id');
     }
 }

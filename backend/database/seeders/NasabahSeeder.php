@@ -5,22 +5,37 @@ namespace Database\Seeders;
 use App\Models\BankSampah;
 use App\Models\Nasabah;
 use App\Models\User;
+use App\Services\NasabahService;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class NasabahSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('role', 'admin')->first();
-        $bank = BankSampah::first();
-<<<<<<< HEAD
-        foreach ([['budi001', 'Budi Santoso', '081234567001'], ['siti002', 'Siti Aminah', '081234567002']] as [$username, $nama, $noHp]) {
-            Nasabah::updateOrCreate(['no_hp' => $noHp], ['username' => $username, 'bank_sampah_id' => $bank->id, 'nama' => $nama, 'alamat_rt_rw' => 'RT 01 / RW 05', 'pin' => '123456', 'kartu_qr_token' => Str::random(48), 'status_verifikasi' => 'verified', 'dibuat_oleh' => $admin->id]);
-=======
-        foreach ([['Budi Santoso', '081234567001'], ['Siti Aminah', '081234567002']] as [$nama, $noHp]) {
-            Nasabah::updateOrCreate(['no_hp' => $noHp], ['bank_sampah_id' => $bank->id, 'nama' => $nama, 'alamat_rt_rw' => 'RT 01 / RW 05', 'pin' => '123456', 'kartu_qr_token' => Str::random(48), 'status_verifikasi' => 'verified', 'dibuat_oleh' => $admin->id]);
->>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
+        $admin = User::query()->where('role', 'admin')->firstOrFail();
+        $banks = BankSampah::query()->orderBy('id')->get();
+
+        $data = [
+            [env('ECOWIN_SEED_NASABAH_EMAIL', 'nasabah.budi.ecowin@gmail.com'), 'Budi Santoso', '081234567001', 0],
+            ['nasabah.siti.ecowin@gmail.com', 'Siti Aminah', '081234567002', 0],
+            ['nasabah.agus.ecowin@gmail.com', 'Agus Wibowo', '081234567003', 1],
+            ['nasabah.rina.ecowin@gmail.com', 'Rina Lestari', '081234567004', 2],
+        ];
+
+        foreach ($data as [$email, $nama, $noHp, $bankIndex]) {
+            if (User::query()->where('email', $email)->exists() || Nasabah::query()->where('no_hp', $noHp)->exists()) {
+                continue;
+            }
+
+            $bank = $banks[$bankIndex] ?? $banks->first();
+
+            app(NasabahService::class)->daftarkan($admin, [
+                'nama' => $nama,
+                'email' => $email,
+                'no_hp' => $noHp,
+                'alamat_rt_rw' => "RT {$bank->rt} / RW {$bank->rw}",
+                'bank_sampah_id' => $bank->id,
+            ]);
         }
     }
 }

@@ -35,4 +35,22 @@ return [
         ],
     ],
 
+    /*
+    | Google Sign-In (semua role). Backend SELALU memverifikasi ID token Google
+    | (signature, issuer, audience/client ID, expiry, email_verified).
+    */
+    'google' => [
+        // OAuth client "Web application" (dipakai dashboard Filament).
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', rtrim((string) env('APP_URL', 'http://localhost'), '/').'/auth/google/callback'),
+        // Audience yang diterima untuk ID token dari aplikasi Android.
+        // Android (Credential Manager) memakai serverClientId = GOOGLE_CLIENT_ID,
+        // sehingga aud token = web client ID. Client ID tambahan dipisah koma.
+        'allowed_audiences' => array_values(array_filter(array_map('trim', explode(',', (string) env('GOOGLE_CLIENT_ID').','.(string) env('GOOGLE_EXTRA_CLIENT_IDS', ''))))),
+        'certs_url' => 'https://www.googleapis.com/oauth2/v1/certs',
+        'auth_url' => 'https://accounts.google.com/o/oauth2/v2/auth',
+        'token_url' => 'https://oauth2.googleapis.com/token',
+    ],
+
 ];

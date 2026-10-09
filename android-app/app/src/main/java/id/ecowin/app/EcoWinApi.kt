@@ -1,50 +1,74 @@
 package id.ecowin.app
 
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
-import retrofit2.http.Body
-import retrofit2.http.Multipart
-import retrofit2.http.Part
-import retrofit2.http.Query
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-
-<<<<<<< HEAD
-data class LoginRequest(val username: String, val pin: String)
-data class ChangePinRequest(val pin_lama: String, val pin_baru: String)
-=======
-data class LoginRequest(val no_hp: String, val pin: String)
->>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Multipart
+import retrofit2.http.PATCH
+import retrofit2.http.POST
+import retrofit2.http.Part
 
 interface EcoWinApi {
-    @POST("api/auth/nasabah-login")
-    suspend fun login(@Body request: LoginRequest): LoginResponse
+    /** Satu-satunya cara login: Google ID token diverifikasi server. */
+    @POST("auth/google")
+    suspend fun loginGoogle(@Body body: GoogleLoginRequest): LoginResponse
 
-<<<<<<< HEAD
-    @POST("api/auth/logout")
-    suspend fun logout(@Header("Authorization") token: String)
+    /** Dipanggil dengan refresh token (bukan access token). */
+    @POST("auth/refresh")
+    suspend fun refresh(@Header("Authorization") bearerRefresh: String): TokenPair
 
-    @retrofit2.http.PATCH("api/auth/nasabah-pin")
-    suspend fun changePin(@Header("Authorization") token: String, @Body request: ChangePinRequest)
+    @GET("auth/me")
+    suspend fun me(): DataWrapper<UserDto>
 
-=======
->>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
-    @GET("api/dashboard/ringkasan")
-    suspend fun dashboard(@Header("Authorization") token: String): DashboardResponse
+    @POST("auth/logout")
+    suspend fun logout()
 
-    @GET("api/transaksi")
-    suspend fun transactions(@Header("Authorization") token: String, @Query("tipe") type: String = "semua"): TransactionResponse
+    @PATCH("profile")
+    suspend fun updateProfile(@Body body: ProfileUpdateRequest): DataWrapper<UserDto>
 
-    @GET("api/organik/biopori")
-    suspend fun biopori(@Header("Authorization") token: String): List<BioporiActivity>
+    @GET("dashboard/summary")
+    suspend fun dashboard(): DashboardDto
+
+    @GET("me/saldo")
+    suspend fun saldo(): SaldoDto
+
+    @GET("me/mutasi-saldo")
+    suspend fun mutasi(): Paged<MutasiDto>
+
+    @GET("me/qr")
+    suspend fun qr(): QrDto
+
+    @GET("harga")
+    suspend fun harga(): DataWrapper<List<KategoriHargaDto>>
+
+    @GET("transaksi/anorganik")
+    suspend fun transaksiAnorganik(): Paged<TransaksiAnorganikDto>
+
+    @GET("organik")
+    suspend fun organik(): Paged<TransaksiOrganikDto>
+
+    @GET("organik/biopori/lokasi")
+    suspend fun lokasiBiopori(): DataWrapper<List<TitikBioporiDto>>
+
+    @GET("organik/biopori")
+    suspend fun aktivitasBiopori(): Paged<AktivitasBioporiDto>
 
     @Multipart
-    @POST("api/organik/biopori")
-    suspend fun submitBiopori(
-        @Header("Authorization") token: String,
-        @Part("tanggal_pemasukan") date: RequestBody,
-        @Part("deskripsi") description: RequestBody,
-        @Part photo: MultipartBody.Part,
-    ): BioporiActivity
+    @POST("organik/biopori")
+    suspend fun laporBiopori(
+        @Part("titik_biopori_id") titikId: RequestBody,
+        @Part("tanggal_pemasukan") tanggal: RequestBody,
+        @Part("jenis_sampah") jenisSampah: RequestBody,
+        @Part("berat_kg") beratKg: RequestBody,
+        @Part("catatan") catatan: RequestBody,
+        @Part foto: MultipartBody.Part,
+    ): DataWrapper<AktivitasBioporiDto>
+
+    @GET("penarikan")
+    suspend fun penarikan(): Paged<PenarikanDto>
+
+    @POST("penarikan")
+    suspend fun ajukanPenarikan(@Body body: PenarikanRequest): DataWrapper<PenarikanDto>
 }

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class JenisSampah extends Model
 {
@@ -14,26 +16,22 @@ class JenisSampah extends Model
     protected $fillable = [
         'kategori_sampah_id',
         'nama_jenis',
+        'satuan',
+        'status',
     ];
 
-    // Relasi: Jenis ini milik satu Kategori
-    public function kategori()
+    protected $attributes = [
+        'satuan' => 'kg',
+        'status' => 'aktif',
+    ];
+
+    public function kategori(): BelongsTo
     {
         return $this->belongsTo(KategoriSampah::class, 'kategori_sampah_id');
     }
 
-    // Relasi: satu Jenis punya banyak riwayat Harga
-    public function hargaSampah()
+    public function hargaSampah(): HasMany
     {
         return $this->hasMany(HargaSampah::class, 'jenis_sampah_id');
-    }
-
-    // Accessor: ambil harga AKTIF (berlaku_mulai terbaru) untuk kondisi tertentu
-    public function hargaAktif($kondisi)
-    {
-        return $this->hargaSampah()
-            ->where('kondisi', $kondisi)
-            ->orderByDesc('berlaku_mulai')
-            ->first();
     }
 }

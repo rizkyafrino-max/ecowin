@@ -2,15 +2,16 @@
 
 namespace Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
+use App\Services\KomposCalculator;
+use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    /**
-     * A basic test example.
-     */
-    public function test_that_true_is_true(): void
+    public function test_kompos_estimate_uses_configurable_ratio(): void
     {
-        $this->assertTrue(true);
+        config(['ecowin.kompos.rasio_default' => 0.5, 'ecowin.kompos.rasio_per_metode.maggot' => 0.3]);
+
+        $this->assertSame(5.0, app(KomposCalculator::class)->estimasi(10));
+        $this->assertSame(3.0, app(KomposCalculator::class)->estimasi(10, 'maggot'));
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Enums\Role;
+use App\Models\BankSampah;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 /**
  * @extends Factory<User>
@@ -13,33 +13,31 @@ use Illuminate\Support\Str;
 class UserFactory extends Factory
 {
     /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
-
-    /**
-     * Define the model's default state.
-     *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'nama' => fake()->name(),
+            'email' => fake()->unique()->userName().'@gmail.com',
+            'role' => Role::Admin->value,
+            'status' => User::STATUS_AKTIF,
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
+    public function admin(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return $this->state(['role' => Role::Admin->value, 'bank_sampah_id' => null]);
+    }
+
+    public function petugas(?BankSampah $bank = null): static
+    {
+        return $this->state(fn () => ['role' => Role::Petugas->value, 'bank_sampah_id' => $bank?->id ?? BankSampah::factory()]);
+    }
+
+    public function nonaktif(): static
+    {
+        return $this->state(['status' => User::STATUS_NONAKTIF]);
     }
 }
