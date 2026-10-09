@@ -93,7 +93,7 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
                     Tab.Transaksi -> TransaksiTab(client, refreshKey)
                     Tab.Fitur -> FiturTab(go)
                     Tab.Organik -> OrganikTab(client, refreshKey)
-                    Tab.Saldo -> SaldoTab(client, refreshKey)
+                    Tab.Saldo -> SaldoTab(client, user, refreshKey)
                     Tab.Profil -> ProfilTab(client, user, refreshKey, onUserChanged, onLogout)
                 }
             }
@@ -126,7 +126,10 @@ private fun TopBar(user: UserDto, current: Tab, onRefresh: () -> Unit, onProfile
                 Text("Win", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Emerald)
             }
         } else {
-            Text(current.label, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
+            Column {
+                Text(current.label, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
+                subjudul(current)?.let { Text(it, fontSize = 13.sp, color = Slate500, modifier = Modifier.padding(end = 8.dp)) }
+            }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onRefresh) { Icon(Lucide.RefreshCw, contentDescription = "Muat ulang", tint = Slate500, modifier = Modifier.size(22.dp)) }
@@ -200,4 +203,13 @@ fun TabList(content: LazyListScope.() -> Unit) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
         content = content,
     )
+}
+
+private fun subjudul(tab: Tab): String? = when (tab) {
+    Tab.Transaksi -> "Riwayat setoran sampah anorganik Anda."
+    Tab.Organik -> "Kelola aktivitas organikmu. Organik tidak menjadi saldo rupiah."
+    Tab.Saldo -> "Riwayat perubahan saldo EcoWin Anda."
+    Tab.Profil -> "Data akun dan QR Card Anda."
+    Tab.Fitur -> "Semua yang bisa Anda lakukan di EcoWin."
+    else -> null
 }

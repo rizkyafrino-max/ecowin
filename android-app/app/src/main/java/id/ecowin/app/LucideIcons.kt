@@ -129,4 +129,25 @@ object Lucide {
         "M12 9v4",
         "M12 17h.01"
     ) }
+
+    val ArrowDownLeft: ImageVector by lazy { icon("ArrowDownLeft",
+        "M17 7 7 17",
+        "M17 17H7V7"
+    ) }
+
+    val ArrowUpRight: ImageVector by lazy { icon("ArrowUpRight",
+        "M7 7h10v10",
+        "M7 17 17 7"
+    ) }
+
+    val ArrowUpFromLine: ImageVector by lazy { icon("ArrowUpFromLine",
+        "m18 9-6-6-6 6",
+        "M12 3v14",
+        "M5 21h14"
+    ) }
+
+    val Mail: ImageVector by lazy { icon("Mail",
+        "M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-16a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2Z",
+        "m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"
+    ) }
 }

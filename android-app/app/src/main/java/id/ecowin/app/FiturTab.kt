@@ -45,7 +45,6 @@ private val Grup: List<Pair<String, List<Fitur>>> = listOf(
 @Composable
 fun FiturTab(onNavigate: (Tab) -> Unit) {
     TabList {
-        item { Text("Semua yang bisa Anda lakukan di EcoWin.", color = Slate500, fontSize = 14.sp) }
         Grup.forEach { (judul, daftar) ->
             item { Text(judul, color = Slate500, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, modifier = Modifier.padding(top = 4.dp)) }
             daftar.forEach { f ->

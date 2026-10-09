@@ -58,12 +58,21 @@ fun OrganikTab(client: ApiClient, refreshKey: Int) {
                 LoadableContent(aktivitas) { akt ->
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         SectionTitle("Aktivitas Terbaru")
-                        if (list.isEmpty() && akt.isEmpty()) EmptyText("Belum ada aktivitas organik.")
+                        if (list.isEmpty() && akt.isEmpty()) ListCard { EmptyText("Belum ada aktivitas organik. Tambahkan aktivitas pertama Anda dengan foto bukti.") }
                         // Gabungan dua sumber, terbaru di atas.
                         val gabungan = list.map { Triple(it.tanggal.orEmpty(), true, it) } +
                             akt.map { Triple(it.tanggalPemasukan.orEmpty(), false, it) }
-                        gabungan.sortedByDescending { it.first }.forEach { (_, setoranCatatan, data) ->
-                            if (setoranCatatan) SetoranOrganikRow(data as TransaksiOrganikDto) else BioporiRow(data as AktivitasBioporiDto)
+                        if (list.isNotEmpty() || akt.isNotEmpty()) ListCard {
+                            gabungan.sortedByDescending { it.first }.forEachIndexed { i, (_, setoranCatatan, data) ->
+                                if (i > 0) RowDivider()
+                                if (setoranCatatan) {
+                                    val o = data as TransaksiOrganikDto
+                                    ActivityRow(Lucide.Recycle, o.jenisOrganik ?: "Setoran organik", tanggal(o.tanggal, false) + " · " + (o.lokasi ?: "Tanpa lokasi"), kg(o.beratKg), o.statusPengolahan)
+                                } else {
+                                    val a = data as AktivitasBioporiDto
+                                    ActivityRow(Lucide.Leaf, a.jenisSampah ?: "Aktivitas organik", "BioporiPrint · " + (a.lokasi ?: "Lokasi") + " · " + tanggal(a.tanggalPemasukan, false), kg(a.beratKg), a.status)
+                                }
+                            }
                         }
                     }
                 }

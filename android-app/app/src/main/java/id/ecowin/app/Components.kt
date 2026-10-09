@@ -123,7 +123,7 @@ fun StatusBadge(status: String?) {
 }
 
 @Composable
-fun StatTile(label: String, value: String, modifier: Modifier = Modifier, icon: androidx.compose.ui.graphics.vector.ImageVector? = null, hint: String? = null) {
+fun StatTile(label: String, value: String, modifier: Modifier = Modifier, icon: androidx.compose.ui.graphics.vector.ImageVector? = null, hint: String? = null, warn: Boolean = false) {
     Column(
         modifier
             .background(Color.White, RoundedCornerShape(20.dp))
@@ -132,8 +132,8 @@ fun StatTile(label: String, value: String, modifier: Modifier = Modifier, icon: 
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         if (icon != null) {
-            Box(Modifier.size(40.dp).background(EmeraldSoft, RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) {
-                androidx.compose.material3.Icon(icon, contentDescription = null, tint = Emerald, modifier = Modifier.size(20.dp))
+            Box(Modifier.size(40.dp).background(if (warn) AmberSoft else EmeraldSoft, RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) {
+                androidx.compose.material3.Icon(icon, contentDescription = null, tint = if (warn) Amber else Emerald, modifier = Modifier.size(20.dp))
             }
             androidx.compose.foundation.layout.Spacer(Modifier.size(6.dp))
         }

@@ -67,7 +67,8 @@ fun BerandaTab(client: ApiClient, user: UserDto, refreshKey: Int, onNavigate: (T
                 BalanceCard(
                     saldo = d.saldo ?: 0.0,
                     detail = if (s != null) "Tersedia ${rupiah(s.saldoTersedia)} · Ditahan ${rupiah(s.saldoDitahan)}" else (user.nasabah?.nomorNasabah ?: ""),
-                    onTarik = { onNavigate(Tab.Saldo) },
+                    actionLabel = "Tarik saldo",
+                    onAction = { onNavigate(Tab.Saldo) },
                 )
             }
         }
@@ -87,14 +88,14 @@ fun BerandaTab(client: ApiClient, user: UserDto, refreshKey: Int, onNavigate: (T
                     }
 
                     SectionTitle("Transaksi terbaru")
-                    val trx = d.transaksiTerakhir.orEmpty()
-                    if (trx.isEmpty()) EmptyText("Belum ada transaksi.")
-                    trx.forEach { TransaksiRow(it) }
+                    ListCardOf(d.transaksiTerakhir.orEmpty(), "Belum ada transaksi.") { t ->
+                        TransactionRow(t.jenisSampah ?: "Setoran anorganik", kg(t.beratKg) + " · " + tanggal(t.createdAt), rupiah(t.nilaiRupiah), kredit = true)
+                    }
 
                     SectionTitle("Aktivitas organik")
-                    val bio = d.bioporiTerakhir.orEmpty()
-                    if (bio.isEmpty()) EmptyText("Belum ada aktivitas organik.")
-                    bio.forEach { BioporiRow(it) }
+                    ListCardOf(d.bioporiTerakhir.orEmpty(), "Belum ada aktivitas organik.") { a ->
+                        ActivityRow(Lucide.Leaf, a.jenisSampah ?: "Aktivitas organik", (a.lokasi ?: "Lokasi") + " · " + tanggal(a.tanggalPemasukan, false), kg(a.beratKg), a.status)
+                    }
                 }
             }
         }
@@ -113,31 +114,6 @@ private fun sapaan(): String = when (java.time.LocalTime.now().hour) {
     in 11..14 -> "Selamat siang"
     in 15..17 -> "Selamat sore"
     else -> "Selamat malam"
-}
-
-/** Kartu saldo hijau dengan lingkaran dekoratif dan tombol Tarik saldo (sama dengan Web). */
-@Composable
-private fun BalanceCard(saldo: Double, detail: String, onTarik: () -> Unit) {
-    Box(
-        Modifier.fillMaxWidth()
-            .background(Brush.linearGradient(listOf(Emerald, Color(0xFF10B981))), RoundedCornerShape(24.dp)),
-    ) {
-        Box(Modifier.align(Alignment.TopEnd).padding(top = 0.dp, end = 0.dp).size(120.dp).background(Color.White.copy(alpha = 0.10f), CircleShape))
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("Saldo EcoWin", color = Color(0xFFD1FAE5), fontSize = 14.sp)
-            Text(rupiah(saldo), color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.ExtraBold)
-            Text(detail, color = Color(0xFFD1FAE5), fontSize = 12.sp)
-            Text(
-                "Tarik saldo",
-                color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
-                modifier = Modifier.padding(top = 12.dp)
-                    .background(Color.White.copy(alpha = 0.18f), RoundedCornerShape(999.dp))
-                    .border(1.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(999.dp))
-                    .clickable(onClick = onTarik)
-                    .padding(horizontal = 18.dp, vertical = 10.dp),
-            )
-        }
-    }
 }
 
 private data class Aksi(val tab: Tab, val icon: ImageVector, val label: String)
