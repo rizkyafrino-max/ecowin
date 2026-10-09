@@ -7,6 +7,8 @@ package id.ecowin.app
 
 data class GoogleLoginRequest(val idToken: String, val deviceName: String)
 
+data class StatistikDto(val labels: List<String> = emptyList(), val berat: List<Double> = emptyList(), val nilai: List<Long> = emptyList())
+
 data class RegisterRequest(
     val idToken: String,
     val deviceName: String,

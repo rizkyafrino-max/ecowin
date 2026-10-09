@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -29,6 +31,7 @@ import androidx.compose.ui.unit.sp
 fun BerandaTab(client: ApiClient, user: UserDto, refreshKey: Int, onNavigate: (Tab) -> Unit) {
     val state = rememberLoadable(client, refreshKey) { client.api.dashboard() }
     val saldo = rememberLoadable(client, refreshKey) { client.api.saldo() }
+    val statistik = rememberLoadable(client, refreshKey) { client.api.statistik(6) }
 
     TabList {
         item {
@@ -93,6 +96,13 @@ fun BerandaTab(client: ApiClient, user: UserDto, refreshKey: Int, onNavigate: (T
                     if (bio.isEmpty()) EmptyText("Belum ada aktivitas organik.")
                     bio.forEach { BioporiRow(it) }
                 }
+            }
+        }
+
+        item {
+            EcoCard {
+                Text("Setoran anorganik 6 bulan terakhir", fontWeight = FontWeight.Bold, color = Slate900)
+                LoadableContent(statistik) { st -> GrafikBulanan(st) }
             }
         }
     }
@@ -195,5 +205,29 @@ fun BioporiRow(a: AktivitasBioporiDto) {
         if (!a.catatanPetugas.isNullOrBlank()) {
             Text("Catatan petugas: ${a.catatanPetugas}", color = Slate500, fontSize = 13.sp)
         }
+    }
+}
+
+/** Grafik batang berat setoran per bulan (sama dengan grafik di Web): angka kg di atas batang, bulan kosong berupa garis tipis. */
+@Composable
+private fun GrafikBulanan(st: StatistikDto) {
+    val max = (st.berat.maxOrNull() ?: 0.0).coerceAtLeast(1.0)
+    Row(Modifier.fillMaxWidth().height(176.dp).padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        st.berat.forEachIndexed { i, v ->
+            Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(if (v > 0) kg(v).removeSuffix(" kg") + " kg" else "", fontSize = 9.sp, color = Slate500, fontWeight = FontWeight.SemiBold, maxLines = 1, modifier = Modifier.height(14.dp))
+                Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.BottomCenter) {
+                    val fraksi = if (v > 0) (v / max).toFloat().coerceAtLeast(0.06f) else 0.02f
+                    Box(
+                        Modifier.fillMaxWidth().fillMaxHeight(fraksi)
+                            .background(if (v > 0) Color(0xFF10B981) else Slate200, RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
+                    )
+                }
+                Text(st.labels.getOrNull(i)?.substringBefore(' ') ?: "", fontSize = 10.sp, color = Slate500)
+            }
+        }
+    }
+    if (st.berat.all { it == 0.0 }) {
+        Text("Belum ada setoran dalam 6 bulan terakhir.", color = Slate500, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
     }
 }
