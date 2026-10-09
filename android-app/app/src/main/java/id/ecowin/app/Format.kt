@@ -35,3 +35,6 @@ fun statusLabel(status: String?): String = when (status) {
     "selesai" -> "Selesai"
     else -> status ?: "-"
 }
+
+/** Inisial untuk avatar: huruf pertama nama (sama dengan Web). */
+fun inisial(nama: String?): String = nama?.trim()?.firstOrNull()?.uppercase() ?: "?"

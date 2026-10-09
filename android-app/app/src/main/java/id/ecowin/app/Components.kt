@@ -79,8 +79,8 @@ fun EcoCard(modifier: Modifier = Modifier, accent: Color? = null, content: @Comp
     Column(
         modifier
             .fillMaxWidth()
-            .background(Color.White, RoundedCornerShape(16.dp))
-            .border(1.dp, Slate200, RoundedCornerShape(16.dp))
+            .background(Color.White, RoundedCornerShape(20.dp))
+            .border(1.dp, Slate200, RoundedCornerShape(20.dp))
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
@@ -123,15 +123,23 @@ fun StatusBadge(status: String?) {
 }
 
 @Composable
-fun StatTile(label: String, value: String, modifier: Modifier = Modifier) {
+fun StatTile(label: String, value: String, modifier: Modifier = Modifier, icon: androidx.compose.ui.graphics.vector.ImageVector? = null, hint: String? = null) {
     Column(
         modifier
-            .background(Color.White, RoundedCornerShape(14.dp))
-            .border(1.dp, Slate200, RoundedCornerShape(14.dp))
-            .padding(12.dp),
+            .background(Color.White, RoundedCornerShape(20.dp))
+            .border(1.dp, Slate200, RoundedCornerShape(20.dp))
+            .padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
+        if (icon != null) {
+            Box(Modifier.size(40.dp).background(EmeraldSoft, RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) {
+                androidx.compose.material3.Icon(icon, contentDescription = null, tint = Emerald, modifier = Modifier.size(20.dp))
+            }
+            androidx.compose.foundation.layout.Spacer(Modifier.size(6.dp))
+        }
         Text(label, color = Slate500, fontSize = 12.sp)
-        Text(value, color = Slate900, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text(value, color = Slate900, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+        if (hint != null) Text(hint, color = Slate500, fontSize = 11.sp)
     }
 }
 
@@ -142,7 +150,7 @@ fun EmptyText(text: String) {
 
 @Composable
 fun PrimaryButton(text: String, enabled: Boolean = true, loading: Boolean = false, onClick: () -> Unit) {
-    Button(onClick = onClick, enabled = enabled && !loading, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
+    Button(onClick = onClick, enabled = enabled && !loading, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
         if (loading) CircularProgressIndicator(Modifier.padding(end = 8.dp).size(18.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp)
         Text(text)
     }

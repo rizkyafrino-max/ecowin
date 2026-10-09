@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 
 val Emerald = Color(0xFF059669)
 val EmeraldSoft = Color(0xFFECFDF5)
+val EmeraldDeep = Color(0xFF047857)
 val Slate900 = Color(0xFF0F172A)
 val Slate500 = Color(0xFF64748B)
 val Slate200 = Color(0xFFE2E8F0)
