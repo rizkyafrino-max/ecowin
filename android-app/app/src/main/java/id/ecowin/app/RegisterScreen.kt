@@ -81,7 +81,7 @@ fun RegisterScreen(
                     when (val r = googleAuth.signIn()) {
                         is GoogleAuth.Result.Success -> idToken = r.idToken
                         is GoogleAuth.Result.Failure -> error = r.message
-                        GoogleAuth.Result.Cancelled -> Unit
+                        GoogleAuth.Result.Cancelled -> error = "Pemilihan akun Google ditutup. Jika Anda tidak membatalkannya, Google belum mengenali aplikasi ini: buat OAuth client tipe Android (package id.ecowin.app + SHA-1 kunci debug) di Google Cloud, dan pastikan email Anda terdaftar sebagai Test user."
                     }
                     busy = false
                 }

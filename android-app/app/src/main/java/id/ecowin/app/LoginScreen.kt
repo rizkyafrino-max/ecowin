@@ -64,7 +64,7 @@ fun LoginScreen(
                             message = if (e is IllegalStateException) e.message else client.errorMessage(e)
                         }
                         is GoogleAuth.Result.Failure -> message = result.message
-                        GoogleAuth.Result.Cancelled -> Unit
+                        GoogleAuth.Result.Cancelled -> message = "Pemilihan akun Google ditutup. Jika Anda tidak membatalkannya, Google belum mengenali aplikasi ini: buat OAuth client tipe Android (package id.ecowin.app + SHA-1 kunci debug) di Google Cloud, dan pastikan email Anda terdaftar sebagai Test user."
                     }
                     loading = false
                 }
