@@ -7,7 +7,6 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -56,18 +55,6 @@ class NasabahsTable
                     ->action(function ($record): void {
                         app(NasabahService::class)->verifikasi(auth()->user(), $record);
                         Notification::make()->title('Nasabah diverifikasi')->success()->send();
-                    }),
-                Action::make('tolak')
-                    ->label('Tolak')
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->visible(fn ($record): bool => $record->status_verifikasi === 'pending' && auth()->user()?->can('update', $record))
-                    ->modalHeading('Tolak pendaftaran ini?')
-                    ->modalDescription('Akun akan dinonaktifkan dan nasabah tidak bisa masuk. Alasan tercatat di audit log.')
-                    ->schema([Textarea::make('alasan')->label('Alasan penolakan')->required()->minLength(5)->maxLength(500)])
-                    ->action(function ($record, array $data): void {
-                        app(NasabahService::class)->tolak(auth()->user(), $record, $data['alasan']);
-                        Notification::make()->title('Pendaftaran ditolak')->success()->send();
                     }),
                 EditAction::make(),
                 Action::make('cetak_kartu')

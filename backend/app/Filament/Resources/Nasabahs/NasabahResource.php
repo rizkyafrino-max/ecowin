@@ -9,13 +9,16 @@ use App\Filament\Resources\Nasabahs\Pages\ListNasabahs;
 use App\Models\BankSampah;
 use App\Models\Nasabah;
 use App\Models\User;
+use App\Services\NasabahService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -80,14 +83,42 @@ class NasabahResource extends Resource
                 TextColumn::make('user.email')->label('Email Google')->searchable()->toggleable(),
                 TextColumn::make('no_hp')->label('No. HP')->searchable(),
                 TextColumn::make('saldo')->money('IDR', locale: 'id')->sortable(),
+                TextColumn::make('status_verifikasi')->label('Verifikasi')->badge()
+                    ->formatStateUsing(fn (string $state): string => $state === 'verified' ? 'Terverifikasi' : 'Menunggu')
+                    ->color(fn (string $state): string => $state === 'verified' ? 'success' : 'warning'),
                 TextColumn::make('status')->badge()->formatStateUsing(fn (string $state): string => ucfirst($state))->color(fn (string $state): string => $state === 'aktif' ? 'success' : 'gray'),
                 TextColumn::make('bankSampah.nama_bank_sampah')->label('Bank Sampah')->visible(fn (): bool => auth()->user()?->isAdmin() ?? false),
             ])
             ->filters([
+                SelectFilter::make('status_verifikasi')->label('Verifikasi')->options(['pending' => 'Menunggu', 'verified' => 'Terverifikasi']),
                 SelectFilter::make('status')->options(['aktif' => 'Aktif', 'nonaktif' => 'Nonaktif']),
                 SelectFilter::make('bank_sampah_id')->label('Bank Sampah')->relationship('bankSampah', 'nama_bank_sampah')->visible(fn (): bool => auth()->user()?->isAdmin() ?? false),
             ])
             ->recordActions([
+                Action::make('verifikasi')
+                    ->label('Verifikasi')
+                    ->icon('heroicon-o-check-badge')
+                    ->color('success')
+                    ->visible(fn (Nasabah $record): bool => $record->status_verifikasi === 'pending' && $record->status === 'aktif' && (auth()->user()?->can('update', $record) ?? false))
+                    ->requiresConfirmation()
+                    ->modalHeading('Verifikasi nasabah ini?')
+                    ->modalDescription('Pastikan nama, nomor HP, dan alamat sudah sesuai. Setelah diverifikasi, nasabah dapat mengajukan penarikan saldo.')
+                    ->action(function (Nasabah $record): void {
+                        app(NasabahService::class)->verifikasi(auth()->user(), $record);
+                        Notification::make()->title('Nasabah diverifikasi')->success()->send();
+                    }),
+                Action::make('tolak')
+                    ->label('Tolak')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn (Nasabah $record): bool => $record->status_verifikasi === 'pending' && $record->status === 'aktif' && (auth()->user()?->can('update', $record) ?? false))
+                    ->modalHeading('Tolak pendaftaran ini?')
+                    ->modalDescription('Akun akan dinonaktifkan dan nasabah tidak bisa masuk. Alasan tercatat di audit log.')
+                    ->schema([Textarea::make('alasan')->label('Alasan penolakan')->required()->minLength(5)->maxLength(500)])
+                    ->action(function (Nasabah $record, array $data): void {
+                        app(NasabahService::class)->tolak(auth()->user(), $record, $data['alasan']);
+                        Notification::make()->title('Pendaftaran ditolak')->success()->send();
+                    }),
                 EditAction::make(),
                 Action::make('cetak_kartu')->label('QR Card')->icon('heroicon-o-qr-code')
                     ->url(fn (Nasabah $record): string => route('admin.nasabah.kartu', $record))->openUrlInNewTab(),

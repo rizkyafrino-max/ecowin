@@ -221,4 +221,26 @@ class PanelWorkflowTest extends TestCase
 
         $this->assertDatabaseHas('harga_sampah', ['harga_per_kg' => 3000, 'dibuat_oleh' => $this->admin->id]);
     }
+
+    public function test_petugas_verifies_and_rejects_new_nasabah_from_the_panel(): void
+    {
+        $verif = \App\Models\Nasabah::factory()->forBank($this->petugas->bankSampah)->create();
+        $verif->forceFill(['status_verifikasi' => 'pending'])->save();
+        $tolak = \App\Models\Nasabah::factory()->forBank($this->petugas->bankSampah)->create();
+        $tolak->forceFill(['status_verifikasi' => 'pending'])->save();
+        $lain = \App\Models\Nasabah::factory()->forBank(\App\Models\BankSampah::factory()->create())->create();
+        $lain->forceFill(['status_verifikasi' => 'pending'])->save();
+        $this->actingAs($this->petugas);
+
+        $page = Livewire::test(\App\Filament\Resources\Nasabahs\Pages\ListNasabahs::class);
+        $page->assertActionVisible(TestAction::make('verifikasi')->table($verif))
+            ->assertActionHidden(TestAction::make('verifikasi')->table($this->nasabahA))
+            ->callAction(TestAction::make('verifikasi')->table($verif));
+        $this->assertSame('verified', $verif->fresh()->status_verifikasi);
+
+        $page->callAction(TestAction::make('tolak')->table($tolak), ['alasan' => 'Bukan warga RT ini']);
+        $this->assertSame('nonaktif', $tolak->fresh()->status);
+        $this->assertDatabaseHas('audit_log', ['aksi' => 'tolak_nasabah', 'model_id' => $tolak->id]);
+        $this->assertDatabaseHas('audit_log', ['aksi' => 'verifikasi_nasabah', 'model_id' => $verif->id]);
+    }
 }
