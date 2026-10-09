@@ -2,8 +2,17 @@
     <div class="eco-home">
     @if (count($popup) > 0)
         {{-- Pengingat tugas menunggu: muncul saat Beranda dibuka, dan muncul lagi bila jumlah tugas bertambah. --}}
-        <div x-data="{ open: false }"
-             x-init="try { const k = 'eco-popup-{{ $user->id }}'; const last = parseInt(sessionStorage.getItem(k) || '0'); if ({{ $totalPending }} > last) { open = true; sessionStorage.setItem(k, {{ $totalPending }}) } } catch (e) { open = true }"
+        <div x-data="{
+                open: false,
+                init() {
+                    try {
+                        const k = 'eco-popup-{{ $user->id }}';
+                        const last = parseInt(sessionStorage.getItem(k) || '0');
+                        if ({{ $totalPending }} > last) { this.open = true; sessionStorage.setItem(k, {{ $totalPending }}); }
+                    } catch (e) { this.open = true; }
+                },
+             }"
+             
              x-show="open" x-cloak x-transition.opacity @keydown.escape.window="open = false"
              class="eco-popup" role="dialog" aria-modal="true" aria-labelledby="eco-popup-title">
             <div class="eco-popup-card" @click.outside="open = false">
