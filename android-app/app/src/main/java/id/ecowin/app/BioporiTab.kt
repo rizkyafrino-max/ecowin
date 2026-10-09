@@ -51,60 +51,11 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 /**
- * Organik -> Aktivitas Biopori -> BioporiPrint.
- * Nasabah melaporkan sampah organik yang dimasukkan ke lubang Biopori, wajib dengan foto.
- * Status awal selalu "Menunggu" sampai diverifikasi petugas.
+ * Form "Tambah Aktivitas" Organik. Satu-satunya metode pengolahan Nasabah: BioporiPrint.
+ * Wajib foto bukti; status awal selalu "Menunggu" sampai diverifikasi petugas.
  */
 @Composable
-fun BioporiTab(client: ApiClient, refreshKey: Int) {
-    var formOpen by rememberSaveable { mutableStateOf(false) }
-    var localRefresh by remember { mutableStateOf(0) }
-    val riwayat = rememberLoadable(client, refreshKey, localRefresh) { client.api.aktivitasBiopori().data }
-    val lokasi = rememberLoadable(client, refreshKey) { client.api.lokasiBiopori().data }
-
-    TabList {
-        item {
-            if (formOpen) {
-                LaporBioporiForm(client, lokasi, onDone = { formOpen = false; localRefresh++ }, onCancel = { formOpen = false })
-            } else {
-                PrimaryButton("+ Lapor aktivitas Biopori") { formOpen = true }
-            }
-        }
-
-        item {
-            LoadableContent(lokasi) { list ->
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    SectionTitle("Lokasi Biopori & estimasi panen")
-                    if (list.isEmpty()) EmptyText("Belum ada lokasi Biopori di Bank Sampah Anda.")
-                    list.forEach { t ->
-                        EcoCard {
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                                Text(t.namaLokasi ?: "Lokasi", fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                                StatusBadge(t.statusPanen)
-                            }
-                            if (t.bioporiprint) Text("Pipa BioporiPrint (3D print plastik daur ulang)", color = Slate500, fontSize = 12.sp)
-                            LabelValue("Terakhir diisi", tanggal(t.terakhirDiisiAt, withTime = false))
-                            LabelValue("Estimasi panen", tanggal(t.estimasiPanenAt, withTime = false))
-                        }
-                    }
-                }
-            }
-        }
-
-        item {
-            LoadableContent(riwayat) { list ->
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    SectionTitle("Riwayat laporan")
-                    if (list.isEmpty()) EmptyText("Belum ada laporan.")
-                    list.forEach { BioporiRow(it) }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun LaporBioporiForm(client: ApiClient, lokasi: Loadable<List<TitikBioporiDto>>, onDone: () -> Unit, onCancel: () -> Unit) {
+fun TambahAktivitasForm(client: ApiClient, lokasi: Loadable<List<TitikBioporiDto>>, onDone: () -> Unit, onCancel: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -136,11 +87,12 @@ private fun LaporBioporiForm(client: ApiClient, lokasi: Loadable<List<TitikBiopo
     }
 
     EcoCard {
-        Text("Lapor aktivitas Biopori", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text("Tambah aktivitas organik", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        LabelValue("Metode pengolahan", "BioporiPrint")
 
-        Text("Lokasi Biopori", color = Slate500, fontSize = 13.sp)
-        val daftar = lokasi.data.orEmpty().filter { it.status == "aktif" }
-        if (daftar.isEmpty()) EmptyText("Tidak ada lokasi Biopori aktif.")
+        Text("Lokasi BioporiPrint", color = Slate500, fontSize = 13.sp)
+        val daftar = lokasi.data.orEmpty().filter { it.status == "aktif" && it.bioporiprint }
+        if (daftar.isEmpty()) EmptyText("Tidak ada lokasi BioporiPrint aktif.")
         daftar.forEach { t ->
             Row(
                 Modifier.fillMaxWidth().clickable { titikId = t.id },
@@ -177,11 +129,11 @@ private fun LaporBioporiForm(client: ApiClient, lokasi: Loadable<List<TitikBiopo
 
         error?.let { Text(it, color = Red, fontSize = 13.sp) }
 
-        PrimaryButton("Kirim laporan", loading = sending) {
+        PrimaryButton("Kirim aktivitas", loading = sending) {
             val beratKg = berat.replace(',', '.').toDoubleOrNull()
             val path = fotoPath
             error = when {
-                titikId == null -> "Pilih lokasi Biopori."
+                titikId == null -> "Pilih lokasi BioporiPrint."
                 jenis.isBlank() -> "Isi jenis sampah."
                 beratKg == null || beratKg <= 0 || beratKg > 100 -> "Berat harus antara 0 dan 100 kg."
                 path == null -> "Foto bukti wajib diambil."

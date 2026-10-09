@@ -14,7 +14,6 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
@@ -40,7 +39,6 @@ private enum class Tab(val label: String, val icon: ImageVector) {
     Beranda("Beranda", Icons.Filled.Home),
     Transaksi("Transaksi", Icons.Filled.ShoppingCart),
     Organik("Organik", Icons.Filled.Favorite),
-    Biopori("Biopori", Icons.Filled.Place),
     Saldo("Saldo", Icons.Filled.AccountBox),
     Profil("Profil", Icons.Filled.Person),
 }
@@ -84,7 +82,6 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
                 Tab.Beranda -> BerandaTab(client, user, refreshKey)
                 Tab.Transaksi -> TransaksiTab(client, refreshKey)
                 Tab.Organik -> OrganikTab(client, refreshKey)
-                Tab.Biopori -> BioporiTab(client, refreshKey)
                 Tab.Saldo -> SaldoTab(client, refreshKey)
                 Tab.Profil -> ProfilTab(client, user, refreshKey, onUserChanged, onLogout)
             }

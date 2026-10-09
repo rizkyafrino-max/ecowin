@@ -38,8 +38,8 @@ fun BerandaTab(client: ApiClient, user: UserDto, refreshKey: Int) {
                         StatTile("Sampah organik", kg(d.organik?.totalBeratKg), Modifier.weight(1f))
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        StatTile("Aktivitas Biopori", "${d.organik?.jumlahAktivitasBiopori ?: 0}", Modifier.weight(1f))
-                        StatTile("Biopori menunggu", "${d.organik?.bioporiPending ?: 0}", Modifier.weight(1f))
+                        StatTile("Aktivitas organik", "${d.organik?.jumlahAktivitasBiopori ?: 0}", Modifier.weight(1f))
+                        StatTile("Menunggu verifikasi", "${d.organik?.bioporiPending ?: 0}", Modifier.weight(1f))
                     }
 
                     SectionTitle("Transaksi terakhir")
@@ -47,9 +47,9 @@ fun BerandaTab(client: ApiClient, user: UserDto, refreshKey: Int) {
                     if (trx.isEmpty()) EmptyText("Belum ada transaksi.")
                     trx.forEach { TransaksiRow(it) }
 
-                    SectionTitle("Status Biopori")
+                    SectionTitle("Aktivitas organik")
                     val bio = d.bioporiTerakhir.orEmpty()
-                    if (bio.isEmpty()) EmptyText("Belum ada laporan Biopori.")
+                    if (bio.isEmpty()) EmptyText("Belum ada aktivitas organik.")
                     bio.forEach { BioporiRow(it) }
                 }
             }
@@ -76,7 +76,7 @@ fun BioporiRow(a: AktivitasBioporiDto) {
     EcoCard {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text(a.lokasi ?: "Lokasi Biopori", fontWeight = FontWeight.SemiBold)
+                Text(a.lokasi ?: "Lokasi BioporiPrint", fontWeight = FontWeight.SemiBold)
                 Text("${a.jenisSampah ?: "-"} · ${kg(a.beratKg)}", color = Slate500, fontSize = 13.sp)
                 Text(tanggal(a.tanggalPemasukan), color = Slate500, fontSize = 12.sp)
             }
