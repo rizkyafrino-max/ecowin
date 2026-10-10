@@ -1,6 +1,9 @@
 package id.ecowin.app
 
 import android.os.Bundle
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -40,7 +43,10 @@ class MainActivity : ComponentActivity() {
     private lateinit var googleAuth: GoogleAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Splash Screen native: bertahan hanya selagi sesi tersimpan diperiksa, dengan batas waktu agar tidak menahan aplikasi.
+        installSplashScreen().setKeepOnScreenCondition { SplashGate.keep }
         super.onCreate(savedInstanceState)
+        lifecycleScope.launch { delay(SplashGate.MAX_MS); SplashGate.keep = false }
         enableEdgeToEdge()
         session = SessionStore(this)
         client = ApiClient(session)
@@ -56,6 +62,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/** Penahan splash: false begitu status sesi diketahui (login/dashboard), sehingga tidak ada kilatan layar login. */
+object SplashGate {
+    const val MAX_MS = 2500L
+    @Volatile var keep: Boolean = true
+}
+
 private sealed interface AppState {
     data object Checking : AppState
     data class Offline(val message: String) : AppState
@@ -68,6 +80,8 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
     var state by remember { mutableStateOf<AppState>(if (session.hasSession()) AppState.Checking else AppState.LoggedOut()) }
     var retry by remember { mutableStateOf(0) }
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(state) { if (state !is AppState.Checking) SplashGate.keep = false }
 
     LaunchedEffect(Unit) {
         client.sessionExpired.collect {
