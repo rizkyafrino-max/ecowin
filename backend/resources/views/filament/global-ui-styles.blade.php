@@ -257,4 +257,11 @@ html,html.dark{color-scheme:light!important;background:var(--eco-canvas)!importa
 .eco-popup-card li em{font-style:normal;min-width:30px;padding:.15rem .55rem;border-radius:999px;background:#DC2626;color:#fff;font-size:.8rem;font-weight:700;text-align:center}
 .eco-popup-card>button{width:100%;padding:.7rem;border-radius:12px;border:1px solid var(--eco-line);background:#fff;font-weight:600;color:var(--eco-muted);cursor:pointer}
 .eco-popup-card>button:hover{background:var(--eco-canvas)}
+.eco-popup-card li{border:1px solid var(--eco-line);border-radius:14px;overflow:hidden}
+.eco-popup-card li a.eco-popup-head{border:0;border-radius:0;background:#fff}
+.eco-popup-items{border-top:1px solid var(--eco-line);background:var(--eco-canvas);padding:.25rem .5rem}
+.eco-popup-items a{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.5rem .6rem;border:0!important;border-radius:10px!important;font-size:.82rem}
+.eco-popup-items a:hover{background:#fff!important}
+.eco-popup-items small{margin:0;white-space:nowrap}
+.eco-popup-items a.eco-popup-more{color:var(--eco-primary);font-weight:600;justify-content:center}
 </style>

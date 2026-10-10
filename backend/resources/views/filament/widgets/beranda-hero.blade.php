@@ -13,7 +13,7 @@
                 },
              }"
              
-             x-show="open" x-cloak x-transition.opacity @keydown.escape.window="open = false"
+             x-show="open" x-cloak x-transition.opacity @keydown.escape.window="open = false" @eco-popup.window="open = true"
              class="eco-popup" role="dialog" aria-modal="true" aria-labelledby="eco-popup-title">
             <div class="eco-popup-card" @click.outside="open = false">
                 <span class="eco-popup-ico"><x-filament::icon icon="heroicon-o-bell-alert" class="eco-ico" /></span>
@@ -22,10 +22,20 @@
                 <ul>
                     @foreach ($popup as $p)
                         <li>
-                            <a href="{{ $p['url'] }}">
+                            <a class="eco-popup-head" href="{{ $p['url'] }}">
                                 <span><b>{{ $p['label'] }}</b><small>{{ $p['hint'] }}</small></span>
                                 <em>{{ $p['count'] }}</em>
                             </a>
+                            @if (count($p['items']) > 0)
+                                <div class="eco-popup-items">
+                                    @foreach ($p['items'] as $it)
+                                        <a href="{{ $it['url'] }}"><span>{{ $it['title'] }}</span><small>{{ $it['meta'] }}</small></a>
+                                    @endforeach
+                                    @if ($p['count'] > count($p['items']))
+                                        <a class="eco-popup-more" href="{{ $p['url'] }}">Lihat {{ $p['count'] - count($p['items']) }} lainnya</a>
+                                    @endif
+                                </div>
+                            @endif
                         </li>
                     @endforeach
                 </ul>
@@ -51,7 +61,7 @@
                     <x-filament::icon icon="heroicon-o-magnifying-glass" class="eco-ico" />
                     <input type="search" name="tableSearch" placeholder="Cari nasabah…" aria-label="Cari nasabah" autocomplete="off">
                 </form>
-                <a class="eco-icon-btn" href="{{ $urlPending ?? '#' }}" aria-label="Tugas menunggu: {{ $totalPending }}">
+                <a class="eco-icon-btn" href="{{ $urlPending ?? '#' }}" aria-label="Tugas menunggu: {{ $totalPending }}"@if (count($popup) > 0) onclick="event.preventDefault(); window.dispatchEvent(new CustomEvent('eco-popup'))"@endif>
                     <x-filament::icon icon="heroicon-o-bell" class="eco-ico" />
                     @if ($totalPending > 0)<span class="eco-dot">{{ $totalPending > 99 ? '99+' : $totalPending }}</span>@endif
                 </a>

@@ -55,15 +55,23 @@ class BerandaHero extends Widget
             'nasabah' => Nasabah::query()->visibleTo($user)->where('status_verifikasi', 'pending')->where('status', 'aktif')->count(),
         ];
 
-        // Pop-up pengingat saat membuka Beranda: hanya kategori yang punya tugas menunggu.
+        // Pop-up pengingat: kategori yang punya tugas menunggu, lengkap dengan beberapa item terbaru yang langsung menuju halamannya.
         $filterNasabah = ['tableFilters' => ['status_verifikasi' => ['value' => 'pending']]];
-        $popup = array_values(array_filter([
-            ['label' => 'Pendaftaran nasabah baru', 'hint' => 'Perlu diverifikasi sebelum bisa menarik saldo', 'count' => $pending['nasabah'], 'url' => NasabahResource::getUrl('index', $filterNasabah)],
-            ['label' => 'Penarikan saldo', 'hint' => 'Menunggu persetujuan', 'count' => $pending['penarikan'], 'url' => PenarikanSaldoResource::getUrl('index')],
-            ['label' => 'Aktivitas organik', 'hint' => 'Menunggu verifikasi foto bukti', 'count' => $pending['biopori'], 'url' => AktivitasBioporiResource::getUrl('index')],
-            ['label' => 'Koreksi transaksi', 'hint' => 'Menunggu keputusan', 'count' => $pending['koreksi'], 'url' => \App\Filament\Resources\KoreksiTransaksis\KoreksiTransaksiResource::getUrl('index')],
-        ], fn (array $p): bool => $p['count'] > 0));
+        $nasabahBaru = Nasabah::query()->visibleTo($user)->where('status_verifikasi', 'pending')->where('status', 'aktif')->latest('id')->limit(3)->get()
+            ->map(fn (Nasabah $n) => ['title' => $n->nama, 'meta' => 'Mendaftar '.$n->created_at?->format('d M Y'), 'url' => NasabahResource::getUrl('index', $filterNasabah + ['tableSearch' => $n->nama])]);
+        $penarikan = PenarikanSaldo::query()->visibleTo($user)->with('nasabah')->where('status', PenarikanSaldo::STATUS_PENDING)->latest('id')->limit(3)->get()
+            ->map(fn (PenarikanSaldo $p) => ['title' => ($p->nasabah?->nama ?? 'Nasabah').' · Rp '.number_format((float) $p->jumlah, 0, ',', '.'), 'meta' => 'Diajukan '.$p->created_at?->format('d M Y'), 'url' => PenarikanSaldoResource::getUrl('index')]);
+        $organik = AktivitasBiopori::query()->visibleTo($user)->with('nasabah')->where('status', AktivitasBiopori::STATUS_PENDING)->latest('id')->limit(3)->get()
+            ->map(fn (AktivitasBiopori $a) => ['title' => ($a->nasabah?->nama ?? 'Nasabah').' · '.($a->jenis_sampah ?: 'Aktivitas'), 'meta' => number_format((float) $a->berat_kg, 1, ',', '.').' kg', 'url' => AktivitasBioporiResource::getUrl('view', ['record' => $a])]);
+        $koreksi = KoreksiTransaksi::query()->visibleTo($user)->where('status', KoreksiTransaksi::STATUS_PENDING)->latest('id')->limit(3)->get()
+            ->map(fn (KoreksiTransaksi $k) => ['title' => ucfirst($k->tipe_transaksi).' #'.$k->transaksi_id, 'meta' => 'Menunggu keputusan', 'url' => \App\Filament\Resources\KoreksiTransaksis\KoreksiTransaksiResource::getUrl('index')]);
 
+        $popup = array_values(array_filter([
+            ['label' => 'Pendaftaran nasabah baru', 'hint' => 'Perlu diverifikasi sebelum bisa menarik saldo', 'count' => $pending['nasabah'], 'url' => NasabahResource::getUrl('index', $filterNasabah), 'items' => $nasabahBaru->all()],
+            ['label' => 'Penarikan saldo', 'hint' => 'Menunggu persetujuan', 'count' => $pending['penarikan'], 'url' => PenarikanSaldoResource::getUrl('index'), 'items' => $penarikan->all()],
+            ['label' => 'Aktivitas organik', 'hint' => 'Menunggu verifikasi foto bukti', 'count' => $pending['biopori'], 'url' => AktivitasBioporiResource::getUrl('index'), 'items' => $organik->all()],
+            ['label' => 'Koreksi transaksi', 'hint' => 'Menunggu keputusan', 'count' => $pending['koreksi'], 'url' => \App\Filament\Resources\KoreksiTransaksis\KoreksiTransaksiResource::getUrl('index'), 'items' => $koreksi->all()],
+        ], fn (array $p): bool => $p['count'] > 0));
         $jam = (int) now()->format('G');
 
         return [
