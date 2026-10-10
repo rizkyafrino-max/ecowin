@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ikon splash: logo EcoWin asli. Kanvas 288dp (ukuran ikon tanpa latar pada Android 12+) dengan logo di tengah:
-     setengah diagonal logo (±89dp) berada di dalam topeng lingkaran sistem (jari-jari 96dp), jadi tidak terpotong,
-     dan ukurannya sama (116dp) dengan layar peluncuran Compose sehingga transisi tanpa lompatan. -->
+<!-- Ikon splash: logo EcoWin asli. Kanvas 288dp (ukuran ikon tanpa latar pada Android 12+) dengan logo di tengah.
+     Bitmap memakai gravity "fill" agar diskalakan penuh ke kotak 116x135dp (sesuai rasio logo), bukan dipotong
+     pada ukuran pikselnya. Setengah diagonal logo (±89dp) berada di dalam topeng lingkaran sistem (jari-jari 96dp). -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:width="288dp" android:height="288dp">
         <shape android:shape="rectangle">
@@ -12,6 +12,9 @@
     <item
         android:width="116dp"
         android:height="135dp"
-        android:gravity="center"
-        android:drawable="@drawable/ecowin_logo" />
+        android:gravity="center">
+        <bitmap
+            android:src="@drawable/ecowin_logo"
+            android:gravity="fill" />
+    </item>
 </layer-list>
