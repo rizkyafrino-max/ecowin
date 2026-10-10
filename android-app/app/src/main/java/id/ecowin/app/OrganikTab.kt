@@ -1,6 +1,10 @@
 package id.ecowin.app
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,13 +47,9 @@ fun OrganikTab(client: ApiClient, refreshKey: Int) {
             val totalSetoran = setoran.data.orEmpty().sumOf { it.beratKg }
             val totalKompos = setoran.data.orEmpty().sumOf { it.estimasiKomposKg }
             val totalAktivitas = aktivitas.data.orEmpty().filter { it.status == "approved" || it.status == "completed" }.sumOf { it.beratKg }
-            EcoCard {
-                Text("Kelola aktivitas organikmu", fontWeight = FontWeight.Bold)
-                Text("Organik tidak menjadi saldo rupiah.", color = Slate500, fontSize = 13.sp)
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                    StatTile("Total Organik", kg(totalSetoran + totalAktivitas), Modifier.weight(1f))
-                    StatTile("Estimasi kompos", kg(totalKompos), Modifier.weight(1f))
-                }
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                StatTile("Total Organik", kg(totalSetoran + totalAktivitas), Modifier.weight(1f), icon = Lucide.Recycle)
+                StatTile("Estimasi kompos", kg(totalKompos), Modifier.weight(1f), icon = Lucide.Leaf)
             }
         }
 
@@ -70,7 +70,7 @@ fun OrganikTab(client: ApiClient, refreshKey: Int) {
                                     ActivityRow(Lucide.Recycle, o.jenisOrganik ?: "Setoran organik", tanggal(o.tanggal, false) + " · " + (o.lokasi ?: "Tanpa lokasi"), kg(o.beratKg), o.statusPengolahan)
                                 } else {
                                     val a = data as AktivitasBioporiDto
-                                    ActivityRow(Lucide.Leaf, a.jenisSampah ?: "Aktivitas organik", "BioporiPrint · " + (a.lokasi ?: "Lokasi") + " · " + tanggal(a.tanggalPemasukan, false), kg(a.beratKg), a.status)
+                                    ActivityRow(Lucide.Leaf, a.jenisSampah ?: "Aktivitas organik", (a.lokasi ?: "Lokasi") + " · " + tanggal(a.tanggalPemasukan, false), kg(a.beratKg), a.status)
                                 }
                             }
                         }
@@ -93,6 +93,7 @@ fun OrganikTab(client: ApiClient, refreshKey: Int) {
                             }
                             LabelValue("Terakhir diisi", tanggal(t.terakhirDiisiAt, withTime = false))
                             LabelValue("Estimasi panen", tanggal(t.estimasiPanenAt, withTime = false))
+                            if (t.latitude != null && t.longitude != null) BukaDiPeta(t.namaLokasi ?: "Lokasi BioporiPrint", t.latitude, t.longitude)
                         }
                     }
                 }
@@ -113,5 +114,29 @@ private fun SetoranOrganikRow(o: TransaksiOrganikDto) {
             StatusBadge(o.statusPengolahan)
         }
         LabelValue("Estimasi kompos", kg(o.estimasiKomposKg))
+    }
+}
+
+/** Membuka titik di aplikasi peta bawaan perangkat (intent geo:, tanpa izin lokasi dan tanpa SDK peta). */
+@Composable
+private fun BukaDiPeta(nama: String, lat: Double, lng: Double) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    Row(
+        Modifier.fillMaxWidth().padding(top = 6.dp)
+            .background(EmeraldSoft, androidx.compose.foundation.shape.RoundedCornerShape(14.dp))
+            .clickable {
+                val uri = android.net.Uri.parse("geo:0,0?q=" + lat + "," + lng + "(" + android.net.Uri.encode(nama) + ")")
+                try {
+                    context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, uri))
+                } catch (_: android.content.ActivityNotFoundException) {
+                    android.widget.Toast.makeText(context, "Tidak ada aplikasi peta di perangkat ini.", android.widget.Toast.LENGTH_SHORT).show()
+                }
+            }
+            .padding(horizontal = 14.dp, vertical = 11.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        androidx.compose.material3.Icon(Lucide.MapPin, contentDescription = null, tint = Emerald, modifier = Modifier.size(18.dp))
+        Text("Buka di peta", color = Emerald, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
     }
 }

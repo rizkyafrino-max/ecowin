@@ -325,4 +325,15 @@ class UnifiedLoginTest extends TestCase
         $this->expectException(\Illuminate\Validation\ValidationException::class);
         app(\App\Services\NasabahService::class)->tolak($petugas, $nasabah, 'alasan apa saja');
     }
+
+    public function test_disabled_account_cannot_be_verified(): void
+    {
+        $bank = BankSampah::factory()->create();
+        $petugas = User::factory()->petugas($bank)->create();
+        $nasabah = Nasabah::factory()->forBank($bank)->create();
+        $nasabah->forceFill(['status_verifikasi' => 'pending', 'status' => 'nonaktif'])->save();
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        app(\App\Services\NasabahService::class)->verifikasi($petugas, $nasabah);
+    }
 }

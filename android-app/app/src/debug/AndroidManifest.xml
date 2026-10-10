@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <application>
-        <!-- HANYA build debug (tidak ada di release): menyimpan token yang dikirim lewat adb agar UI bisa diuji tanpa Google Sign-In. -->
-        <activity android:name="id.ecowin.app.DebugLoginActivity" android:exported="true" />
-    </application>
-</manifest>

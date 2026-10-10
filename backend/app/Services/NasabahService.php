@@ -143,6 +143,10 @@ class NasabahService
             return $nasabah;
         }
 
+        if ($nasabah->status !== 'aktif' || ! ($nasabah->user?->isActive() ?? true)) {
+            throw ValidationException::withMessages(['status' => ['Akun nonaktif tidak dapat diverifikasi. Aktifkan akun lebih dulu.']]);
+        }
+
         $before = ['status_verifikasi' => $nasabah->status_verifikasi];
         $nasabah->forceFill(['status_verifikasi' => 'verified'])->save();
         app(AuditLogger::class)->log('verifikasi_nasabah', $nasabah, $before, ['status_verifikasi' => 'verified'], $actor);

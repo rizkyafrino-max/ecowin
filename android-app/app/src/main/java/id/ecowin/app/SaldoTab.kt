@@ -66,7 +66,7 @@ fun SaldoTab(client: ApiClient, user: UserDto, refreshKey: Int) {
                 ListCardOf(list, "Belum ada mutasi saldo. Setoran dan penarikan akan tercatat di sini.") { m ->
                     TransactionRow(
                         title = m.keterangan ?: if (m.tipe == "kredit") "Saldo masuk" else "Saldo keluar",
-                        subtitle = "Saldo ${rupiah(m.saldoSesudah)} · ${tanggal(m.createdAt)}",
+                        subtitle = "Saldo ${rupiah(m.saldoSesudah)} · ${tanggal(m.createdAt, false)}",
                         amount = rupiah(m.jumlah),
                         kredit = m.tipe == "kredit",
                     )

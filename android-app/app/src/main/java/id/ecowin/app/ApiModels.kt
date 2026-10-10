@@ -112,6 +112,8 @@ data class TitikBioporiDto(
     val id: Long,
     val namaLokasi: String?,
     val deskripsiLokasi: String?,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
     val bioporiprint: Boolean = true,
     val status: String?,
     val terakhirDiisiAt: String?,
