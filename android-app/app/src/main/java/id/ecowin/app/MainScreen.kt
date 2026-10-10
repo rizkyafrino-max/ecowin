@@ -1,6 +1,8 @@
 package id.ecowin.app
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.draw.clip
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -133,19 +135,58 @@ private fun TopBar(user: UserDto, current: Tab, onRefresh: () -> Unit, onProfile
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onRefresh) { Icon(Lucide.RefreshCw, contentDescription = "Muat ulang", tint = Slate500, modifier = Modifier.size(22.dp)) }
-            Avatar(user.nama, Modifier.padding(end = 8.dp), size = 38, onClick = onProfile)
+            Avatar(user.nama, Modifier.padding(end = 8.dp), size = 38, onClick = onProfile, url = user.avatar)
         }
     }
 }
 
-/** Lingkaran berisi inisial nama (sama dengan Web). */
+/** Pemuat foto profil Google: https + host Google saja, tanpa kredensial, ukuran dibatasi, di-cache di memori. */
+private object AvatarCache {
+    private val cache = object : android.util.LruCache<String, androidx.compose.ui.graphics.ImageBitmap>(8) {}
+
+    fun get(url: String) = cache.get(url)
+
+    suspend fun load(url: String): androidx.compose.ui.graphics.ImageBitmap? {
+        cache.get(url)?.let { return it }
+        return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            runCatching {
+                val conn = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
+                    connectTimeout = 8000
+                    readTimeout = 8000
+                    instanceFollowRedirects = false
+                }
+                try {
+                    if (conn.responseCode != 200 || conn.contentLength > 1_000_000) return@runCatching null
+                    conn.inputStream.use { input ->
+                        val bytes = input.readBytes()
+                        android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
+                    }
+                } finally {
+                    conn.disconnect()
+                }
+            }.getOrNull()?.also { cache.put(url, it) }
+        }
+    }
+}
+
+/** Lingkaran berisi foto profil Google (bila ada dan aman), jika tidak inisial nama (sama dengan Web). */
 @Composable
-fun Avatar(nama: String?, modifier: Modifier = Modifier, size: Int = 44, onClick: (() -> Unit)? = null) {
+fun Avatar(nama: String?, modifier: Modifier = Modifier, size: Int = 44, onClick: (() -> Unit)? = null, url: String? = null) {
+    val aman = safeAvatarUrl(url)
+    var foto by remember(aman) { mutableStateOf(aman?.let { AvatarCache.get(it) }) }
+    androidx.compose.runtime.LaunchedEffect(aman) {
+        if (aman != null && foto == null) foto = AvatarCache.load(aman)
+    }
     Box(
-        modifier.size(size.dp).background(EmeraldSoft, CircleShape).let { if (onClick != null) it.clickable(onClick = onClick) else it },
+        modifier.size(size.dp).clip(CircleShape).background(EmeraldSoft, CircleShape).let { if (onClick != null) it.clickable(onClick = onClick) else it },
         contentAlignment = Alignment.Center,
     ) {
-        Text(inisial(nama), color = Emerald, fontWeight = FontWeight.Bold, fontSize = (size * 0.36f).sp)
+        val f = foto
+        if (f != null) {
+            androidx.compose.foundation.Image(f, contentDescription = "Foto profil", contentScale = androidx.compose.ui.layout.ContentScale.Crop, modifier = Modifier.fillMaxSize())
+        } else {
+            Text(inisial(nama), color = Emerald, fontWeight = FontWeight.Bold, fontSize = (size * 0.36f).sp)
+        }
     }
 }
 

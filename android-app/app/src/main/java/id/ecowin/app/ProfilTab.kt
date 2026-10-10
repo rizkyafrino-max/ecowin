@@ -52,7 +52,7 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
         item {
             EcoCard {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Avatar(user.nama, size = 64)
+                    Avatar(user.nama, size = 64, url = user.avatar)
                     Column(Modifier.weight(1f)) {
                         Text(user.nama ?: "-", fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {

@@ -36,7 +36,7 @@ fun BerandaTab(client: ApiClient, user: UserDto, refreshKey: Int, onNavigate: (T
     TabList {
         item {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                Avatar(user.nama, size = 52)
+                Avatar(user.nama, size = 52, url = user.avatar)
                 Column {
                     Text(sapaan() + ",", color = Slate500, fontSize = 14.sp)
                     Text(user.nama ?: "Nasabah", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)

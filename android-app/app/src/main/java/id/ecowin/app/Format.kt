@@ -38,3 +38,16 @@ fun statusLabel(status: String?): String = when (status) {
 
 /** Inisial untuk avatar: huruf pertama nama (sama dengan Web). */
 fun inisial(nama: String?): String = nama?.trim()?.firstOrNull()?.uppercase() ?: "?"
+
+/**
+ * URL foto profil yang aman dimuat: wajib https dan host milik Google (googleusercontent.com).
+ * Nilai lain (http, host asing, skema aneh) ditolak agar aplikasi tidak memuat sumber sembarang.
+ */
+fun safeAvatarUrl(url: String?): String? {
+    if (url.isNullOrBlank() || url.length > 512) return null
+    val uri = runCatching { java.net.URI(url.trim()) }.getOrNull() ?: return null
+    val host = uri.host?.lowercase() ?: return null
+    if (uri.scheme != "https" || uri.userInfo != null) return null
+    if (host != "googleusercontent.com" && !host.endsWith(".googleusercontent.com")) return null
+    return uri.toString()
+}
