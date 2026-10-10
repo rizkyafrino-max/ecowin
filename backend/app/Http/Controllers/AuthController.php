@@ -39,22 +39,14 @@ class AuthController extends Controller
     public function loginNasabah(Request $request): JsonResponse
     {
         $validated = $request->validate([
-<<<<<<< HEAD
             'username' => ['required', 'string'],
             'pin' => ['required', 'string'],
         ]);
 
         $nasabah = Nasabah::where('username', $validated['username'])->first();
-=======
-            'no_hp' => ['required', 'string'],
-            'pin' => ['required', 'string'],
-        ]);
-
-        $nasabah = Nasabah::where('no_hp', $validated['no_hp'])->first();
->>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
 
         if (! $nasabah || ! Hash::check($validated['pin'], $nasabah->pin)) {
-            return response()->json(['message' => 'Nomor HP atau PIN salah.'], 422);
+            return response()->json(['message' => 'Username atau PIN salah.'], 422);
         }
 
         if ($nasabah->status_verifikasi !== 'verified') {
@@ -64,6 +56,25 @@ class AuthController extends Controller
         return response()->json([
             'nasabah' => $nasabah,
             'token' => $nasabah->createToken('nasabah-android')->plainTextToken,
+        ]);
+    }
+
+    public function nasabahProfile(Request $request): JsonResponse
+    {
+        $nasabah = $request->user();
+        abort_unless($nasabah instanceof Nasabah, 403);
+        $nasabah->load('bankSampah');
+
+        return response()->json([
+            'id' => $nasabah->id,
+            'nama' => $nasabah->nama,
+            'username' => $nasabah->username,
+            'no_hp' => $nasabah->no_hp,
+            'alamat_rt_rw' => $nasabah->alamat_rt_rw,
+            'status_verifikasi' => $nasabah->status_verifikasi,
+            'nama_bank_sampah' => $nasabah->bankSampah?->nama_bank_sampah,
+            'rt' => $nasabah->bankSampah?->rt,
+            'rw' => $nasabah->bankSampah?->rw,
         ]);
     }
 

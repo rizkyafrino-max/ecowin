@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Nasabah;
 use App\Models\User;
 
 return [
@@ -42,12 +41,8 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
-        ],
-
-        // Guard untuk nasabah — digunakan oleh Sanctum dengan provider 'nasabah'
-        'nasabah' => [
-            'driver' => 'sanctum',
-            'provider' => 'nasabah',
+            // Persistent login (remember me) untuk Admin/Petugas: 30 hari.
+            'remember' => (int) env('AUTH_REMEMBER_MINUTES', 60 * 24 * 30),
         ],
     ],
 
@@ -72,12 +67,6 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
-        ],
-
-        // Provider untuk nasabah — login dengan no_hp + PIN
-        'nasabah' => [
-            'driver' => 'eloquent',
-            'model' => Nasabah::class,
         ],
 
         // 'users' => [

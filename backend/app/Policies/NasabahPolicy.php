@@ -7,51 +7,37 @@ use App\Models\User;
 
 class NasabahPolicy
 {
-    /**
-     * Admin dapat melakukan apa saja.
-     * Petugas hanya untuk nasabah di bank sampahnya.
-     */
-    public function before(User $user): ?bool
-    {
-        if ($user->isAdmin()) {
-            return true;
-        }
-
-        return null;
-    }
-
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, ['admin', 'petugas']);
+        return $user->isStaff() && $user->isActive();
     }
 
     public function view(User $user, Nasabah $nasabah): bool
     {
-        return $user->bank_sampah_id === $nasabah->bank_sampah_id;
+        if ($user->isNasabah()) {
+            return $user->isActive() && (int) $nasabah->user_id === (int) $user->id;
+        }
+
+        return $user->canManageBankSampah($nasabah->bank_sampah_id);
     }
 
     public function create(User $user): bool
     {
-        return in_array($user->role, ['admin', 'petugas']);
+        return $user->isStaff() && $user->isActive();
     }
 
     public function update(User $user, Nasabah $nasabah): bool
     {
-        return $user->bank_sampah_id === $nasabah->bank_sampah_id;
+        return $user->isStaff() && $user->canManageBankSampah($nasabah->bank_sampah_id);
     }
 
     public function delete(User $user, Nasabah $nasabah): bool
     {
-        return false; // nasabah tidak boleh dihapus
+        return false;
     }
 
-    public function verifikasi(User $user, Nasabah $nasabah): bool
+    public function deleteAny(User $user): bool
     {
-        return $user->bank_sampah_id === $nasabah->bank_sampah_id;
-    }
-
-    public function resetPin(User $user, Nasabah $nasabah): bool
-    {
-        return $user->bank_sampah_id === $nasabah->bank_sampah_id;
+        return false;
     }
 }

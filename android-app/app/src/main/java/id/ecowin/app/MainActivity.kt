@@ -1,205 +1,214 @@
 package id.ecowin.app
 
-import android.net.Uri
 import android.os.Bundle
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.time.OffsetDateTime
+import retrofit2.HttpException
 
+/**
+ * Alur sesi:
+ *  - Buka aplikasi -> cek token tersimpan -> masih valid? langsung ke Beranda (tanpa login Google lagi).
+ *  - Access token kedaluwarsa -> ApiClient refresh otomatis memakai refresh token.
+ *  - Refresh token dicabut/kedaluwarsa/akun dinonaktifkan -> kembali ke layar login.
+ */
 class MainActivity : ComponentActivity() {
+
+    private lateinit var session: SessionStore
+    private lateinit var client: ApiClient
+    private lateinit var googleAuth: GoogleAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Splash Screen native: bertahan hanya selagi sesi tersimpan diperiksa, dengan batas waktu agar tidak menahan aplikasi.
+        installSplashScreen().setKeepOnScreenCondition { SplashGate.keep }
         super.onCreate(savedInstanceState)
-        setContent { EcoWinApp() }
-    }
-}
+        lifecycleScope.launch { delay(SplashGate.MAX_MS); SplashGate.keep = false }
+        enableEdgeToEdge()
+        session = SessionStore(this)
+        client = ApiClient(session)
+        googleAuth = GoogleAuth(this)
 
-<<<<<<< HEAD
-private enum class Screen { DASHBOARD, TRANSAKSI, BIOPORI, AKUN }
-
-@Composable
-private fun EcoWinApp() {
-    val context = LocalContext.current
-    var token by remember { mutableStateOf(SessionStore.readToken(context)) }
-    Surface(Modifier.fillMaxSize()) {
-        if (token == null) LoginScreen { SessionStore.saveToken(context, it); token = it } else MainScreen(token!!) {
-            SessionStore.clear(context)
-            token = null
-        }
-=======
-private enum class Screen { DASHBOARD, TRANSAKSI, BIOPORI }
-
-@Composable
-private fun EcoWinApp() {
-    var token by remember { mutableStateOf<String?>(null) }
-    Surface(Modifier.fillMaxSize()) {
-        if (token == null) LoginScreen { token = it } else MainScreen(token!!)
->>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
-    }
-}
-
-@Composable
-private fun LoginScreen(onLoggedIn: (String) -> Unit) {
-<<<<<<< HEAD
-    var username by remember { mutableStateOf("") }
-=======
-    var phone by remember { mutableStateOf("") }
->>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
-    var pin by remember { mutableStateOf("") }
-    var message by remember { mutableStateOf<String?>(null) }
-    var loading by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.Center) {
-        Text("EcoWin", style = MaterialTheme.typography.headlineLarge)
-        Text("Login Nasabah")
-        Spacer(Modifier.height(20.dp))
-<<<<<<< HEAD
-        OutlinedTextField(username, { username = it }, label = { Text("Username dari petugas") }, modifier = Modifier.fillMaxWidth())
-=======
-        OutlinedTextField(phone, { phone = it }, label = { Text("Nomor HP") }, modifier = Modifier.fillMaxWidth())
->>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
-        OutlinedTextField(pin, { pin = it }, label = { Text("PIN") }, modifier = Modifier.fillMaxWidth())
-        Spacer(Modifier.height(12.dp))
-        Button(enabled = !loading, modifier = Modifier.fillMaxWidth(), onClick = {
-            scope.launch {
-                loading = true
-<<<<<<< HEAD
-                runCatching { ApiClient.api.login(LoginRequest(username, pin)).token }
-                    .onSuccess(onLoggedIn).onFailure { message = "Login gagal. Periksa username dan PIN." }
-=======
-                runCatching { ApiClient.api.login(LoginRequest(phone, pin)).token }
-                    .onSuccess(onLoggedIn).onFailure { message = "Login gagal. Periksa nomor HP dan PIN." }
->>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
-                loading = false
-            }
-        }) { Text(if (loading) "Memuat..." else "Masuk") }
-        message?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-    }
-}
-
-@Composable
-<<<<<<< HEAD
-private fun MainScreen(token: String, onLogout: () -> Unit) {
-=======
-private fun MainScreen(token: String) {
->>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
-    var screen by remember { mutableStateOf(Screen.DASHBOARD) }
-    Column(Modifier.fillMaxSize()) {
-        Box(Modifier.weight(1f)) {
-            when (screen) {
-                Screen.DASHBOARD -> DashboardScreen(token)
-                Screen.TRANSAKSI -> TransactionScreen(token)
-                Screen.BIOPORI -> BioporiScreen(token)
-<<<<<<< HEAD
-                Screen.AKUN -> AccountScreen(token, onLogout)
-=======
->>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
+        setContent {
+            EcoWinTheme {
+                Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                    EcoWinRoot(session, client, googleAuth)
+                }
             }
         }
-        NavigationBar {
-            NavigationBarItem(screen == Screen.DASHBOARD, { screen = Screen.DASHBOARD }, label = { Text("Beranda") }, icon = {})
-            NavigationBarItem(screen == Screen.TRANSAKSI, { screen = Screen.TRANSAKSI }, label = { Text("Transaksi") }, icon = {})
-            NavigationBarItem(screen == Screen.BIOPORI, { screen = Screen.BIOPORI }, label = { Text("Biopori") }, icon = {})
-<<<<<<< HEAD
-            NavigationBarItem(screen == Screen.AKUN, { screen = Screen.AKUN }, label = { Text("Akun") }, icon = {})
-=======
->>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
+    }
+}
+
+/** Penahan splash: false begitu status sesi diketahui (login/dashboard), sehingga tidak ada kilatan layar login. */
+object SplashGate {
+    const val MAX_MS = 2500L
+    @Volatile var keep: Boolean = true
+}
+
+private sealed interface AppState {
+    data object Checking : AppState
+    data class Offline(val message: String) : AppState
+    data class LoggedOut(val message: String? = null) : AppState
+    data class LoggedIn(val user: UserDto) : AppState
+}
+
+@Composable
+private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: GoogleAuth) {
+    var state by remember { mutableStateOf<AppState>(if (session.hasSession()) AppState.Checking else AppState.LoggedOut()) }
+    var retry by remember { mutableStateOf(0) }
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(state) { if (state !is AppState.Checking) SplashGate.keep = false }
+
+    LaunchedEffect(Unit) {
+        client.sessionExpired.collect {
+            state = AppState.LoggedOut("Sesi Anda berakhir. Silakan masuk kembali dengan Google.")
         }
     }
-}
 
-@Composable
-private fun DashboardScreen(token: String) {
-    var data by remember { mutableStateOf<DashboardResponse?>(null) }
-    var error by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(token) { runCatching { ApiClient.api.dashboard("Bearer $token") }.onSuccess { data = it }.onFailure { error = "Dashboard belum dapat dimuat." } }
-    Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Dashboard EcoWin", style = MaterialTheme.typography.headlineMedium)
-        data?.let { Text("Saldo: Rp ${it.total_saldo}\nAnorganik: ${it.total_berat_anorganik} kg\nOrganik: ${it.total_organik} kg\nEstimasi kompos: ${it.estimasi_kompos} kg\nBiopori menunggu: ${it.biopori_menunggu}") } ?: Text(error ?: "Memuat data...")
+    LaunchedEffect(retry) {
+        if (state is AppState.Checking) {
+            state = try {
+                val user = client.api.me().data
+                if (user.role == "nasabah") AppState.LoggedIn(user) else {
+                    session.clear()
+                    AppState.LoggedOut("Aplikasi ini khusus nasabah. Admin/Petugas gunakan dashboard web.")
+                }
+            } catch (e: HttpException) {
+                if (e.code() == 401 || e.code() == 403) {
+                    session.clear()
+                    AppState.LoggedOut("Sesi Anda berakhir. Silakan masuk kembali.")
+                } else AppState.Offline(client.errorMessage(e))
+            } catch (e: Exception) {
+                AppState.Offline(client.errorMessage(e))
+            }
+        }
+    }
+
+    when (val s = state) {
+        AppState.Checking -> CenteredProgress()
+        is AppState.Offline -> Column(
+            Modifier.fillMaxSize().padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(s.message, textAlign = TextAlign.Center)
+            Button(onClick = { state = AppState.Checking; retry++ }) { Text("Coba lagi") }
+        }
+        is AppState.LoggedOut -> LoginScreen(
+            initialMessage = s.message,
+            onGoogleToken = { idToken ->
+                val response = client.api.loginGoogle(GoogleLoginRequest(idToken, android.os.Build.MODEL ?: "android"))
+                if (response.user.role != "nasabah") {
+                    // Simpan sementara agar bisa dicabut di server, lalu langsung logout.
+                    session.save(response.tokens())
+                    runCatching { client.api.logout() }
+                    session.clear()
+                    throw IllegalStateException("Aplikasi ini khusus nasabah. Admin/Petugas gunakan dashboard web.")
+                }
+                session.save(response.tokens())
+                state = AppState.LoggedIn(response.user)
+            },
+            googleAuth = googleAuth,
+            client = client,
+            onRegistered = { response ->
+                session.save(response.tokens())
+                state = AppState.LoggedIn(response.user)
+            },
+        )
+        is AppState.LoggedIn -> MainScreen(
+            user = s.user,
+            client = client,
+            onUserChanged = { state = AppState.LoggedIn(it) },
+            onLogout = {
+                scope.launch {
+                    runCatching { client.api.logout() }
+                    session.clear()
+                    googleAuth.signOut()
+                    state = AppState.LoggedOut()
+                }
+            },
+        )
     }
 }
 
+/**
+ * Layar peluncuran saat sesi diperiksa: logo EcoWin yang sama dengan splash native, di posisi yang sama
+ * (tidak ada lompatan). Animasi ringan: masuk memudar-membesar, lalu "bernapas" pelan dengan garis kemajuan tipis.
+ * Tidak memuat data sensitif.
+ */
 @Composable
-<<<<<<< HEAD
-private fun AccountScreen(token: String, onLogout: () -> Unit) {
-    var oldPin by remember { mutableStateOf("") }
-    var newPin by remember { mutableStateOf("") }
-    var message by remember { mutableStateOf<String?>(null) }
-    var loading by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Akun", style = MaterialTheme.typography.headlineMedium)
-        OutlinedTextField(oldPin, { oldPin = it }, label = { Text("PIN lama") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(newPin, { newPin = it }, label = { Text("PIN baru (4–12 karakter)") }, modifier = Modifier.fillMaxWidth())
-        Button(enabled = !loading && oldPin.isNotBlank() && newPin.length in 4..12, onClick = {
-            scope.launch {
-                loading = true
-                runCatching { ApiClient.api.changePin("Bearer $token", ChangePinRequest(oldPin, newPin)) }
-                    .onSuccess { message = "PIN berhasil diganti."; oldPin = ""; newPin = "" }
-                    .onFailure { message = "Gagal mengganti PIN. Periksa PIN lama dan koneksi." }
-                loading = false
-            }
-        }) { Text(if (loading) "Memproses..." else "Ganti PIN") }
-        message?.let { Text(it) }
-        OutlinedButton(onClick = {
-            scope.launch {
-                runCatching { ApiClient.api.logout("Bearer $token") }
-                onLogout()
-            }
-        }) { Text("Keluar") }
+fun CenteredProgress() {
+    val masuk = remember { androidx.compose.animation.core.Animatable(0f) }
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        masuk.animateTo(1f, androidx.compose.animation.core.tween(450, easing = androidx.compose.animation.core.FastOutSlowInEasing))
     }
-}
+    val napas = androidx.compose.animation.core.rememberInfiniteTransition(label = "napas")
+    val skala by napas.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.045f,
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            androidx.compose.animation.core.tween(1300, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+            androidx.compose.animation.core.RepeatMode.Reverse,
+        ),
+        label = "skala",
+    )
 
-@Composable
-=======
->>>>>>> a3b4c50838bdd51191f54f8122435bf578fedcae
-private fun TransactionScreen(token: String) {
-    var data by remember { mutableStateOf<TransactionResponse?>(null) }
-    LaunchedEffect(token) { runCatching { ApiClient.api.transactions("Bearer $token") }.onSuccess { data = it } }
-    Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("Riwayat Transaksi", style = MaterialTheme.typography.headlineMedium)
-        data?.let { result ->
-            result.anorganik.forEach { Text("Anorganik • ${it.berat_kg} kg • Rp ${it.nilai_rupiah}") }
-            result.organik.forEach { Text("Organik • ${it.jenis_organik} • ${it.berat_kg} kg") }
-        } ?: Text("Memuat riwayat...")
-    }
-}
-
-@Composable
-private fun BioporiScreen(token: String) {
-    val context = LocalContext.current
-    var activities by remember { mutableStateOf<List<BioporiActivity>>(emptyList()) }
-    var description by remember { mutableStateOf("") }
-    var photoUri by remember { mutableStateOf<Uri?>(null) }
-    var message by remember { mutableStateOf<String?>(null) }
-    val scope = rememberCoroutineScope()
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { photoUri = it }
-    LaunchedEffect(token) { runCatching { ApiClient.api.biopori("Bearer $token") }.onSuccess { activities = it } }
-    Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text("BioporiPrint", style = MaterialTheme.typography.headlineMedium)
-        OutlinedTextField(description, { description = it }, label = { Text("Deskripsi aktivitas") }, modifier = Modifier.fillMaxWidth())
-        Button(onClick = { picker.launch("image/*") }) { Text(if (photoUri == null) "Pilih foto bukti" else "Foto dipilih") }
-        Button(enabled = photoUri != null, onClick = {
-            scope.launch {
-                val uri = photoUri ?: return@launch
-                val bytes = context.contentResolver.openInputStream(uri)?.readBytes() ?: return@launch
-                val body = bytes.toRequestBody("image/*".toMediaType())
-                runCatching { ApiClient.api.submitBiopori("Bearer $token", OffsetDateTime.now().toString().toRequestBody(), description.toRequestBody(), MultipartBody.Part.createFormData("foto_bukti", "bukti.jpg", body)) }
-                    .onSuccess { message = "Laporan terkirim dan menunggu verifikasi." }.onFailure { message = "Laporan gagal dikirim." }
-            }
-        }) { Text("Kirim laporan") }
-        message?.let { Text(it) }
-        activities.forEach { Text("${it.tanggal_pemasukan} • ${it.status}") }
+    Column(
+        Modifier.fillMaxSize().background(Canvas),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Image(
+            painterResource(R.drawable.ecowin_logo),
+            contentDescription = "EcoWin",
+            modifier = Modifier.width(116.dp).graphicsLayer {
+                val s0 = (0.9f + 0.1f * masuk.value) * skala
+                scaleX = s0
+                scaleY = s0
+                alpha = masuk.value
+            },
+        )
+        androidx.compose.material3.LinearProgressIndicator(
+            modifier = Modifier.padding(top = 36.dp).width(72.dp).clip(RoundedCornerShape(99.dp)),
+            color = Emerald,
+            trackColor = EmeraldSoft,
+        )
     }
 }

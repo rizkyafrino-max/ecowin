@@ -1,0 +1,29 @@
+@extends('auth.shell')
+
+@section('title', 'Daftar')
+
+@section('card')
+    <span class="ecl-kicker">DAFTAR NASABAH</span>
+    <h2>Buat akun EcoWin</h2>
+    <p class="ecl-sub">Daftar sebagai nasabah Bank Sampah RT/RW Anda dengan akun Google.</p>
+
+    <div class="ecl-steps" aria-label="Langkah pendaftaran">
+        <span class="on">1. Akun Google</span><span>2. Data diri</span><span>3. Petugas</span>
+    </div>
+
+    @if (session('auth_error'))
+        <div class="ecl-err" role="alert">{{ session('auth_error') }}</div>
+    @endif
+
+    <a href="{{ $googleUrl }}" class="ecl-btn">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+        <span>Daftar dengan Google</span>
+    </a>
+
+    <p class="ecl-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 5 3 8.5 7 10 4-1.5 7-5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+        <span>Kami hanya membaca nama dan email dari akun Google Anda. Tidak ada kata sandi yang dibuat.</span>
+    </p>
+
+    <p class="ecl-or">Sudah punya akun? <a class="ecl-link" href="{{ route('filament.admin.auth.login') }}">Masuk</a></p>
+@endsection

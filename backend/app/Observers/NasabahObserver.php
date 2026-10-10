@@ -2,26 +2,18 @@
 
 namespace App\Observers;
 
-use App\Models\AuditLog;
 use App\Models\Nasabah;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class NasabahObserver
 {
-    public function created(Nasabah $nasabah): void
+    /**
+     * Token QR acak & tidak bisa ditebak (bukan data pribadi).
+     */
+    public function creating(Nasabah $nasabah): void
     {
-        if (! Auth::id()) {
-            return;
+        if (! $nasabah->kartu_qr_token) {
+            $nasabah->kartu_qr_token = Str::random(48);
         }
-
-        AuditLog::create([
-            'user_id' => Auth::id(),
-            'aksi' => 'buat_akun_nasabah',
-            'detail' => json_encode([
-                'nasabah_id' => $nasabah->id,
-                'nama' => $nasabah->nama,
-                'no_hp' => $nasabah->no_hp,
-            ]),
-        ]);
     }
 }
