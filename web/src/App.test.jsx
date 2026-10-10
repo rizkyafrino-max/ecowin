@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import { saveSession } from './api/session';
@@ -7,6 +7,7 @@ import { createPkce } from './utils/pkce';
 vi.mock('./utils/navigate', () => ({
   LOGIN_URL: 'http://localhost:8000/masuk',
   REGISTER_URL: 'http://localhost:8000/daftar',
+  GOOGLE_URL: 'http://localhost:8000/auth/google/redirect',
   goExternal: vi.fn(),
 }));
 import { goExternal } from './utils/navigate';
@@ -39,20 +40,27 @@ beforeEach(() => {
 });
 
 describe('login satu pintu (halaman Laravel)', () => {
-  it('tanpa sesi: diarahkan ke halaman login Laravel membawa PKCE challenge', async () => {
+  it('tanpa sesi: tampil halaman login; tombol Google memulai OAuth dengan PKCE challenge', async () => {
     render(<App />);
+    expect(await screen.findByRole('heading', { name: 'Selamat datang' })).toBeInTheDocument();
+    expect(screen.getByText('Langkah kecil, dampak besar.')).toBeInTheDocument();
+    expect(screen.queryByLabelText(/password|kata sandi|pin/i)).toBeNull();
+    expect(goExternal).not.toHaveBeenCalled(); // tidak ada pengalihan otomatis
+
+    fireEvent.click(screen.getByRole('button', { name: /Lanjutkan dengan Google/ }));
     await waitFor(() => expect(goExternal).toHaveBeenCalledTimes(1));
 
     const url = new URL(goExternal.mock.calls[0][0]);
-    expect(url.origin + url.pathname).toBe('http://localhost:8000/masuk');
+    expect(url.origin + url.pathname).toBe('http://localhost:8000/auth/google/redirect');
     expect(url.searchParams.get('app')).toBe('web');
     expect(url.searchParams.get('c')).toMatch(/^[A-Za-z0-9_-]{43}$/); // SHA-256 base64url
     expect(sessionStorage.getItem('ecowin.pkce')).toBeTruthy(); // verifier disimpan lokal, tidak dikirim
   });
 
-  it('/daftar mengarahkan ke halaman pendaftaran Laravel', async () => {
+  it('/daftar: tombol mengarahkan ke halaman pendaftaran Laravel', async () => {
     window.history.pushState({}, '', '/daftar');
     render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: /Daftar dengan Google/ }));
     await waitFor(() => expect(goExternal).toHaveBeenCalled());
     expect(goExternal.mock.calls[0][0]).toMatch(/^http:\/\/localhost:8000\/daftar\?/);
   });
@@ -124,10 +132,10 @@ describe('sesi tersimpan', () => {
     await waitFor(() => expect(localStorage.getItem('ecowin.session')).toBeNull());
   });
 
-  it('refresh token kedaluwarsa: sesi dibuang dan diarahkan login', async () => {
+  it('refresh token kedaluwarsa: sesi dibuang dan kembali ke halaman login', async () => {
     saveSession({ access_token: 'A', access_expires_at: future(-1000), refresh_token: 'R', refresh_expires_at: future(-1000) });
     render(<App />);
-    await waitFor(() => expect(goExternal).toHaveBeenCalled());
+    expect(await screen.findByRole('heading', { name: 'Selamat datang' })).toBeInTheDocument();
     expect(localStorage.getItem('ecowin.session')).toBeNull();
   });
 

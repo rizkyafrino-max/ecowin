@@ -55,7 +55,7 @@ class UnifiedLoginTest extends TestCase
     public function test_login_page_is_single_entry_for_all_roles_with_register_link(): void
     {
         $this->get('/admin/login')->assertOk()
-            ->assertSee('ADMIN')->assertSee('PETUGAS')->assertSee('NASABAH')
+            ->assertDontSee('Masuk sebagai')->assertSee('Kelola Sampah.', false)->assertSee('Langkah kecil, dampak besar.')->assertSee('Lanjutkan dengan Google')
             ->assertSee('Daftar sebagai nasabah')->assertSee(route('daftar'), false);
     }
 

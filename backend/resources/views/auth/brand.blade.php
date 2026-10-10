@@ -1,9 +1,15 @@
 <section class="ecl-top" aria-label="Tentang EcoWin">
-        <img class="ecl-logo" src="{{ asset('images/ecowin-logo.png') }}" alt="EcoWin — since 2026" width="168" height="195">
-
-        <div>
-            <span class="ecl-eyebrow">Bank Sampah Digital Berkelanjutan</span>
-            <h1>Sampah jadi <em>nilai</em>, lingkungan jadi lestari.</h1>
-            <p>Setoran anorganik tercatat transparan menjadi saldo, sementara sampah organik diolah lewat Biopori menjadi kompos. Semua dalam satu sistem untuk RT/RW.</p>
+        <div class="ecl-brand">
+            <span class="ecl-mark"><img src="{{ asset('images/ecowin-emblem.png') }}" alt="" width="40" height="40"></span>
+            <span class="ecl-word">Eco<b>Win</b></span>
         </div>
+
+        <div class="ecl-hero">
+            <h1>Kelola Sampah.<br><em>Jaga Masa Depan.</em></h1>
+            <p>Bank sampah digital untuk lingkungan yang lebih baik.</p>
+        </div>
+
+        <img class="ecl-illus" src="{{ asset('images/ecowin-illustration.svg') }}" alt="" width="480" height="360">
+
+        <p class="ecl-tagline">Langkah kecil, dampak besar.</p>
     </section>

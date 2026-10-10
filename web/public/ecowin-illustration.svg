@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" fill="none" role="img" aria-label="Ilustrasi daun dan siklus daur ulang EcoWin">
+  <path d="M62 246C22 188 50 92 142 68c82-21 134 18 196 8 62-10 116 34 124 104 8 72-44 132-124 152-92 22-194 8-276-86Z" fill="#D1FAE5"/>
+  <path d="M130 90c28-22 72-26 100-8 24 16 14 48-12 58-32 12-70 6-92-12-10-9-6-28 4-38Z" fill="#A7F3D0" opacity=".7"/>
+  <path d="M240 78a112 112 0 1 0 0 224 112 112 0 1 0 0-224Z" fill="#ECFDF5"/>
+  <path d="M132 190a108 108 0 0 1 176-84" stroke="#059669" stroke-width="12" stroke-linecap="round"/>
+  <path d="M300 84l30 12-24 20Z" fill="#059669"/>
+  <path d="M348 190a108 108 0 0 1-176 84" stroke="#10B981" stroke-width="12" stroke-linecap="round"/>
+  <path d="M180 296l-30-12 24-20Z" fill="#10B981"/>
+  <path d="M240 118c-52 12-76 66-60 126 62 0 112-38 124-120-24-8-44-8-64-6Z" fill="#10B981"/>
+  <path d="M192 232c18-34 42-58 78-82" stroke="#ECFDF5" stroke-width="7" stroke-linecap="round"/>
+  <path d="M404 64c-34 4-50 34-42 70 38 0 66-22 72-64-12-4-20-6-30-6Z" fill="#34D399"/>
+  <path d="M378 118c8-18 20-30 38-40" stroke="#ECFDF5" stroke-width="4" stroke-linecap="round"/>
+  <path d="M66 270c26-2 46 16 44 44-28 0-46-16-44-44Z" fill="#059669"/>
+  <path d="M96 40a9 9 0 1 0 0 18 9 9 0 1 0 0-18Z" fill="#34D399"/>
+  <path d="M440 250a7 7 0 1 0 0 14 7 7 0 1 0 0-14Z" fill="#10B981"/>
+  <path d="M30 150a6 6 0 1 0 0 12 6 6 0 1 0 0-12Z" fill="#059669" opacity=".6"/>
+</svg>

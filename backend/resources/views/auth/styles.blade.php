@@ -77,4 +77,45 @@
         .ecl-who img{width:40px;height:40px;border-radius:999px;object-fit:cover;flex:none}
         .ecl-who b{display:block;font-size:.88rem}
         .ecl-who span{font-size:.78rem;color:#64748B}
+    
+        /* ===== Desain ulang: panel kiri terang, ilustrasi organik, tipografi tegas ===== */
+        .ecl-root{background:#F8FAFC;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);grid-template-rows:1fr;grid-template-areas:"top form"}
+        .ecl-bg{background:#ECFDF5;grid-row:1}
+        .ecl-top{grid-area:top;color:#0F172A;justify-content:space-between;gap:1.5rem;padding:clamp(1.75rem,4vw,3rem) clamp(1.5rem,5vw,4.5rem)}
+        .ecl-brand{display:flex;align-items:center;gap:.7rem}
+        .ecl-mark{width:44px;height:44px;border-radius:14px;background:#000;display:inline-flex;align-items:center;justify-content:center}
+        .ecl-mark img{width:30px;height:auto}
+        .ecl-word{font-size:1.45rem;font-weight:800;color:#0F172A;letter-spacing:-.01em}
+        .ecl-word b{color:#059669}
+        .ecl-hero h1{margin:0;font-size:clamp(2rem,3.6vw,3.1rem);line-height:1.1;font-weight:800;color:#0F172A;letter-spacing:-.02em;max-width:none}
+        .ecl-hero h1 em{font-style:normal;color:#059669;background:none;-webkit-text-fill-color:#059669}
+        .ecl-hero p{margin:1rem 0 0;max-width:34ch;color:#475569;font-size:clamp(1rem,1.3vw,1.12rem);line-height:1.6}
+        .ecl-illus{width:min(100%,520px);height:auto;align-self:center;margin:0 auto}
+        .ecl-top .ecl-tagline{margin:0;color:#047857;max-width:none;font-size:.95rem;font-weight:600;letter-spacing:.01em}
+        .ecl-tagline::before{content:"";display:inline-block;width:26px;height:2px;border-radius:2px;background:#10B981;margin-right:.6rem;vertical-align:middle}
+        .ecl-form{background:#fff}
+        .ecl-btn{border-radius:14px;min-height:56px;border-color:#D1D5DB}
+        .ecl-btn:hover{border-color:#059669;background:#F0FDF4;box-shadow:0 0 0 3px rgba(5,150,105,.14)}
+        .ecl-btn:focus-visible{outline:3px solid #059669;outline-offset:2px}
+        .ecl-btn:active{transform:translateY(1px)}
+        .ecl-kicker{background:#ECFDF5;border-color:#A7F3D0;color:#047857}
+        .ecl-btn-primary{background:#059669;border-radius:14px}
+        .ecl-btn-primary:hover{background:#047857}
+        .ecl-link{color:#047857}
+        @media(max-width:960px){
+            .ecl-root{display:flex;flex-direction:column;background:#ECFDF5}
+            .ecl-top{padding:1.25rem 1.25rem .5rem;gap:.75rem;align-items:flex-start;text-align:left;background-image:none}
+            .ecl-hero h1{font-size:1.7rem}
+            .ecl-hero p{font-size:.92rem;margin-top:.5rem}
+            .ecl-illus{width:min(78%,300px);margin:0 auto}
+            .ecl-tagline{display:none}
+            .ecl-top .ecl-hero p{display:block}
+            .ecl-form{background:transparent;padding:0 1rem 1.5rem}
+            .ecl-card{box-shadow:0 12px 30px rgba(15,23,42,.10);border:1px solid #E2E8F0}
+        }
+        @media(min-width:600px) and (max-width:960px){
+            .ecl-top{padding-inline:2.5rem}
+            .ecl-illus{width:min(60%,340px)}
+            .ecl-form{padding-inline:2.5rem}
+        }
     </style>

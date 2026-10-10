@@ -25,7 +25,7 @@ class GoogleWebLoginTest extends TestCase
             ->assertOk()
             ->assertSee('EcoWin')->assertSee('Masuk')
             ->assertSee('Bank Sampah Digital Berkelanjutan')
-            ->assertSee('Continue with Google')
+            ->assertSee('Lanjutkan dengan Google')
             ->assertSee('Gunakan akun Google yang telah terverifikasi untuk mengakses EcoWin.')
             ->assertDontSee('type="password"', false);
     }

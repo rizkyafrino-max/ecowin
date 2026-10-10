@@ -1,5 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { LoadingState } from './components/States';
+import LaunchScreen from './components/LaunchScreen';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import AppLayout from './layouts/AppLayout';
 import Dashboard from './pages/Dashboard';
@@ -15,7 +15,7 @@ import Transaksi from './pages/Transaksi';
 /** Halaman di balik login: sesi valid langsung masuk, selain itu kembali ke Login Google. */
 function Protected() {
   const { status } = useAuth();
-  if (status === 'loading') return <div className="mx-auto max-w-md p-8"><LoadingState rows={3} /></div>;
+  if (status === 'loading') return <LaunchScreen />;
   if (status !== 'authed') return <Navigate to="/masuk" replace />;
   return <AppLayout />;
 }
