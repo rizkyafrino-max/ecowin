@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ikon splash: daun + siklus EcoWin. Isi dikecilkan agar muat di zona aman (2/3 tengah) pada topeng lingkaran Android 12+. -->
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="240dp"
-    android:height="240dp"
-    android:viewportWidth="240"
-    android:viewportHeight="240">
-    <group android:pivotX="120" android:pivotY="120" android:scaleX="0.62" android:scaleY="0.62">
-        <path android:strokeColor="#059669" android:strokeWidth="11" android:strokeLineCap="round" android:pathData="M52,124a68,68 0,0 1,110 -52" />
-        <path android:fillColor="#059669" android:pathData="M152,56l24,9 -19,16Z" />
-        <path android:strokeColor="#10B981" android:strokeWidth="11" android:strokeLineCap="round" android:pathData="M188,116a68,68 0,0 1,-110 52" />
-        <path android:fillColor="#10B981" android:pathData="M88,184l-24,-9 19,-16Z" />
-        <path android:fillColor="#10B981" android:pathData="M120,66c-34,8 -49,44 -38,82 42,0 74,-26 80,-79 -16,-5 -30,-5 -42,-3Z" />
-        <path android:strokeColor="#F8FAFC" android:strokeWidth="6" android:strokeLineCap="round" android:pathData="M92,140c12,-24 28,-40 52,-56" />
-    </group>
-</vector>
+<!-- Ikon splash: logo EcoWin asli (bukan ikon lain), diperkecil agar muat di zona aman topeng lingkaran Android 12+. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:width="116dp"
+        android:height="135dp"
+        android:gravity="center"
+        android:drawable="@drawable/ecowin_logo" />
+</layer-list>
