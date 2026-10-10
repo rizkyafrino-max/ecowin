@@ -10,6 +10,11 @@ plugins {
 val apiBaseUrl: String = (project.findProperty("ECOWIN_API_BASE_URL") as String?) ?: "http://10.0.2.2:8000/api/"
 val googleWebClientId: String = (project.findProperty("ECOWIN_GOOGLE_WEB_CLIENT_ID") as String?) ?: ""
 
+val taskDir = gradle.startParameter.taskNames
+if (taskDir.any { it.contains("Release", ignoreCase = true) && !it.contains("releaseCheck", ignoreCase = true) } && !apiBaseUrl.startsWith("https://")) {
+    throw GradleException("Build release wajib memakai HTTPS: set ECOWIN_API_BASE_URL=https://domain-anda/api/ di gradle.properties.")
+}
+
 android {
     namespace = "id.ecowin.app"
     compileSdk = 35
@@ -30,8 +35,30 @@ android {
             manifestPlaceholders["usesCleartextTraffic"] = "true"
         }
         release {
-            isMinifyEnabled = false
+            // R8 + penyusutan resource; HTTP biasa dimatikan. Penandatanganan memakai keystore dari gradle.properties
+            // pengguna (ECOWIN_KEYSTORE_FILE/PASSWORD, ECOWIN_KEY_ALIAS/PASSWORD): tidak pernah disimpan di repo.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             manifestPlaceholders["usesCleartextTraffic"] = "false"
+            val ks = project.findProperty("ECOWIN_KEYSTORE_FILE") as String?
+            if (!ks.isNullOrBlank()) {
+                signingConfig = signingConfigs.create("ecowinRelease") {
+                    storeFile = file(ks)
+                    storePassword = project.findProperty("ECOWIN_KEYSTORE_PASSWORD") as String?
+                    keyAlias = project.findProperty("ECOWIN_KEY_ALIAS") as String?
+                    keyPassword = project.findProperty("ECOWIN_KEY_PASSWORD") as String?
+                }
+            }
+        }
+        // Hanya untuk menguji hasil R8 di perangkat sendiri: sama dengan release tetapi memakai kunci debug
+        // (SHA-1 sama, jadi login Google tetap jalan). JANGAN dibagikan.
+        create("releaseCheck") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += "release"
+            // Hanya build uji lokal ini yang boleh HTTP (server Laravel lokal); release asli tetap HTTPS saja.
+            manifestPlaceholders["usesCleartextTraffic"] = "true"
         }
     }
 
