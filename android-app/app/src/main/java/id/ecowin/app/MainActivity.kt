@@ -1,6 +1,7 @@
 package id.ecowin.app
 
 import android.os.Bundle
+import androidx.compose.foundation.layout.offset
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.draw.clip
@@ -77,7 +78,7 @@ class MainActivity : ComponentActivity() {
 
 /** Penahan splash: false begitu status sesi diketahui (login/dashboard), sehingga tidak ada kilatan layar login. */
 object SplashGate {
-    const val MAX_MS = 2500L
+    const val MAX_MS = 4000L
     @Volatile var keep: Boolean = true
 }
 
@@ -169,20 +170,16 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
 }
 
 /**
- * Layar peluncuran saat sesi diperiksa: logo EcoWin yang sama dengan splash native, di posisi yang sama
- * (tidak ada lompatan). Animasi ringan: masuk memudar-membesar, lalu "bernapas" pelan dengan garis kemajuan tipis.
- * Tidak memuat data sensitif.
+ * Layar peluncuran cadangan, hanya tampil bila pemeriksaan sesi lebih lama dari batas splash sistem.
+ * Logo diletakkan tepat di tengah dengan ukuran sama seperti splash sistem (116dp) dan langsung penuh
+ * (tanpa animasi masuk), sehingga peralihan dari splash sistem tidak terlihat melompat. Hanya "bernapas" pelan.
  */
 @Composable
 fun CenteredProgress() {
-    val masuk = remember { androidx.compose.animation.core.Animatable(0f) }
-    androidx.compose.runtime.LaunchedEffect(Unit) {
-        masuk.animateTo(1f, androidx.compose.animation.core.tween(450, easing = androidx.compose.animation.core.FastOutSlowInEasing))
-    }
     val napas = androidx.compose.animation.core.rememberInfiniteTransition(label = "napas")
     val skala by napas.animateFloat(
         initialValue = 1f,
-        targetValue = 1.045f,
+        targetValue = 1.04f,
         animationSpec = androidx.compose.animation.core.infiniteRepeatable(
             androidx.compose.animation.core.tween(1300, easing = androidx.compose.animation.core.FastOutSlowInEasing),
             androidx.compose.animation.core.RepeatMode.Reverse,
@@ -190,23 +187,17 @@ fun CenteredProgress() {
         label = "skala",
     )
 
-    Column(
-        Modifier.fillMaxSize().background(Canvas),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(Canvas)) {
         Image(
             painterResource(R.drawable.ecowin_logo),
             contentDescription = "EcoWin",
-            modifier = Modifier.width(116.dp).graphicsLayer {
-                val s0 = (0.9f + 0.1f * masuk.value) * skala
-                scaleX = s0
-                scaleY = s0
-                alpha = masuk.value
+            modifier = Modifier.align(Alignment.Center).width(116.dp).graphicsLayer {
+                scaleX = skala
+                scaleY = skala
             },
         )
         androidx.compose.material3.LinearProgressIndicator(
-            modifier = Modifier.padding(top = 36.dp).width(72.dp).clip(RoundedCornerShape(99.dp)),
+            modifier = Modifier.align(Alignment.Center).offset(y = 104.dp).width(72.dp).clip(RoundedCornerShape(99.dp)),
             color = Emerald,
             trackColor = EmeraldSoft,
         )
