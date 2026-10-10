@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ikon splash: daun EcoWin di dalam lingkaran mint. Hanya bentuk, tanpa data apa pun. -->
+<!-- Ikon splash: daun + siklus EcoWin. Isi dikecilkan agar muat di zona aman (2/3 tengah) pada topeng lingkaran Android 12+. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="240dp"
     android:height="240dp"
     android:viewportWidth="240"
     android:viewportHeight="240">
-    <path android:fillColor="#D1FAE5" android:pathData="M120,20a100,100 0,1 0,0 200a100,100 0,1 0,0 -200Z" />
-    <path android:strokeColor="#059669" android:strokeWidth="9" android:strokeLineCap="round" android:pathData="M60,122a60,60 0,0 1,98 -46" />
-    <path android:fillColor="#059669" android:pathData="M150,64l20,8 -16,14Z" />
-    <path android:strokeColor="#10B981" android:strokeWidth="9" android:strokeLineCap="round" android:pathData="M180,118a60,60 0,0 1,-98 46" />
-    <path android:fillColor="#10B981" android:pathData="M90,176l-20,-8 16,-14Z" />
-    <path android:fillColor="#10B981" android:pathData="M120,76c-30,7 -43,38 -34,72 36,0 64,-22 70,-68 -14,-5 -26,-5 -36,-4Z" />
-    <path android:strokeColor="#D1FAE5" android:strokeWidth="5" android:strokeLineCap="round" android:pathData="M96,140c10,-20 24,-34 44,-48" />
+    <group android:pivotX="120" android:pivotY="120" android:scaleX="0.62" android:scaleY="0.62">
+        <path android:strokeColor="#059669" android:strokeWidth="11" android:strokeLineCap="round" android:pathData="M52,124a68,68 0,0 1,110 -52" />
+        <path android:fillColor="#059669" android:pathData="M152,56l24,9 -19,16Z" />
+        <path android:strokeColor="#10B981" android:strokeWidth="11" android:strokeLineCap="round" android:pathData="M188,116a68,68 0,0 1,-110 52" />
+        <path android:fillColor="#10B981" android:pathData="M88,184l-24,-9 19,-16Z" />
+        <path android:fillColor="#10B981" android:pathData="M120,66c-34,8 -49,44 -38,82 42,0 74,-26 80,-79 -16,-5 -30,-5 -42,-3Z" />
+        <path android:strokeColor="#F8FAFC" android:strokeWidth="6" android:strokeLineCap="round" android:pathData="M92,140c12,-24 28,-40 52,-56" />
+    </group>
 </vector>

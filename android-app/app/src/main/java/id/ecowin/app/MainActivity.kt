@@ -1,6 +1,15 @@
 package id.ecowin.app
 
 import android.os.Bundle
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
@@ -155,9 +164,23 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
     }
 }
 
+/** Layar peluncuran saat sesi diperiksa: identitas yang sama dengan splash dan Web, tanpa data sensitif. */
 @Composable
 fun CenteredProgress() {
-    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-        CircularProgressIndicator()
+    Column(
+        Modifier.fillMaxSize().background(Canvas),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Image(
+            painterResource(R.drawable.ecowin_emblem), contentDescription = null,
+            modifier = Modifier.size(80.dp).background(Color.Black, RoundedCornerShape(26.dp)).padding(14.dp),
+        )
+        Row(Modifier.padding(top = 18.dp)) {
+            Text("Eco", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
+            Text("Win", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = Emerald)
+        }
+        Text("Langkah kecil, dampak besar.", color = Slate500, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp))
+        CircularProgressIndicator(Modifier.padding(top = 28.dp).size(22.dp), strokeWidth = 2.dp, color = Emerald)
     }
 }

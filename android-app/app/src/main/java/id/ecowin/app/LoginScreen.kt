@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -61,7 +63,7 @@ fun LoginScreen(
     val scope = rememberCoroutineScope()
 
     Column(
-        Modifier.fillMaxSize().background(EmeraldSoft).verticalScroll(rememberScrollState()),
+        Modifier.fillMaxSize().background(EmeraldSoft).statusBarsPadding().navigationBarsPadding().verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // Identitas + ilustrasi
