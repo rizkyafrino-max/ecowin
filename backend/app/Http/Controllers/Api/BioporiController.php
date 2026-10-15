@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DecisionRequest;
 use App\Http\Requests\StoreAktivitasBioporiRequest;
+use App\Http\Requests\StoreTitikBioporiRequest;
 use App\Http\Resources\AktivitasBioporiResource;
 use App\Http\Resources\TitikBioporiResource;
 use App\Models\AktivitasBiopori;
@@ -30,13 +31,47 @@ class BioporiController extends Controller
     {
         $user = $request->user();
 
+        // Titik resmi (disetujui) di Bank Sampah pengguna. Nasabah juga melihat pengajuannya sendiri
+        // yang masih menunggu / ditolak; pengajuan nasabah lain tidak pernah terlihat.
         $titik = TitikBiopori::query()
-            ->when(! $user->isAdmin(), fn ($q) => $q->where('bank_sampah_id', $user->bank_sampah_id ?? $user->nasabah?->bank_sampah_id ?? 0))
+            ->when(! $user->isAdmin(), fn ($q) => $q->where('bank_sampah_id', ($user->isNasabah() ? $user->nasabah?->bank_sampah_id : $user->bank_sampah_id) ?? 0))
             ->where('status', 'aktif')
+            ->where(function ($q) use ($user): void {
+                $q->where('verifikasi', TitikBiopori::VERIFIKASI_APPROVED);
+                if ($user->isNasabah()) {
+                    $q->orWhere('diajukan_oleh', $user->id);
+                } else {
+                    $q->orWhere('verifikasi', TitikBiopori::VERIFIKASI_PENDING);
+                }
+            })
             ->orderBy('nama_lokasi')
             ->get();
 
         return TitikBioporiResource::collection($titik);
+    }
+
+    /**
+     * Nasabah mengajukan titik Biopori baru (menunggu verifikasi petugas).
+     */
+    public function ajukanTitik(StoreTitikBioporiRequest $request): JsonResponse
+    {
+        $titik = $this->service->ajukanTitik($request->user(), $request->validated());
+
+        return (new TitikBioporiResource($titik))->response()->setStatusCode(201);
+    }
+
+    public function approveTitik(DecisionRequest $request, TitikBiopori $titik): TitikBioporiResource
+    {
+        $this->authorize('verify', $titik);
+
+        return new TitikBioporiResource($this->service->setujuiTitik($request->user(), $titik, $request->input('catatan')));
+    }
+
+    public function rejectTitik(DecisionRequest $request, TitikBiopori $titik): TitikBioporiResource
+    {
+        $this->authorize('verify', $titik);
+
+        return new TitikBioporiResource($this->service->tolakTitik($request->user(), $titik, (string) $request->input('catatan')));
     }
 
     public function index(Request $request): AnonymousResourceCollection

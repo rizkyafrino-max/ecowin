@@ -49,19 +49,45 @@
                 this.setPoint(position.lat, position.lng, 'Penanda digeser. Koordinat berhasil diperbarui.');
             });
         },
+        watchId: null,
+        circle: null,
+        berhenti() {
+            if (this.watchId !== null) { navigator.geolocation.clearWatch(this.watchId); this.watchId = null; }
+        },
         ambil() {
             if (!navigator.geolocation) {
                 this.status = 'Perangkat tidak mendukung akses lokasi. Pilih titik di peta atau isi manual.';
                 return;
             }
+            this.berhenti();
             this.status = 'Meminta izin lokasi…';
-            navigator.geolocation.getCurrentPosition(
-                posisi => this.setPoint(posisi.coords.latitude, posisi.coords.longitude, `Lokasi terisi (akurasi ±${Math.round(posisi.coords.accuracy)} meter). Anda masih bisa menggeser penanda atau mengedit koordinat.`),
+            let terbaik = null;
+            const selesai = () => {
+                this.berhenti();
+                if (!terbaik) return;
+                const a = Math.round(terbaik.accuracy);
+                this.status = a > 100
+                    ? `Akurasi rendah (±${a} m): perangkat ini kemungkinan memakai perkiraan WiFi/IP, bukan GPS. Geser penanda ke posisi yang benar atau coba dari HP.`
+                    : `Lokasi terisi (akurasi ±${a} m). Anda masih bisa menggeser penanda atau mengedit koordinat.`;
+            };
+            // Pembacaan pertama sering kasar; ikuti beberapa detik dan simpan yang paling akurat.
+            this.watchId = navigator.geolocation.watchPosition(
+                posisi => {
+                    const c = posisi.coords;
+                    if (terbaik && c.accuracy >= terbaik.accuracy) return;
+                    terbaik = { accuracy: c.accuracy };
+                    this.setPoint(c.latitude, c.longitude, `Mencari sinyal terbaik… (akurasi ±${Math.round(c.accuracy)} m)`);
+                    if (this.circle) this.map.removeLayer(this.circle);
+                    this.circle = L.circle([c.latitude, c.longitude], { radius: c.accuracy, weight: 1, color: '#176b4d', fillOpacity: 0.12 }).addTo(this.map);
+                    if (c.accuracy <= 20) selesai();
+                },
                 error => {
+                    this.berhenti();
                     this.status = error.code === 1 ? 'Izin lokasi ditolak. Anda tetap dapat memilih titik di peta atau mengisi manual.' : 'Lokasi belum tersedia. Pilih titik di peta atau isi manual.';
                 },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
             );
+            setTimeout(selesai, 15000);
         }
     }"
     class="biopori-location-picker"

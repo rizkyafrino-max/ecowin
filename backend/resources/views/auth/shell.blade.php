@@ -14,7 +14,7 @@
     </style>
 </head>
 <body>
-    <div class="ecl-root">
+    <div class="ecl-root @yield('rootClass')">
         @include('auth.styles')
 
         <div class="ecl-bg" aria-hidden="true"></div>

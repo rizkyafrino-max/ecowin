@@ -63,6 +63,9 @@ interface EcoWinApi {
     @GET("organik/biopori/lokasi")
     suspend fun lokasiBiopori(): DataWrapper<List<TitikBioporiDto>>
 
+    @POST("organik/biopori/lokasi")
+    suspend fun ajukanTitik(@Body body: AjukanTitikRequest): DataWrapper<TitikBioporiDto>
+
     @GET("organik/biopori")
     suspend fun aktivitasBiopori(): Paged<AktivitasBioporiDto>
 

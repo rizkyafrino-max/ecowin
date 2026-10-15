@@ -59,7 +59,7 @@ class LaporanService
                 'jumlah_aktivitas_biopori' => (clone $biopori)->count(),
                 'biopori_pending' => (clone $biopori)->where('status', AktivitasBiopori::STATUS_PENDING)->count(),
                 'biopori_terverifikasi' => (clone $biopori)->where('status', AktivitasBiopori::STATUS_APPROVED)->count(),
-                'biopori_aktif' => $user->isNasabah() ? null : TitikBiopori::query()->visibleTo($user)->where('status', 'aktif')->count(),
+                'biopori_aktif' => $user->isNasabah() ? null : TitikBiopori::query()->visibleTo($user)->disetujui()->where('status', 'aktif')->count(),
             ],
             'keuangan' => [
                 'total_saldo_nasabah' => (float) Nasabah::query()->visibleTo($user)->sum('saldo'),

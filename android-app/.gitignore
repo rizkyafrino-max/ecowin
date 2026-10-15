@@ -8,3 +8,6 @@ local.properties
 *.err
 hs_err_pid*
 replay_pid*
+
+# APK uji untuk dibagikan lokal
+/dist/

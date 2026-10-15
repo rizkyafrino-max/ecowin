@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\VisibleToUser;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,7 +28,24 @@ class TitikBiopori extends Model
         self::PANEN_SUDAH => 'Sudah panen',
     ];
 
+    public const VERIFIKASI_PENDING = 'pending';
+
+    public const VERIFIKASI_APPROVED = 'approved';
+
+    public const VERIFIKASI_REJECTED = 'rejected';
+
     protected $table = 'titik_biopori';
+
+    /** Hanya titik yang sudah disetujui yang tampil di peta resmi dan boleh dipakai untuk melapor. */
+    public function scopeDisetujui(Builder $query): Builder
+    {
+        return $query->where($this->qualifyColumn('verifikasi'), self::VERIFIKASI_APPROVED);
+    }
+
+    public function isPendingVerifikasi(): bool
+    {
+        return $this->verifikasi === self::VERIFIKASI_PENDING;
+    }
 
     protected $fillable = [
         'nasabah_id',
@@ -51,6 +69,7 @@ class TitikBiopori extends Model
             'terakhir_diisi_at' => 'datetime',
             'estimasi_panen_at' => 'datetime',
             'dipanen_at' => 'datetime',
+            'diverifikasi_at' => 'datetime',
             'hasil_kompos_kg' => 'decimal:2',
         ];
     }

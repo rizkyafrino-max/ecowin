@@ -97,14 +97,34 @@ class TitikBioporiResource extends Resource
                 TextColumn::make('status')->badge()->color(fn (string $state): string => match ($state) {
                     'aktif' => 'success', 'penuh' => 'warning', default => 'gray',
                 }),
+                TextColumn::make('verifikasi')->label('Verifikasi')->badge()
+                    ->formatStateUsing(fn (string $state): string => ['pending' => 'Menunggu', 'approved' => 'Disetujui', 'rejected' => 'Ditolak'][$state] ?? $state)
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning', 'rejected' => 'danger', default => 'success',
+                    }),
                 TextColumn::make('bankSampah.nama_bank_sampah')->label('Bank Sampah')->visible(fn (): bool => auth()->user()?->isAdmin() ?? false),
             ])
             ->filters([
                 SelectFilter::make('status')->options(['aktif' => 'Aktif', 'penuh' => 'Penuh', 'dikosongkan' => 'Dikosongkan']),
+                SelectFilter::make('verifikasi')->label('Verifikasi')->options(['pending' => 'Menunggu', 'approved' => 'Disetujui', 'rejected' => 'Ditolak']),
             ])
             ->recordActions([
+                Action::make('setujui')->label('Setujui titik')->icon('heroicon-o-check-circle')->color('success')
+                    ->visible(fn (TitikBiopori $r): bool => $r->isPendingVerifikasi() && (auth()->user()?->can('verify', $r) ?? false))
+                    ->requiresConfirmation()->modalDescription('Titik akan tampil di peta dan bisa dipakai nasabah untuk melapor aktivitas.')
+                    ->action(function (TitikBiopori $record): void {
+                        app(BioporiService::class)->setujuiTitik(auth()->user(), $record);
+                        Notification::make()->success()->title('Titik disetujui.')->send();
+                    }),
+                Action::make('tolak')->label('Tolak')->icon('heroicon-o-x-circle')->color('danger')
+                    ->visible(fn (TitikBiopori $r): bool => $r->isPendingVerifikasi() && (auth()->user()?->can('verify', $r) ?? false))
+                    ->schema([TextInput::make('catatan')->label('Alasan penolakan')->required()->maxLength(500)])
+                    ->action(function (TitikBiopori $record, array $data): void {
+                        app(BioporiService::class)->tolakTitik(auth()->user(), $record, $data['catatan']);
+                        Notification::make()->success()->title('Titik ditolak.')->send();
+                    }),
                 Action::make('panen')->label('Catat panen')->icon('heroicon-o-check-badge')->color('success')
-                    ->visible(fn (TitikBiopori $r): bool => $r->statusPanenEfektif() !== TitikBiopori::PANEN_SUDAH && (auth()->user()?->can('update', $r) ?? false))
+                    ->visible(fn (TitikBiopori $r): bool => $r->verifikasi === TitikBiopori::VERIFIKASI_APPROVED && $r->statusPanenEfektif() !== TitikBiopori::PANEN_SUDAH && (auth()->user()?->can('update', $r) ?? false))
                     ->schema([TextInput::make('hasil_kompos_kg')->label('Hasil kompos')->suffix('kg')->numeric()->minValue(0)->maxValue(10000)->required()])
                     ->action(function (TitikBiopori $record, array $data): void {
                         app(BioporiService::class)->tandaiPanen(auth()->user(), $record, (float) $data['hasil_kompos_kg']);

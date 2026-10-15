@@ -88,6 +88,9 @@ Route::middleware(['auth:sanctum', 'active', 'abilities:access'])->name('api.')-
 
     // Organik (satu fitur): setoran + aktivitas dengan metode BioporiPrint
     Route::get('/organik/biopori/lokasi', [BioporiController::class, 'titik'])->name('biopori.titik');
+    Route::post('/organik/biopori/lokasi', [BioporiController::class, 'ajukanTitik'])->middleware(['role:nasabah', 'throttle:uploads'])->name('biopori.titik.store');
+    Route::post('/organik/biopori/lokasi/{titik}/approve', [BioporiController::class, 'approveTitik'])->middleware('role:admin,petugas')->whereNumber('titik')->name('biopori.titik.approve');
+    Route::post('/organik/biopori/lokasi/{titik}/reject', [BioporiController::class, 'rejectTitik'])->middleware('role:admin,petugas')->whereNumber('titik')->name('biopori.titik.reject');
     Route::get('/organik/biopori', [BioporiController::class, 'index'])->name('biopori.index');
     Route::post('/organik/biopori', [BioporiController::class, 'store'])->middleware(['role:nasabah', 'throttle:uploads'])->name('biopori.store');
     Route::get('/organik/biopori/{aktivitas}', [BioporiController::class, 'show'])->name('biopori.show');

@@ -91,7 +91,7 @@ fun TambahAktivitasForm(client: ApiClient, lokasi: Loadable<List<TitikBioporiDto
         LabelValue("Metode pengolahan", "BioporiPrint")
 
         Text("Lokasi BioporiPrint", color = Slate500, fontSize = 13.sp)
-        val daftar = lokasi.data.orEmpty().filter { it.status == "aktif" && it.bioporiprint }
+        val daftar = lokasi.data.orEmpty().filter { it.status == "aktif" && it.bioporiprint && (it.verifikasi ?: "approved") == "approved" }
         if (daftar.isEmpty()) EmptyText("Tidak ada lokasi BioporiPrint aktif.")
         daftar.forEach { t ->
             Row(

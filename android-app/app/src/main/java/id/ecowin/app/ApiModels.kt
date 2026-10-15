@@ -119,6 +119,17 @@ data class TitikBioporiDto(
     val terakhirDiisiAt: String?,
     val estimasiPanenAt: String?,
     val statusPanen: String?,
+    val verifikasi: String? = null,
+    val catatanVerifikasi: String? = null,
+    val diajukanSaya: Boolean = false,
+)
+
+/** Pengajuan titik Biopori baru oleh nasabah (menunggu verifikasi petugas). */
+data class AjukanTitikRequest(
+    val namaLokasi: String,
+    val deskripsiLokasi: String?,
+    val latitude: Double,
+    val longitude: Double,
 )
 
 data class AktivitasBioporiDto(

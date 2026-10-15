@@ -99,5 +99,8 @@ dependencies {
     // Rotasi foto kamera sebelum kompresi
     implementation("androidx.exifinterface:exifinterface:1.3.7")
 
+    // Peta OpenStreetMap di dalam aplikasi (tanpa kunci API).
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
+
     testImplementation("junit:junit:4.13.2")
 }

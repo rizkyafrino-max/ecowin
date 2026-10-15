@@ -1,4 +1,4 @@
-import { Camera, CheckCircle2, ImagePlus, Leaf, MapPin, Plus, Recycle } from 'lucide-react';
+import { Camera, CheckCircle2, ImagePlus, Leaf, MapPin, MapPinPlus, Plus, Recycle } from 'lucide-react';
 import { lazy, Suspense, useRef, useState } from 'react';
 import { EcoApi } from '../api/endpoints';
 import AuthImage from '../components/AuthImage';
@@ -17,23 +17,51 @@ import { usePaged } from '../hooks/usePaged';
 import { prepareImage } from '../utils/image';
 
 const PetaBiopori = lazy(() => import('../components/PetaBiopori'));
+const FormTitik = lazy(() => import('../components/FormTitik'));
 import { kg, tanggal } from '../utils/format';
 
 const pad = (n) => String(n).padStart(2, '0');
 const localNow = () => { const d = new Date(Date.now() - 60_000); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 
-function Lokasi({ lokasi, onLapor }) {
+function Lokasi({ lokasi, onLapor, onAjukan }) {
   if (lokasi.loading) return <LoadingState rows={2} />;
-  if (lokasi.error || !lokasi.data.data.length) return null;
-  const daftar = lokasi.data.data;
+  const semua = lokasi.error ? [] : lokasi.data.data;
+  // Peta & daftar resmi hanya memuat titik yang sudah disetujui; pengajuan milik sendiri ditampilkan terpisah.
+  const resmi = semua.filter((t) => (t.verifikasi ?? 'approved') === 'approved');
+  const pengajuan = semua.filter((t) => t.diajukan_saya && t.verifikasi && t.verifikasi !== 'approved');
+  const tombol = <Button size="sm" variant="soft" icon={MapPinPlus} onClick={onAjukan}>Ajukan titik baru</Button>;
   return (
     <section className="space-y-4">
-      <Suspense fallback={<div className="h-[320px] ew-skeleton !rounded-[20px]" />}>
-        <PetaBiopori titik={daftar} onLapor={onLapor} />
-      </Suspense>
-      <h3 className="font-bold">Lokasi BioporiPrint</h3>
+      {resmi.length > 0 && (
+        <Suspense fallback={<div className="h-[320px] ew-skeleton !rounded-[20px]" />}>
+          <PetaBiopori titik={resmi} onLapor={onLapor} />
+        </Suspense>
+      )}
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="font-bold">Lokasi BioporiPrint</h3>
+        {tombol}
+      </div>
+      {resmi.length === 0 && pengajuan.length === 0 && (
+        <Card className="!p-4 text-sm text-muted">Belum ada lokasi di Bank Sampah Anda. Ajukan titik pertama agar bisa melapor aktivitas.</Card>
+      )}
+      {pengajuan.length > 0 && (
+        <div className="space-y-3">
+          <p className="text-sm font-semibold text-muted">Pengajuan Anda</p>
+          {pengajuan.map((t) => (
+            <Card key={t.id} className="!p-4">
+              <div className="flex items-start justify-between gap-3">
+                <p className="flex items-center gap-2 font-semibold"><MapPin className="h-4 w-4 text-primary" aria-hidden />{t.nama_lokasi}</p>
+                <StatusBadge status={t.verifikasi} />
+              </div>
+              <p className="mt-2 text-xs text-muted">
+                {t.verifikasi === 'pending' ? 'Menunggu pemeriksaan petugas Bank Sampah.' : `Alasan: ${t.catatan_verifikasi || '-'}`}
+              </p>
+            </Card>
+          ))}
+        </div>
+      )}
       <div className="grid gap-3 sm:grid-cols-2">
-        {daftar.map((t) => (
+        {resmi.map((t) => (
           <Card key={t.id} className="!p-4">
             <div className="flex items-start justify-between gap-3">
               <p className="flex items-center gap-2 font-semibold"><MapPin className="h-4 w-4 text-primary" aria-hidden />{t.nama_lokasi}</p>
@@ -60,7 +88,7 @@ function Form({ onDone, lokasi, initialId }) {
   const gallery = useRef(null);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
-  const titik = (lokasi.data?.data ?? []).filter((t) => t.bioporiprint);
+  const titik = (lokasi.data?.data ?? []).filter((t) => t.bioporiprint && t.verifikasi !== 'pending' && t.verifikasi !== 'rejected');
 
   const pick = async (e) => {
     const file = e.target.files?.[0];
@@ -180,6 +208,7 @@ export default function Organik() {
   const [pilihLokasi, setPilihLokasi] = useState(null);
   const [sheet, setSheet] = useState(null); // 'baru' | item
   const [done, setDone] = useState(false);
+  const [titikTerkirim, setTitikTerkirim] = useState(false);
   const total = ringkasan.data?.organik?.total_berat_kg;
   const tambah = () => { setDone(false); setPilihLokasi(null); setSheet('baru'); };
 
@@ -201,12 +230,18 @@ export default function Organik() {
         renderItem={(a) => (a.jenis === 'setoran'
           ? <OrganikRow item={a.raw} />
           : <ActivityCard onClick={() => setSheet(a.raw)} title={a.raw.jenis_sampah} subtitle={`${a.raw.metode ?? 'Biopori'} · ${a.raw.lokasi ?? 'Lokasi'} · ${tanggal(a.raw.tanggal_pemasukan)}`} status={a.raw.status} right={<p className="text-sm font-bold tabular-nums">{kg(a.raw.berat_kg)}</p>} />)} />
-      <Lokasi lokasi={lokasi} onLapor={(t) => { setDone(false); setPilihLokasi(t.id); setSheet('baru'); }} />
+      {titikTerkirim && <p className="flex items-center gap-2 rounded-2xl bg-tint p-3.5 text-sm font-semibold text-primary" role="status"><CheckCircle2 className="h-5 w-5" aria-hidden />Titik diajukan. Menunggu persetujuan petugas.</p>}
+      <Lokasi lokasi={lokasi} onLapor={(t) => { setDone(false); setPilihLokasi(t.id); setSheet('baru'); }} onAjukan={() => { setTitikTerkirim(false); setSheet('titik'); }} />
 
       <BottomSheet open={sheet === 'baru'} onClose={() => setSheet(null)} title="Tambah aktivitas organik">
         <Form lokasi={lokasi} initialId={pilihLokasi} onDone={() => { setSheet(null); setDone(true); list.reloadBiopori(); }} />
       </BottomSheet>
-      <BottomSheet open={!!sheet && sheet !== 'baru'} onClose={() => setSheet(null)} title="Detail aktivitas">{sheet && sheet !== 'baru' && <Detail item={sheet} />}</BottomSheet>
+      <BottomSheet open={sheet === 'titik'} onClose={() => setSheet(null)} title="Ajukan titik Biopori baru">
+        <Suspense fallback={<div className="h-64 ew-skeleton !rounded-2xl" />}>
+          <FormTitik onDone={() => { setSheet(null); setTitikTerkirim(true); lokasi.reload?.(); }} />
+        </Suspense>
+      </BottomSheet>
+      <BottomSheet open={!!sheet && sheet !== 'baru' && sheet !== 'titik'} onClose={() => setSheet(null)} title="Detail aktivitas">{sheet && sheet !== 'baru' && sheet !== 'titik' && <Detail item={sheet} />}</BottomSheet>
     </div>
   );
 }

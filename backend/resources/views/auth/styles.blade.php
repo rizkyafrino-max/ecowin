@@ -118,4 +118,48 @@
             .ecl-illus{width:min(60%,340px)}
             .ecl-form{padding-inline:2.5rem}
         }
+
+        /* ===== Halaman pendaftaran (.ecl-reg): stepper bernomor, kartu Bank Sampah, tampilan HP ringkas ===== */
+        .ecl-stepper{list-style:none;margin:0 0 1.25rem;padding:0;display:flex;align-items:flex-start}
+        .ecl-stepper li{flex:1;display:flex;flex-direction:column;align-items:center;gap:.4rem;position:relative;font-size:.72rem;font-weight:600;color:#64748B;text-align:center}
+        .ecl-stepper li+li::before{content:"";position:absolute;top:15px;right:50%;width:100%;height:2px;background:#E2E8F0;z-index:0}
+        .ecl-stepper li.done+li::before,.ecl-stepper li.on::before{background:#10B981}
+        .ecl-stepper i{position:relative;z-index:1;width:30px;height:30px;border-radius:999px;border:2px solid #CBD5E1;background:#fff;color:#64748B;font-style:normal;font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+        .ecl-stepper i svg{width:15px;height:15px}
+        .ecl-stepper li.on i{border-color:#059669;background:#059669;color:#fff;box-shadow:0 0 0 4px rgba(5,150,105,.15)}
+        .ecl-stepper li.done i{border-color:#059669;background:#059669;color:#fff}
+        .ecl-stepper li.on,.ecl-stepper li.done{color:#0F172A}
+        .ecl-stepper li.on span{font-weight:800}
+
+        .ecl-banks{border:0;padding:0;margin:1.1rem 0 0;min-width:0;display:grid;gap:.6rem}
+        .ecl-banks legend{padding:0;margin-bottom:.5rem;font-size:.84rem;font-weight:600;color:#0F172A}
+        .ecl-bank{position:relative;display:flex;align-items:center;gap:.8rem;padding:.8rem .9rem;min-height:64px;border:1.5px solid #CBD5E1;border-radius:14px;background:#fff;cursor:pointer;transition:border-color .15s ease,background .15s ease,box-shadow .15s ease}
+        .ecl-bank:hover{border-color:#10B981}
+        .ecl-bank input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+        .ecl-bank-ico{width:42px;height:42px;flex:none;border-radius:12px;background:#ECFDF5;color:#059669;display:flex;align-items:center;justify-content:center}
+        .ecl-bank-ico svg{width:22px;height:22px}
+        .ecl-bank-txt{flex:1;min-width:0}
+        .ecl-bank-txt b{display:block;font-size:.95rem;font-weight:700;color:#0F172A}
+        .ecl-bank-txt small{display:block;margin-top:.1rem;font-size:.78rem;color:#64748B}
+        .ecl-bank-tick{width:24px;height:24px;flex:none;border-radius:999px;border:2px solid #CBD5E1;color:transparent;display:flex;align-items:center;justify-content:center}
+        .ecl-bank-tick svg{width:14px;height:14px}
+        .ecl-bank:has(input:checked){border-color:#059669;background:#F0FDF4;box-shadow:0 0 0 3px rgba(5,150,105,.14)}
+        .ecl-bank:has(input:checked) .ecl-bank-tick{border-color:#059669;background:#059669;color:#fff}
+        .ecl-bank:has(input:focus-visible){outline:3px solid #059669;outline-offset:2px}
+
+        @media(max-width:960px){
+            /* Di HP: hilangkan hero & ilustrasi agar formulir langsung terlihat; hanya bilah merek. */
+            .ecl-reg .ecl-top{padding:.9rem 1.25rem .35rem}
+            .ecl-reg .ecl-hero,.ecl-reg .ecl-illus,.ecl-reg .ecl-tagline{display:none}
+            .ecl-reg .ecl-mark{width:38px;height:38px;border-radius:12px}
+            .ecl-reg .ecl-word{font-size:1.25rem}
+            .ecl-reg .ecl-form{padding:0 .75rem 1.25rem}
+            .ecl-reg .ecl-card{max-width:560px;margin-inline:auto;padding:1.25rem 1.1rem;border-radius:20px}
+            .ecl-reg .ecl-card h2{font-size:1.4rem}
+            .ecl-reg .ecl-input{font-size:1rem;min-height:52px}
+            .ecl-reg .ecl-btn{min-height:56px}
+            .ecl-reg .ecl-submitbar{position:sticky;bottom:0;margin:1.25rem -1.1rem -1.25rem;padding:.9rem 1.1rem calc(.9rem + env(safe-area-inset-bottom));background:linear-gradient(to bottom,rgba(255,255,255,0),#fff 28%);border-radius:0 0 20px 20px}
+            .ecl-reg .ecl-submitbar .ecl-btn-primary{margin-top:0}
+        }
+        @media(max-width:380px){.ecl-stepper li{font-size:.66rem}.ecl-bank{padding:.7rem}}
     </style>

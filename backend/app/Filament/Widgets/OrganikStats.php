@@ -36,7 +36,7 @@ class OrganikStats extends StatsOverviewWidget
         $organik = app(LaporanService::class)->ringkasan($user)['organik'];
 
         $pending = AktivitasBiopori::query()->visibleTo($user)->where('status', AktivitasBiopori::STATUS_PENDING)->count();
-        $titik = TitikBiopori::query()->visibleTo($user)->get();
+        $titik = TitikBiopori::query()->visibleTo($user)->disetujui()->get();
         $siapPanen = $titik->filter(fn (TitikBiopori $t) => $t->statusPanenEfektif() === TitikBiopori::PANEN_SIAP)->count();
 
         return [
