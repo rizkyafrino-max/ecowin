@@ -128,32 +128,45 @@ object NotifikasiHp {
 
 /** Pengecek berkala. Tidak melakukan apa pun tanpa sesi, tanpa opt-in, atau saat aplikasi terbuka. */
 class NotifikasiWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+    /** Log status saja (tanpa isi pesan) dan hanya di build debug. */
+    private fun catat(status: String) { if (BuildConfig.DEBUG) android.util.Log.i("EcoWinNotif", status) }
+
+    companion object {
+        const val EXTRA_PAKSA = "paksa"
+    }
+
     override suspend fun doWork(): Result {
         val c = applicationContext
         val session = SessionStore(c)
         if (!session.hasSession() || !NotifikasiHp.aktif(c)) {
+            catat("berhenti: sesi=${session.hasSession()} aktif=${NotifikasiHp.aktif(c)}")
             NotifikasiHp.berhenti(c)
             return Result.success()
         }
-        val terlihat = withContext(Dispatchers.Main) { ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) }
-        if (terlihat) return Result.success() // aplikasi sedang dipakai; lonceng di dalam aplikasi sudah cukup
+        val paksa = BuildConfig.DEBUG && inputData.getBoolean(EXTRA_PAKSA, false) // hanya untuk uji di build debug
+        val terlihat = !paksa && withContext(Dispatchers.Main) { ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) }
+        if (terlihat) { catat("dilewati: aplikasi sedang terlihat"); return Result.success() } // aplikasi sedang dipakai; lonceng di dalam aplikasi sudah cukup
 
         val respons = try {
             ApiClient(session).api.notifikasi()
         } catch (e: HttpException) {
+            catat("http ${e.code()}")
             if (e.code() == 401 || e.code() == 403) { NotifikasiHp.berhenti(c); return Result.success() }
             return Result.retry()
         } catch (e: IOException) {
+            catat("jaringan: ${e.javaClass.simpleName}")
             return Result.retry()
         }
         if (!session.hasSession()) { NotifikasiHp.berhenti(c); return Result.success() } // sesi dicabut saat refresh token
 
         val terakhir = session.notifTerakhir()
+        catat("cek: ${respons.data.size} notifikasi, acuan=$terakhir")
         if (terakhir < 0) { // pengecekan pertama: jadikan acuan, jangan membanjiri dengan kabar lama
             session.setNotifTerakhir(respons.data.maxOfOrNull { it.id } ?: 0)
             return Result.success()
         }
         ringkasBaru(respons.data, terakhir)?.let {
+            catat("menampilkan ${it.jumlah} kabar baru")
             NotifikasiHp.tampilkan(c, it)
             session.setNotifTerakhir(it.idTertinggi)
         }

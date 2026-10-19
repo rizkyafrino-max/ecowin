@@ -64,6 +64,12 @@ class MainActivity : ComponentActivity() {
     /** Ketukan pemberitahuan hanya meminta layar Notifikasi; bila belum login, layar masuk yang tampil seperti biasa. */
     private fun bukaDariPemberitahuan(intent: android.content.Intent?) {
         if (intent?.action == NotifikasiHp.AKSI_BUKA) NavAwal.permintaan = true
+        // Uji manual (build debug saja): jalankan pengecek sekali sekarang tanpa menunggu jadwal 15 menit.
+        if (BuildConfig.DEBUG && intent?.getBooleanExtra("debug_cek_notif", false) == true) {
+            androidx.work.WorkManager.getInstance(this).enqueue(
+                androidx.work.OneTimeWorkRequestBuilder<NotifikasiWorker>().setInputData(androidx.work.workDataOf(NotifikasiWorker.EXTRA_PAKSA to true)).build(),
+            )
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
