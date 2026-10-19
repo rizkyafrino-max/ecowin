@@ -18,6 +18,8 @@ val Slate900 = Color(0xFF0F172A)
 val Slate500 = Color(0xFF64748B)
 val Slate200 = Color(0xFFE2E8F0)
 val Canvas = Color(0xFFF8FAFC)
+/** Garis tepi kolom isian: kontras >= 3:1 terhadap putih (WCAG 1.4.11). */
+val FieldBorder = Color(0xFF8392A6)
 val Amber = Color(0xFFB45309)
 val AmberSoft = Color(0xFFFEF3C7)
 val Red = Color(0xFFB91C1C)
@@ -68,7 +70,7 @@ fun EcoWinTheme(content: @Composable () -> Unit) {
             surface = Color.White,
             onSurface = Slate900,
             onSurfaceVariant = Slate500,
-            outline = Slate200,
+            outline = FieldBorder,
             error = Red,
         ),
         content = content,

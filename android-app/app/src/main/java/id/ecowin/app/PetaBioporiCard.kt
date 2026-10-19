@@ -35,7 +35,10 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.infowindow.InfoWindow
 
 /** Koordinat valid (sama dengan aturan di Web: angka terbatas dan dalam rentang lintang/bujur). */
 private fun TitikBioporiDto.punyaKoordinat(): Boolean {
@@ -145,12 +148,25 @@ private fun OsmMap(titik: List<TitikBioporiDto>, modifier: Modifier) {
         modifier = modifier,
         update = { map ->
             map.overlays.clear()
+            // Ketuk area peta kosong menutup gelembung info yang terbuka (lapisan ini paling bawah, jadi penanda tetap diprioritaskan).
+            map.overlays.add(MapEventsOverlay(object : MapEventsReceiver {
+                override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean { InfoWindow.closeAllInfoWindowsOn(map); return false }
+                override fun longPressHelper(p: GeoPoint?): Boolean = false
+            }))
             val titikGeo = titik.map { GeoPoint(it.latitude!!, it.longitude!!) }
             titik.forEachIndexed { i, t ->
                 Marker(map).apply {
                     position = titikGeo[i]
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                     icon = lingkaran(t.bioporiprint)
+                    infoWindow = InfoWindowTitik(map)
+                    // Hanya satu gelembung terbuka: ketuk penanda lain menutup yang sebelumnya.
+                    setOnMarkerClickListener { m, mv ->
+                        InfoWindow.closeAllInfoWindowsOn(mv)
+                        m.showInfoWindow()
+                        mv.controller.animateTo(m.position)
+                        true
+                    }
                     title = t.namaLokasi ?: "Lokasi #${t.id}"
                     snippet = buildString {
                         append(statusLabel(t.statusPanen))

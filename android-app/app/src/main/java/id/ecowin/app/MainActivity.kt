@@ -191,7 +191,7 @@ fun CenteredProgress() {
         Image(
             painterResource(R.drawable.ecowin_logo),
             contentDescription = "EcoWin",
-            modifier = Modifier.align(Alignment.Center).width(116.dp).graphicsLayer {
+            modifier = Modifier.align(Alignment.Center).width(99.dp).graphicsLayer {
                 scaleX = skala
                 scaleY = skala
             },

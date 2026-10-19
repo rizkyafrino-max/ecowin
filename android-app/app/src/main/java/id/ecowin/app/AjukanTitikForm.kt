@@ -72,6 +72,7 @@ fun AjukanTitikForm(client: ApiClient, onDone: () -> Unit, onCancel: () -> Unit)
     var lng by rememberSaveable { mutableStateOf<Double?>(null) }
     var info by remember { mutableStateOf("Ketuk peta untuk menandai lokasi, atau gunakan lokasi perangkat.") }
     var mencari by remember { mutableStateOf(false) }
+    var lokasiMati by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
 
@@ -87,7 +88,8 @@ fun AjukanTitikForm(client: ApiClient, onDone: () -> Unit, onCancel: () -> Unit)
 
     fun mulaiCari() {
         mencari = true
-        info = "Mencari sinyal terbaik…"
+        lokasiMati = false
+        info = "Mencari sinyal GPS… (bisa sampai 30 detik, lebih baik di luar ruangan)"
         scope.launch {
             val hasil = gps.cari(
                 onUpdate = { l ->
@@ -95,7 +97,12 @@ fun AjukanTitikForm(client: ApiClient, onDone: () -> Unit, onCancel: () -> Unit)
                 },
             )
             mencari = false
-            if (!hasil) info = "Lokasi belum tersedia. Pastikan GPS aktif, atau ketuk peta untuk menandai posisi."
+            lokasiMati = hasil == GpsFix.MATI
+            when (hasil) {
+                GpsFix.MATI -> info = "Layanan lokasi di HP sedang mati. Aktifkan lokasi lalu coba lagi, atau ketuk peta untuk menandai posisi."
+                GpsFix.TIDAK_ADA -> info = "Sinyal GPS belum didapat. Coba di tempat terbuka (di luar ruangan) dan tunggu sekitar 30 detik, atau ketuk peta untuk menandai posisi."
+                else -> Unit
+            }
         }
     }
 
@@ -138,6 +145,12 @@ fun AjukanTitikForm(client: ApiClient, onDone: () -> Unit, onCancel: () -> Unit)
             modifier = Modifier.fillMaxWidth().height(280.dp).clip(RoundedCornerShape(16.dp)),
         )
         Text(info, color = Slate500, fontSize = 12.sp)
+        if (lokasiMati) {
+            OutlinedButton(
+                onClick = { context.startActivity(android.content.Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) },
+                shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth(),
+            ) { Text("Buka pengaturan lokasi") }
+        }
         if (lat != null && lng != null) Text("%.6f, %.6f".format(lat, lng), color = Slate500, fontSize = 12.sp)
 
         error?.let {
@@ -270,8 +283,14 @@ private class GpsFix(private val context: Context) {
         listener = null
     }
 
+    companion object {
+        const val OK = 0
+        const val MATI = 1
+        const val TIDAK_ADA = 2
+    }
+
     @SuppressLint("MissingPermission")
-    suspend fun cari(onUpdate: (Location) -> Unit, batasMs: Long = 15_000): Boolean {
+    suspend fun cari(onUpdate: (Location) -> Unit, batasMs: Long = 30_000): Int {
         stop()
         var terbaik: Float = Float.MAX_VALUE
         var dapat = false
@@ -290,7 +309,13 @@ private class GpsFix(private val context: Context) {
         }
         listener = l
         val providers = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER).filter { runCatching { manager.isProviderEnabled(it) }.getOrDefault(false) }
-        if (providers.isEmpty()) return false
+        if (providers.isEmpty()) return MATI
+
+        // Posisi terakhir yang diketahui (maks. 2 menit) langsung dipakai sebagai awal, lalu disempurnakan.
+        providers.mapNotNull { runCatching { manager.getLastKnownLocation(it) }.getOrNull() }
+            .filter { System.currentTimeMillis() - it.time < 120_000 }
+            .minByOrNull { if (it.hasAccuracy()) it.accuracy else Float.MAX_VALUE }
+            ?.let { l.onLocationChanged(it) }
         providers.forEach { p -> runCatching { manager.requestLocationUpdates(p, 1000L, 0f, l, android.os.Looper.getMainLooper()) } }
 
         var waktu = 0L
@@ -299,6 +324,6 @@ private class GpsFix(private val context: Context) {
             waktu += 500
         }
         stop()
-        return dapat
+        return if (dapat) OK else TIDAK_ADA
     }
 }

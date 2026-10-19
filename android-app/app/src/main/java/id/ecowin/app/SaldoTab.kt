@@ -113,7 +113,7 @@ private fun PenarikanScreen(client: ApiClient, user: UserDto, refreshKey: Int, o
                 Text("Saldo tersedia", color = Slate500, fontSize = 13.sp)
                 Text(if (tersedia == null) "…" else rupiah(tersedia), fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = Emerald)
                 OutlinedTextField(
-                    jumlah, { jumlah = it.filter(Char::isDigit).take(9) },
+                    jumlah, { jumlah = soloAngka(it) },
                     label = { Text("Nominal penarikan (Rp)") }, placeholder = { Text("mis. 20000") }, singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 )

@@ -185,3 +185,18 @@ data class JenisHargaDto(val id: Long, val namaJenis: String, val satuan: String
 data class KategoriHargaDto(val id: Long, val namaKategori: String, val jenisSampah: List<JenisHargaDto>)
 
 data class ApiError(val message: String?, val errors: Map<String, List<String>>?)
+
+/** Notifikasi dalam aplikasi untuk nasabah. */
+data class NotifikasiDto(
+    val id: Long,
+    val tipe: String,
+    val judul: String,
+    val isi: String,
+    val aksi: String? = null,
+    val dibaca: Boolean = false,
+    val createdAt: String? = null,
+)
+
+data class NotifikasiResponse(val data: List<NotifikasiDto> = emptyList(), val belumDibaca: Int = 0)
+
+data class JumlahNotifDto(val belumDibaca: Int = 0)

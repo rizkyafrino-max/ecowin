@@ -63,6 +63,18 @@ interface EcoWinApi {
     @GET("organik/biopori/lokasi")
     suspend fun lokasiBiopori(): DataWrapper<List<TitikBioporiDto>>
 
+    @GET("notifikasi")
+    suspend fun notifikasi(): NotifikasiResponse
+
+    @GET("notifikasi/jumlah")
+    suspend fun jumlahNotif(): JumlahNotifDto
+
+    @POST("notifikasi/{id}/baca")
+    suspend fun bacaNotif(@retrofit2.http.Path("id") id: Long): JumlahNotifDto
+
+    @POST("notifikasi/baca-semua")
+    suspend fun bacaSemuaNotif(): JumlahNotifDto
+
     @POST("organik/biopori/lokasi")
     suspend fun ajukanTitik(@Body body: AjukanTitikRequest): DataWrapper<TitikBioporiDto>
 

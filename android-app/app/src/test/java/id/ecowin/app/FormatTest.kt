@@ -54,4 +54,35 @@ class FormatTest {
         assertNull(safeAvatarUrl(null))
         assertNull(safeAvatarUrl("https://lh3.googleusercontent.com/" + "a".repeat(600)))
     }
+
+    @Test
+    fun autoKoma_nolDiikutiAngkaLangsungBerkoma() {
+        assertEquals("0", autoKoma("0"))
+        assertEquals("0,5", autoKoma("05"))
+        assertEquals("0,0", autoKoma("00"))
+        assertEquals("0,12", autoKoma("0123"))
+        var v = ""
+        for (c in "055") v = autoKoma(v + c)
+        assertEquals("0,55", v)
+    }
+
+    @Test
+    fun autoKoma_angkaBiasaDanSimbol() {
+        assertEquals("10", autoKoma("10"))
+        assertEquals("250", autoKoma("250"))
+        assertEquals("1,5", autoKoma("1.5"))
+        assertEquals("1,55", autoKoma("1,5,5"))
+        assertEquals("1,2", autoKoma("a1b,2c"))
+        assertEquals("0,5", autoKoma("00,5"))
+        assertEquals("0,", autoKoma("0,"))
+    }
+
+    @Test
+    fun keDoubleDanSoloAngka() {
+        assertEquals(0.5, keDouble("0,5")!!, 0.0)
+        assertNull(keDouble("abc"))
+        assertEquals("5000", soloAngka("05000"))
+        assertEquals("0", soloAngka("0"))
+        assertEquals("10005", soloAngka("1.000,5"))
+    }
 }

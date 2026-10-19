@@ -41,6 +41,8 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -63,6 +65,7 @@ enum class Tab(val label: String, val icon: ImageVector) {
     Organik("Organik", Lucide.Recycle),
     Saldo("Saldo", Lucide.Wallet),
     Profil("Profil", Lucide.UserRound),
+    Notifikasi("Notifikasi", Lucide.Bell),
 }
 
 private val FooterLeft = listOf(Tab.Beranda, Tab.Transaksi)
@@ -72,6 +75,20 @@ private val FooterRight = listOf(Tab.Organik, Tab.Saldo)
 fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Unit, onLogout: () -> Unit) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var refreshKey by rememberSaveable { mutableIntStateOf(0) }
+    var belumDibaca by remember { mutableIntStateOf(0) }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val segarkanNotif: () -> Unit = { scope.launch { runCatching { belumDibaca = client.api.jumlahNotif().belumDibaca } } }
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    // Jumlah notifikasi diperbarui tiap 60 detik hanya saat aplikasi terlihat di layar.
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+            while (true) {
+                segarkanNotif()
+                kotlinx.coroutines.delay(60_000)
+            }
+        }
+    }
+    LaunchedEffect(refreshKey, tab) { segarkanNotif() }
     val current = Tab.entries[tab]
     val go: (Tab) -> Unit = { tab = it.ordinal }
     var footerVisible by remember { mutableStateOf(true) }
@@ -88,7 +105,7 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
     Scaffold(containerColor = Canvas) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
             Column(Modifier.fillMaxSize().nestedScroll(scrollWatcher)) {
-                TopBar(user, current, onRefresh = { refreshKey++ }, onProfile = { go(Tab.Profil) })
+                TopBar(user, current, belumDibaca, onRefresh = { refreshKey++ }, onNotif = { go(Tab.Notifikasi) }, onProfile = { go(Tab.Profil) })
 
                 when (current) {
                     Tab.Beranda -> BerandaTab(client, user, refreshKey, go)
@@ -97,6 +114,7 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
                     Tab.Organik -> OrganikTab(client, refreshKey)
                     Tab.Saldo -> SaldoTab(client, user, refreshKey)
                     Tab.Profil -> ProfilTab(client, user, refreshKey, onUserChanged, onLogout)
+                    Tab.Notifikasi -> NotifikasiTab(client, refreshKey, onBerubah = segarkanNotif, go = go)
                 }
             }
 
@@ -116,7 +134,7 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
 }
 
 @Composable
-private fun TopBar(user: UserDto, current: Tab, onRefresh: () -> Unit, onProfile: () -> Unit) {
+private fun TopBar(user: UserDto, current: Tab, belumDibaca: Int, onRefresh: () -> Unit, onNotif: () -> Unit, onProfile: () -> Unit) {
     Row(
         Modifier.fillMaxWidth().padding(start = 20.dp, end = 8.dp, top = 12.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -135,6 +153,17 @@ private fun TopBar(user: UserDto, current: Tab, onRefresh: () -> Unit, onProfile
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onRefresh) { Icon(Lucide.RefreshCw, contentDescription = "Muat ulang", tint = Slate500, modifier = Modifier.size(22.dp)) }
+            Box {
+                IconButton(onClick = onNotif) {
+                    Icon(Lucide.Bell, contentDescription = if (belumDibaca > 0) "Notifikasi, $belumDibaca belum dibaca" else "Notifikasi", tint = if (current == Tab.Notifikasi) Emerald else Slate500, modifier = Modifier.size(22.dp))
+                }
+                if (belumDibaca > 0) {
+                    Text(
+                        if (belumDibaca > 99) "99+" else belumDibaca.toString(), color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold,
+                        modifier = Modifier.align(Alignment.TopEnd).padding(top = 4.dp, end = 2.dp).background(Red, RoundedCornerShape(50)).padding(horizontal = 5.dp, vertical = 1.dp),
+                    )
+                }
+            }
             Avatar(user.nama, Modifier.padding(end = 8.dp), size = 38, onClick = onProfile, url = user.avatar)
         }
     }
@@ -252,5 +281,6 @@ private fun subjudul(tab: Tab): String? = when (tab) {
     Tab.Saldo -> "Riwayat perubahan saldo EcoWin Anda."
     Tab.Profil -> "Data akun dan QR Card Anda."
     Tab.Fitur -> "Semua yang bisa Anda lakukan di EcoWin."
+    Tab.Notifikasi -> "Kabar terbaru tentang setoran, penarikan, dan aktivitas Anda."
     else -> null
 }

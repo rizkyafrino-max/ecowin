@@ -52,3 +52,29 @@ fun safeAvatarUrl(url: String?): String? {
     if (host != "googleusercontent.com" && !host.endsWith(".googleusercontent.com")) return null
     return uri.toString()
 }
+
+/**
+ * Isian angka desimal gaya Indonesia (sama dengan Web dan panel Admin): titik menjadi koma, hanya angka,
+ * satu koma, dan diawali "0" + angka langsung berkoma ("05" menjadi "0,5").
+ */
+fun autoKoma(raw: String, maksDesimal: Int = 2): String {
+    val s = raw.replace('.', ',').filter { it.isDigit() || it == ',' }
+    val i = s.indexOf(',')
+    var bulat = if (i == -1) s else s.substring(0, i)
+    var pecah: String? = if (i == -1) null else s.substring(i + 1).replace(",", "")
+    if (pecah == null && bulat.length >= 2 && bulat[0] == '0') {
+        pecah = bulat.substring(1)
+        bulat = "0"
+    }
+    if (bulat.length > 1) bulat = bulat.trimStart('0').ifEmpty { "0" }
+    return if (pecah == null) bulat else bulat + "," + pecah.take(maksDesimal)
+}
+
+/** Teks berkoma ("0,5") menjadi Double; null bila tidak valid. */
+fun keDouble(teks: String): Double? = teks.replace(',', '.').toDoubleOrNull()
+
+/** Bilangan bulat (mis. rupiah): hanya angka dan tanpa nol di depan. */
+fun soloAngka(raw: String, maksDigit: Int = 9): String {
+    val d = raw.filter { it.isDigit() }.take(maksDigit)
+    return if (d.length > 1) d.trimStart('0').ifEmpty { "0" } else d
+}

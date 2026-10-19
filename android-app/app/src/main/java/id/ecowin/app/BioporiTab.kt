@@ -105,8 +105,8 @@ fun TambahAktivitasForm(client: ApiClient, lokasi: Loadable<List<TitikBioporiDto
 
         OutlinedTextField(jenis, { jenis = it.take(100) }, label = { Text("Jenis sampah organik") }, placeholder = { Text("Sisa sayur, daun, …") }, singleLine = true, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(
-            berat, { berat = it.filter { c -> c.isDigit() || c == '.' || c == ',' }.take(6) },
-            label = { Text("Perkiraan berat (kg)") }, singleLine = true,
+            berat, { berat = autoKoma(it).take(6) },
+            label = { Text("Perkiraan berat (kg)") }, placeholder = { Text("mis. 1,5") }, supportingText = { Text("Ketik 05 untuk 0,5 kg.") }, singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.fillMaxWidth(),
         )
         OutlinedTextField(catatan, { catatan = it.take(1000) }, label = { Text("Catatan (opsional)") }, modifier = Modifier.fillMaxWidth())
@@ -130,7 +130,7 @@ fun TambahAktivitasForm(client: ApiClient, lokasi: Loadable<List<TitikBioporiDto
         error?.let { Text(it, color = Red, fontSize = 13.sp) }
 
         PrimaryButton("Kirim aktivitas", loading = sending) {
-            val beratKg = berat.replace(',', '.').toDoubleOrNull()
+            val beratKg = keDouble(berat)
             val path = fotoPath
             error = when {
                 titikId == null -> "Pilih lokasi BioporiPrint."
