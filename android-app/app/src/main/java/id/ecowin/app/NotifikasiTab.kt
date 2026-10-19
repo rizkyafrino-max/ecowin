@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -60,6 +62,7 @@ fun NotifikasiTab(client: ApiClient, refreshKey: Int, onBerubah: () -> Unit, go:
     val data = rememberLoadable(client, refreshKey, lokal) { client.api.notifikasi() }
 
     TabList {
+        item { PengaturanPemberitahuan() }
         item {
             LoadableContent(data) { respons ->
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -113,6 +116,41 @@ fun NotifikasiTab(client: ApiClient, refreshKey: Int, onBerubah: () -> Unit, go:
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Pemberitahuan di HP: mati secara bawaan dan hanya menyala atas pilihan nasabah. Isi pesan disembunyikan di layar kunci.
+ * Izin pemberitahuan Android 13+ baru diminta saat saklar dinyalakan, bukan saat aplikasi dibuka.
+ */
+@Composable
+private fun PengaturanPemberitahuan() {
+    val konteks = androidx.compose.ui.platform.LocalContext.current
+    var aktif by remember { mutableStateOf(NotifikasiHp.aktif(konteks) && NotifikasiHp.izinDiberikan(konteks)) }
+    var ditolak by remember { mutableStateOf(false) }
+    val minta = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { ok ->
+        if (ok) { NotifikasiHp.nyalakan(konteks); aktif = true; ditolak = false } else ditolak = true
+    }
+    EcoCard {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text("Pemberitahuan di HP", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Slate900)
+                Text(
+                    "Dapat kabar setoran dan penarikan walau aplikasi tertutup (dicek tiap ±15 menit). Di layar kunci isi pesan disembunyikan; nominal baru terlihat setelah HP dibuka. Mati otomatis saat Anda keluar akun.",
+                    color = Slate500, fontSize = 12.sp,
+                )
+                if (ditolak) Text("Izin pemberitahuan ditolak. Aktifkan lewat Pengaturan HP > Aplikasi > EcoWin > Notifikasi.", color = Red, fontSize = 12.sp)
+            }
+            Switch(
+                checked = aktif,
+                onCheckedChange = { nyala ->
+                    if (!nyala) { NotifikasiHp.berhenti(konteks); aktif = false }
+                    else if (NotifikasiHp.izinDiberikan(konteks)) { NotifikasiHp.nyalakan(konteks); aktif = true; ditolak = false }
+                    else minta.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                },
+                colors = SwitchDefaults.colors(checkedTrackColor = Emerald),
+            )
         }
     }
 }

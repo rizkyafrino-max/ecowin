@@ -112,6 +112,8 @@ private fun OsmMap(titik: List<TitikBioporiDto>, modifier: Modifier) {
         MapView(context).apply {
             setTileSource(TileSourceFactory.MAPNIK)
             setMultiTouchControls(true)
+            // Tombol zoom bawaan berupa kotak putih besar; cukup cubit/ketuk dua kali untuk zoom.
+            zoomController.setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER)
             isTilesScaledToDpi = true
             minZoomLevel = 3.0
             maxZoomLevel = 19.0
@@ -184,6 +186,9 @@ private fun OsmMap(titik: List<TitikBioporiDto>, modifier: Modifier) {
                     map.zoomToBoundingBox(BoundingBox.fromGeoPointsSafe(titikGeo), false, 80)
                     if (map.zoomLevelDouble > 17.0) map.controller.setZoom(17.0)
                 }
+                // Gambar ulang setelah zoom/pusat berubah; tanpa ini peta baru tampil setelah disentuh.
+                map.invalidate()
+                map.postDelayed({ map.invalidate() }, 400)
             }
             map.invalidate()
         },

@@ -56,6 +56,16 @@ class MainActivity : ComponentActivity() {
     private lateinit var client: ApiClient
     private lateinit var googleAuth: GoogleAuth
 
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        bukaDariPemberitahuan(intent)
+    }
+
+    /** Ketukan pemberitahuan hanya meminta layar Notifikasi; bila belum login, layar masuk yang tampil seperti biasa. */
+    private fun bukaDariPemberitahuan(intent: android.content.Intent?) {
+        if (intent?.action == NotifikasiHp.AKSI_BUKA) NavAwal.permintaan = true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Splash Screen native: bertahan hanya selagi sesi tersimpan diperiksa, dengan batas waktu agar tidak menahan aplikasi.
         installSplashScreen().setKeepOnScreenCondition { SplashGate.keep }
@@ -65,6 +75,8 @@ class MainActivity : ComponentActivity() {
         session = SessionStore(this)
         client = ApiClient(session)
         googleAuth = GoogleAuth(this)
+        if (NotifikasiHp.aktif(this) && session.hasSession()) NotifikasiHp.jadwalkan(this)
+        bukaDariPemberitahuan(intent)
 
         setContent {
             EcoWinTheme {
@@ -94,11 +106,13 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
     var state by remember { mutableStateOf<AppState>(if (session.hasSession()) AppState.Checking else AppState.LoggedOut()) }
     var retry by remember { mutableStateOf(0) }
     val scope = rememberCoroutineScope()
+    val konteks = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(state) { if (state !is AppState.Checking) SplashGate.keep = false }
 
     LaunchedEffect(Unit) {
         client.sessionExpired.collect {
+            NotifikasiHp.berhenti(konteks)
             state = AppState.LoggedOut("Sesi Anda berakhir. Silakan masuk kembali dengan Google.")
         }
     }
@@ -114,6 +128,7 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
             } catch (e: HttpException) {
                 if (e.code() == 401 || e.code() == 403) {
                     session.clear()
+                    NotifikasiHp.berhenti(konteks)
                     AppState.LoggedOut("Sesi Anda berakhir. Silakan masuk kembali.")
                 } else AppState.Offline(client.errorMessage(e))
             } catch (e: Exception) {
@@ -161,6 +176,7 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
                 scope.launch {
                     runCatching { client.api.logout() }
                     session.clear()
+                    NotifikasiHp.berhenti(konteks)
                     googleAuth.signOut()
                     state = AppState.LoggedOut()
                 }

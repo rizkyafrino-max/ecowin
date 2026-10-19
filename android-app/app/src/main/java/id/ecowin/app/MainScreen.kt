@@ -89,6 +89,9 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
         }
     }
     LaunchedEffect(refreshKey, tab) { segarkanNotif() }
+    LaunchedEffect(NavAwal.permintaan) {
+        if (NavAwal.permintaan) { tab = Tab.Notifikasi.ordinal; NavAwal.permintaan = false }
+    }
     val current = Tab.entries[tab]
     val go: (Tab) -> Unit = { tab = it.ordinal }
     var footerVisible by remember { mutableStateOf(true) }

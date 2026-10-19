@@ -99,6 +99,10 @@ dependencies {
     // Rotasi foto kamera sebelum kompresi
     implementation("androidx.exifinterface:exifinterface:1.3.7")
 
+    // Pemberitahuan di HP: pengecekan berkala (tanpa layanan pihak ketiga).
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
+    implementation("androidx.lifecycle:lifecycle-process:2.8.7")
+
     // Peta OpenStreetMap di dalam aplikasi (tanpa kunci API).
     implementation("org.osmdroid:osmdroid-android:6.1.20")
 

@@ -46,6 +46,11 @@ class SessionStore(context: Context) {
             .apply()
     }
 
+    /** ID notifikasi terakhir yang sudah diberitahukan ke HP (-1 = belum ada acuan). Ikut terhapus saat sesi dibersihkan. */
+    fun notifTerakhir(): Long = prefs.getLong(KEY_NOTIF_TERAKHIR, -1L)
+
+    fun setNotifTerakhir(id: Long) { prefs.edit().putLong(KEY_NOTIF_TERAKHIR, id).apply() }
+
     @Synchronized
     fun clear() {
         cachedAccess = null
@@ -93,6 +98,7 @@ class SessionStore(context: Context) {
         private const val KEY_ACCESS = "access"
         private const val KEY_REFRESH = "refresh"
         private const val KEY_REFRESH_EXPIRES = "refresh_expires_at"
+        private const val KEY_NOTIF_TERAKHIR = "notif_terakhir"
         private const val KEY_ALIAS = "ecowin_session_key"
         private const val ANDROID_KEYSTORE = "AndroidKeyStore"
         private const val TRANSFORMATION = "AES/GCM/NoPadding"
