@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 
 /** Ikon dan warna per jenis notifikasi. Teks selalu ada, jadi makna tidak bergantung pada warna saja. */
 private fun gayaNotif(tipe: String): Triple<ImageVector, Color, Color> = when {
+    tipe == "pengumuman" -> Triple(Lucide.Megaphone, Color(0xFFB45309), Color(0xFFFEF3C7))
     tipe.endsWith("ditolak") -> Triple(Lucide.TriangleAlert, Red, RedSoft)
     tipe.startsWith("penarikan") -> Triple(Lucide.ArrowUpRight, Color(0xFF1D4ED8), Color(0xFFEFF6FF))
     tipe == "setoran_organik" || tipe.startsWith("biopori") -> Triple(Lucide.Leaf, EmeraldDeep, EmeraldSoft)

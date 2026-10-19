@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight, BadgeCheck, Bell, CheckCheck, Leaf, MapPin, Recycle, XCircle } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, BadgeCheck, Bell, CheckCheck, Leaf, MapPin, Megaphone, Recycle, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { EcoApi } from '../api/endpoints';
 import Button from '../components/Button';
@@ -13,6 +13,7 @@ const TUJUAN = { saldo: '/saldo', transaksi: '/transaksi', organik: '/organik', 
 
 /** Ikon dan warna per jenis notifikasi (teks selalu ada, tidak hanya warna). */
 function gaya(tipe = '') {
+  if (tipe === 'pengumuman') return { Icon: Megaphone, kelas: 'bg-warn-tint text-warn' };
   if (tipe.endsWith('ditolak')) return { Icon: XCircle, kelas: 'bg-danger-tint text-danger' };
   if (tipe.startsWith('penarikan')) return { Icon: ArrowUpRight, kelas: 'bg-info-tint text-info' };
   if (tipe.startsWith('setoran_organik') || tipe.startsWith('biopori')) return { Icon: Leaf, kelas: 'bg-tint text-primary-deep' };

@@ -8,7 +8,7 @@ Panduan singkat untuk memindahkan EcoWin dari mesin lokal ke server sungguhan. S
   kamera pemindai QR **tidak berfungsi** (browser memblokirnya di luar HTTPS/localhost), cookie sesi aman tidak terkirim, dan login Google ditolak.
 - PHP 8.3 dengan ekstensi: `mbstring`, `intl`, `pdo_mysql`, `gd`, `bcmath`, `zip`, `exif`, `curl`, `openssl`.
 - MySQL 8 (SQLite hanya untuk pengembangan/tes).
-- Penjadwal: tambahkan cron `* * * * * php /path/backend/artisan schedule:run` (membersihkan notifikasi > 90 hari tiap malam).
+- Penjadwal: tambahkan cron `* * * * * php /path/backend/artisan schedule:run` (membersihkan notifikasi > 90 hari tiap malam dan mengirim pengumuman terjadwal tiap menit).
 
 ## 1. Backend (Laravel)
 

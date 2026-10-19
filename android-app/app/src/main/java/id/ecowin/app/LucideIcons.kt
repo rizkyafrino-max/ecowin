@@ -112,6 +112,10 @@ object Lucide {
         "M7 14h10a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1Z"
     ) }
 
+    val Megaphone: ImageVector by lazy { icon("Megaphone",
+        "m3 11 18-5v12L3 14v-3z",
+        "M11.6 16.8a3 3 0 1 1-5.8-1.6"
+    ) }
     val Bell: ImageVector by lazy { icon("Bell",
         "M10.268 21a2 2 0 0 0 3.464 0",
         "M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"

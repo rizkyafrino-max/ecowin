@@ -42,3 +42,13 @@ Artisan::command('ecowin:bersihkan-notifikasi', function () {
 })->purpose('Hapus notifikasi lebih dari 90 hari');
 
 Schedule::command('ecowin:bersihkan-notifikasi')->dailyAt('03:15');
+
+/*
+| Pengumuman terjadwal dikirim otomatis saat waktunya tiba (butuh `php artisan schedule:run` tiap menit di server).
+*/
+Artisan::command('ecowin:kirim-pengumuman', function () {
+    $n = app(\App\Services\PengumumanService::class)->kirimYangJatuhTempo();
+    $this->info("Pengumuman terkirim: {$n}");
+})->purpose('Kirim pengumuman terjadwal yang sudah jatuh waktu');
+
+Schedule::command('ecowin:kirim-pengumuman')->everyMinute()->withoutOverlapping();
