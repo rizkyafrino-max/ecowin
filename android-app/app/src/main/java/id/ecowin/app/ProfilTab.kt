@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 
 /** Profil: kartu data akun + formulir (seperti halaman Profil di Web), lalu QR Card Nasabah dan tombol keluar. */
 @Composable
-fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: (UserDto) -> Unit, onLogout: () -> Unit) {
+fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: (UserDto) -> Unit, onLogout: () -> Unit, go: (Tab) -> Unit) {
     val qr = rememberLoadable(client, refreshKey) { client.api.qr() }
     val scope = rememberCoroutineScope()
     val nasabah = user.nasabah
@@ -122,6 +122,13 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
                         )
                     }
                 }
+            }
+        }
+
+        item {
+            OutlinedButton(onClick = { go(Tab.Pengaturan) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
+                Icon(Lucide.Settings, contentDescription = null, tint = Slate500, modifier = Modifier.size(18.dp))
+                Text("  Pengaturan", color = Slate900, fontWeight = FontWeight.SemiBold)
             }
         }
 

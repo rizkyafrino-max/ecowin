@@ -63,7 +63,12 @@ fun NotifikasiTab(client: ApiClient, refreshKey: Int, onBerubah: () -> Unit, go:
     val data = rememberLoadable(client, refreshKey, lokal) { client.api.notifikasi() }
 
     TabList {
-        item { PengaturanPemberitahuan() }
+        item {
+            Text(
+                "Atur pemberitahuan HP dan nada", color = Emerald, fontWeight = FontWeight.SemiBold, fontSize = 13.sp,
+                modifier = Modifier.background(EmeraldSoft, RoundedCornerShape(50)).clickable { go(Tab.Pengaturan) }.padding(horizontal = 14.dp, vertical = 8.dp),
+            )
+        }
         item {
             LoadableContent(data) { respons ->
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -117,59 +122,6 @@ fun NotifikasiTab(client: ApiClient, refreshKey: Int, onBerubah: () -> Unit, go:
                     }
                 }
             }
-        }
-    }
-}
-
-/**
- * Pemberitahuan di HP: mati secara bawaan dan hanya menyala atas pilihan nasabah. Isi pesan disembunyikan di layar kunci.
- * Izin pemberitahuan Android 13+ baru diminta saat saklar dinyalakan, bukan saat aplikasi dibuka.
- */
-@Composable
-private fun PengaturanPemberitahuan() {
-    val konteks = androidx.compose.ui.platform.LocalContext.current
-    var aktif by remember { mutableStateOf(NotifikasiHp.aktif(konteks) && NotifikasiHp.izinDiberikan(konteks)) }
-    var ditolak by remember { mutableStateOf(false) }
-    val minta = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { ok ->
-        if (ok) { NotifikasiHp.nyalakan(konteks); aktif = true; ditolak = false } else ditolak = true
-    }
-    EcoCard {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text("Pemberitahuan di HP", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Slate900)
-                Text(
-                    "Dapat kabar setoran dan penarikan walau aplikasi tertutup (dicek tiap ±15 menit). Di layar kunci isi pesan disembunyikan; nominal baru terlihat setelah HP dibuka. Mati otomatis saat Anda keluar akun.",
-                    color = Slate500, fontSize = 12.sp,
-                )
-                if (aktif) {
-                    var nada by remember { mutableStateOf(NotifikasiHp.nada(konteks)) }
-                    Text("Nada notifikasi", fontWeight = FontWeight.SemiBold, fontSize = 12.sp, color = Slate900, modifier = Modifier.padding(top = 6.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-                        NotifikasiHp.Nada.entries.forEach { n ->
-                            val dipilih = n == nada
-                            Text(
-                                n.label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
-                                color = if (dipilih) Color.White else Slate500,
-                                modifier = Modifier
-                                    .background(if (dipilih) Emerald else EmeraldSoft, RoundedCornerShape(50))
-                                    .clickable { nada = n; NotifikasiHp.setNada(konteks, n); NotifikasiHp.pratinjau(konteks, n) }
-                                    .padding(horizontal = 12.dp, vertical = 7.dp),
-                            )
-                        }
-                    }
-                    Text("Ketuk untuk memilih dan mendengar contohnya. Bisa juga diubah di Pengaturan HP > Aplikasi > EcoWin > Notifikasi.", color = Slate500, fontSize = 11.sp)
-                }
-                if (ditolak) Text("Izin pemberitahuan ditolak. Aktifkan lewat Pengaturan HP > Aplikasi > EcoWin > Notifikasi.", color = Red, fontSize = 12.sp)
-            }
-            Switch(
-                checked = aktif,
-                onCheckedChange = { nyala ->
-                    if (!nyala) { NotifikasiHp.berhenti(konteks); aktif = false }
-                    else if (NotifikasiHp.izinDiberikan(konteks)) { NotifikasiHp.nyalakan(konteks); aktif = true; ditolak = false }
-                    else minta.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                },
-                colors = SwitchDefaults.colors(checkedTrackColor = Emerald),
-            )
         }
     }
 }
