@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BioporiController;
+use App\Http\Controllers\Api\NotifikasiController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\HargaSampahController;
 use App\Http\Controllers\Api\KoreksiTransaksiController;
@@ -64,6 +65,11 @@ Route::middleware(['auth:sanctum', 'active', 'abilities:access'])->name('api.')-
         Route::get('/saldo/history', [NasabahController::class, 'mutasi'])->name('alias.saldo.history');
         Route::get('/qr', [NasabahController::class, 'qr'])->name('alias.qr');
         Route::get('/transaksi', [TransaksiAnorganikController::class, 'index'])->name('alias.transaksi');
+        // Notifikasi dalam aplikasi (hanya milik pengguna yang login)
+        Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
+        Route::get('/notifikasi/jumlah', [NotifikasiController::class, 'jumlah'])->name('notifikasi.jumlah');
+        Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'bacaSemua'])->name('notifikasi.baca-semua');
+        Route::post('/notifikasi/{id}/baca', [NotifikasiController::class, 'baca'])->whereNumber('id')->name('notifikasi.baca');
         Route::get('/biopori', [BioporiController::class, 'index'])->name('alias.biopori.index');
         Route::post('/biopori', [BioporiController::class, 'store'])->middleware('throttle:uploads')->name('alias.biopori.store');
     });

@@ -63,7 +63,11 @@ class ApiContractTest extends TestCase
         // Organik: setoran petugas, aktivitas BioporiPrint, lokasi
         $this->getJson('/api/organik')->assertOk()->assertJsonStructure(['data' => ['*' => ['id', 'tanggal', 'jenis_organik', 'lokasi', 'metode_pengolahan', 'berat_kg', 'estimasi_kompos_kg', 'status_pengolahan']]]);
         $this->getJson('/api/biopori')->assertOk()->assertJsonStructure(['data' => ['*' => ['id', 'lokasi', 'bioporiprint', 'metode_pengolahan', 'tanggal_pemasukan', 'jenis_sampah', 'berat_kg', 'status', 'foto_url']]]);
-        $this->getJson('/api/organik/biopori/lokasi')->assertOk()->assertJsonStructure(['data' => ['*' => ['id', 'nama_lokasi', 'latitude', 'longitude', 'bioporiprint', 'status', 'terakhir_diisi_at', 'estimasi_panen_at', 'status_panen']]]);
+        $this->getJson('/api/organik/biopori/lokasi')->assertOk()->assertJsonStructure(['data' => ['*' => ['id', 'nama_lokasi', 'latitude', 'longitude', 'bioporiprint', 'status', 'terakhir_diisi_at', 'estimasi_panen_at', 'status_panen', 'verifikasi', 'catatan_verifikasi', 'diajukan_saya']]]);
+
+        // Notifikasi dalam aplikasi (Web & Android)
+        $this->getJson('/api/notifikasi')->assertOk()->assertJsonStructure(['data' => ['*' => ['id', 'tipe', 'judul', 'isi', 'aksi', 'dibaca', 'created_at']], 'belum_dibaca']);
+        $this->getJson('/api/notifikasi/jumlah')->assertOk()->assertJsonStructure(['belum_dibaca']);
 
         // Penarikan
         $this->getJson('/api/penarikan')->assertOk()->assertJsonStructure(['data' => ['*' => ['id', 'jumlah', 'status', 'created_at']]]);

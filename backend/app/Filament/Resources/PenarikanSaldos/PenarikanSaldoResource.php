@@ -79,7 +79,7 @@ class PenarikanSaldoResource extends Resource
             ->columns([
                 TextColumn::make('created_at')->label('Diajukan')->dateTime('d M Y H:i')->sortable(),
                 TextColumn::make('nasabah.nama')->label('Nasabah')->searchable(),
-                TextColumn::make('jumlah')->money('IDR', locale: 'id')->sortable(),
+                TextColumn::make('jumlah')->money('IDR', locale: 'id', decimalPlaces: 0)->sortable(),
                 TextColumn::make('status')->badge()
                     ->formatStateUsing(fn (string $state): string => PenarikanSaldo::STATUSES[$state] ?? $state)
                     ->color(fn (string $state): string => match ($state) {

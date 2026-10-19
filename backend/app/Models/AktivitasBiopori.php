@@ -52,7 +52,7 @@ class AktivitasBiopori extends Model
 
     public function nasabah(): BelongsTo
     {
-        return $this->belongsTo(Nasabah::class, 'nasabah_id');
+        return $this->belongsTo(Nasabah::class, 'nasabah_id')->withTrashed();
     }
 
     public function bankSampah(): BelongsTo
@@ -67,7 +67,7 @@ class AktivitasBiopori extends Model
 
     public function pemeriksa(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'diperiksa_oleh');
+        return $this->belongsTo(User::class, 'diperiksa_oleh')->withTrashed();
     }
 
     public function isPending(): bool

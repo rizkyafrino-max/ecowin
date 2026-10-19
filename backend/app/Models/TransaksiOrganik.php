@@ -43,7 +43,7 @@ class TransaksiOrganik extends Model
 
     public function nasabah(): BelongsTo
     {
-        return $this->belongsTo(Nasabah::class, 'nasabah_id');
+        return $this->belongsTo(Nasabah::class, 'nasabah_id')->withTrashed();
     }
 
     public function bankSampah(): BelongsTo
@@ -53,6 +53,6 @@ class TransaksiOrganik extends Model
 
     public function pencatat(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'dicatat_oleh');
+        return $this->belongsTo(User::class, 'dicatat_oleh')->withTrashed();
     }
 }

@@ -92,7 +92,7 @@ class TitikBiopori extends Model
 
     public function nasabah(): BelongsTo
     {
-        return $this->belongsTo(Nasabah::class, 'nasabah_id');
+        return $this->belongsTo(Nasabah::class, 'nasabah_id')->withTrashed();
     }
 
     public function bankSampah(): BelongsTo
@@ -100,9 +100,14 @@ class TitikBiopori extends Model
         return $this->belongsTo(BankSampah::class, 'bank_sampah_id');
     }
 
+    public function pengaju(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'diajukan_oleh')->withTrashed();
+    }
+
     public function pencatat(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'dicatat_oleh');
+        return $this->belongsTo(User::class, 'dicatat_oleh')->withTrashed();
     }
 
     public function aktivitas(): HasMany

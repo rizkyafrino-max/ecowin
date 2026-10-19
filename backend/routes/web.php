@@ -3,6 +3,8 @@
 use App\Http\Controllers\Auth\GoogleWebAuthController;
 use App\Http\Controllers\Auth\RegistrationController;
 use App\Http\Controllers\KartuNasabahController;
+use App\Http\Controllers\LaporanCetakController;
+use App\Http\Controllers\LaporanEksporController;
 use App\Http\Controllers\ScanKartuController;
 use App\Http\Controllers\SecureFileController;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +28,8 @@ Route::middleware(['guest', 'throttle:auth'])->group(function (): void {
 
 Route::middleware(['auth', 'role:admin,petugas'])->group(function (): void {
     Route::get('/admin/nasabah/{nasabah}/kartu', [KartuNasabahController::class, 'show'])->name('admin.nasabah.kartu');
+    Route::get('/admin/laporan/cetak', [LaporanCetakController::class, 'show'])->middleware('throttle:30,1')->name('admin.laporan.cetak');
+    Route::get('/admin/laporan/ekspor/{jenis}', [LaporanEksporController::class, 'csv'])->middleware('throttle:20,1')->where('jenis', 'anorganik|organik|penarikan|rekap')->name('admin.laporan.ekspor');
     Route::get('/admin/scan-kartu', [ScanKartuController::class, 'page'])->name('admin.scan-kartu');
     Route::get('/admin/scan-kartu/{token}', [ScanKartuController::class, 'lookup'])->name('admin.scan-kartu.lookup');
     Route::get('/admin/berkas/biopori/{aktivitas}', [SecureFileController::class, 'biopori'])->name('admin.berkas.biopori');

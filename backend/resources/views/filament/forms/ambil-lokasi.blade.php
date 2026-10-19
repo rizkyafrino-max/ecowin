@@ -78,7 +78,7 @@
                     terbaik = { accuracy: c.accuracy };
                     this.setPoint(c.latitude, c.longitude, `Mencari sinyal terbaik… (akurasi ±${Math.round(c.accuracy)} m)`);
                     if (this.circle) this.map.removeLayer(this.circle);
-                    this.circle = L.circle([c.latitude, c.longitude], { radius: c.accuracy, weight: 1, color: '#176b4d', fillOpacity: 0.12 }).addTo(this.map);
+                    this.circle = L.circle([c.latitude, c.longitude], { radius: c.accuracy, weight: 1, color: 'var(--eco-primary)', fillOpacity: 0.12 }).addTo(this.map);
                     if (c.accuracy <= 20) selesai();
                 },
                 error => {
@@ -104,10 +104,10 @@
     .biopori-location-picker{overflow:hidden;border:1px solid #d8e9df;border-radius:16px;background:#f8fcf9}
     .biopori-location-picker__header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px}
     .biopori-location-picker__header strong,.biopori-location-picker__header span{display:block}
-    .biopori-location-picker__header strong{color:#174c37;font-size:13px;font-weight:800}
+    .biopori-location-picker__header strong{color:var(--eco-deep);font-size:13px;font-weight:800}
     .biopori-location-picker__header span{margin-top:3px;color:#718279;font-size:11px}
-    .biopori-location-picker__header button{flex:none;border:0;border-radius:10px;background:#176b4d;padding:9px 13px;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
-    .biopori-location-picker__header button:hover{background:#104b37}
+    .biopori-location-picker__header button{flex:none;border:0;border-radius:10px;background:var(--eco-primary);padding:9px 13px;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
+    .biopori-location-picker__header button:hover{background:var(--eco-deep)}
     .biopori-location-picker__map{height:320px;width:100%;background:#e9f5ee}
     .biopori-location-picker__status{margin:0;padding:10px 16px;color:#527363;font-size:11px}
     @media(max-width:640px){.biopori-location-picker__header{align-items:flex-start;flex-direction:column}.biopori-location-picker__map{height:280px}}

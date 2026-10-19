@@ -40,7 +40,7 @@ class MutasiSaldo extends Model
 
     public function nasabah(): BelongsTo
     {
-        return $this->belongsTo(Nasabah::class, 'nasabah_id');
+        return $this->belongsTo(Nasabah::class, 'nasabah_id')->withTrashed();
     }
 
     public function bankSampah(): BelongsTo
@@ -55,6 +55,6 @@ class MutasiSaldo extends Model
 
     public function pembuat(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'dibuat_oleh');
+        return $this->belongsTo(User::class, 'dibuat_oleh')->withTrashed();
     }
 }

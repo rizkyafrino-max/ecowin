@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TitikBioporis;
 
+use App\Filament\Forms\DecimalInput;
 use App\Filament\Concerns\ScopesToCurrentUser;
 use App\Filament\Resources\TitikBioporis\Pages\CreateTitikBiopori;
 use App\Filament\Resources\TitikBioporis\Pages\EditTitikBiopori;
@@ -125,7 +126,7 @@ class TitikBioporiResource extends Resource
                     }),
                 Action::make('panen')->label('Catat panen')->icon('heroicon-o-check-badge')->color('success')
                     ->visible(fn (TitikBiopori $r): bool => $r->verifikasi === TitikBiopori::VERIFIKASI_APPROVED && $r->statusPanenEfektif() !== TitikBiopori::PANEN_SUDAH && (auth()->user()?->can('update', $r) ?? false))
-                    ->schema([TextInput::make('hasil_kompos_kg')->label('Hasil kompos')->suffix('kg')->numeric()->minValue(0)->maxValue(10000)->required()])
+                    ->schema([DecimalInput::make('hasil_kompos_kg')->label('Hasil kompos')->suffix('kg')->batasMin(0)->batasMax(10000)->required()])
                     ->action(function (TitikBiopori $record, array $data): void {
                         app(BioporiService::class)->tandaiPanen(auth()->user(), $record, (float) $data['hasil_kompos_kg']);
                         Notification::make()->success()->title('Panen dicatat.')->send();

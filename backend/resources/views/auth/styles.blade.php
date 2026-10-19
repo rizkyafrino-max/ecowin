@@ -162,4 +162,10 @@
             .ecl-reg .ecl-submitbar .ecl-btn-primary{margin-top:0}
         }
         @media(max-width:380px){.ecl-stepper li{font-size:.66rem}.ecl-bank{padding:.7rem}}
+        /* State tombol Google: loading (spinner, tidak bisa diklik ulang). */
+        .ecl-btn.is-loading{pointer-events:none;border-color:#A7F3D0;background:#F0FDF4;color:#047857}
+        .ecl-btn.is-loading svg{display:none}
+        .ecl-btn.is-loading::before{content:"";width:20px;height:20px;border-radius:999px;border:3px solid #A7F3D0;border-top-color:#059669;animation:ecl-spin .8s linear infinite;flex:none}
+        @keyframes ecl-spin{to{transform:rotate(360deg)}}
+        @media (prefers-reduced-motion:reduce){.ecl-btn.is-loading::before{animation:none}}
     </style>

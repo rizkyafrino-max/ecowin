@@ -180,6 +180,8 @@ class BioporiService
 
             $aksi = $status === TitikBiopori::VERIFIKASI_APPROVED ? 'setujui_titik_biopori' : 'tolak_titik_biopori';
             $this->audit->log($aksi, $locked, $before, $locked->attributesToArray(), $actor);
+            $disetujui = $status === TitikBiopori::VERIFIKASI_APPROVED;
+            app(\App\Services\NotifikasiService::class)->kirim($locked->pengaju, $disetujui ? 'titik_disetujui' : 'titik_ditolak', $disetujui ? 'Titik Biopori disetujui' : 'Titik Biopori ditolak', $disetujui ? 'Titik "'.$locked->nama_lokasi.'" sudah disetujui dan tampil di peta. Anda bisa melapor aktivitas di sana.' : 'Titik "'.$locked->nama_lokasi.'" ditolak. Alasan: '.($catatan ?: '-'), 'organik');
 
             return $locked;
         });
@@ -265,6 +267,8 @@ class BioporiService
 
             $aksi = $status === AktivitasBiopori::STATUS_APPROVED ? 'approve_biopori' : 'reject_biopori';
             $this->audit->log($aksi, $locked, $before, $locked->attributesToArray(), $actor);
+            $disetujui = $status === AktivitasBiopori::STATUS_APPROVED;
+            app(\App\Services\NotifikasiService::class)->kirim($locked->nasabah?->user, $disetujui ? 'biopori_disetujui' : 'biopori_ditolak', $disetujui ? 'Aktivitas organik disetujui' : 'Aktivitas organik ditolak', $disetujui ? 'Aktivitas Biopori Anda ('.number_format((float) $locked->berat_kg, 2, ',', '.').' kg) sudah disetujui petugas.' : 'Aktivitas Biopori Anda ditolak. Alasan: '.($catatan ?: '-'), 'organik');
 
             return $locked;
         });

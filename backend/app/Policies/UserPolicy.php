@@ -29,9 +29,10 @@ class UserPolicy
         return $user->isAdmin() && $user->isActive();
     }
 
+    /** Hapus data (opsional): hanya Admin, hanya akun petugas yang sudah tidak aktif, bukan diri sendiri. */
     public function delete(User $user, User $model): bool
     {
-        return false;
+        return $user->isAdmin() && $user->isActive() && $model->isPetugas() && ! $model->isActive() && ! $user->is($model);
     }
 
     public function deleteAny(User $user): bool

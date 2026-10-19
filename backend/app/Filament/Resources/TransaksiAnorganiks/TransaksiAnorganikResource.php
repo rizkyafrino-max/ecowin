@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TransaksiAnorganiks;
 
+use App\Filament\Forms\DecimalInput;
 use App\Filament\Actions\AjukanKoreksiAction;
 use App\Filament\Concerns\ScopesToCurrentUser;
 use App\Filament\Resources\TransaksiAnorganiks\Pages\CreateTransaksiAnorganik;
@@ -57,11 +58,11 @@ class TransaksiAnorganikResource extends Resource
                     Select::make('jenis_sampah_id')->label('Jenis sampah')
                         ->options(fn () => JenisSampah::query()->where('status', 'aktif')->whereHas('kategori', fn ($q) => $q->where('tipe', 'anorganik'))->orderBy('nama_jenis')->pluck('nama_jenis', 'id'))
                         ->searchable()->required()->live(),
-                    TextInput::make('berat_kg')->label('Berat')->suffix('kg')->numeric()->minValue(0.01)->maxValue(10000)->step(0.01)->required()->live(onBlur: true),
+                    DecimalInput::make('berat_kg')->label('Berat')->suffix('kg')->batasMin(0.01)->batasMax(10000)->required()->live(onBlur: true)->placeholder('0,5'),
                     Placeholder::make('estimasi')->label('Harga berlaku & total')
                         ->content(function (Get $get): string {
                             $jenis = JenisSampah::with('kategori')->find($get('jenis_sampah_id'));
-                            $berat = (float) $get('berat_kg');
+                            $berat = (float) \App\Support\Desimal::parse($get('berat_kg'));
 
                             if (! $jenis || $berat <= 0) {
                                 return 'Pilih jenis sampah dan isi berat.';
@@ -92,8 +93,8 @@ class TransaksiAnorganikResource extends Resource
                 TextColumn::make('nasabah.nama')->label('Nasabah')->searchable(),
                 TextColumn::make('hargaSampah.jenisSampah.nama_jenis')->label('Jenis'),
                 TextColumn::make('berat_kg')->label('Berat')->suffix(' kg')->sortable(),
-                TextColumn::make('harga_per_kg')->label('Harga/kg')->money('IDR', locale: 'id'),
-                TextColumn::make('nilai_rupiah')->label('Total')->money('IDR', locale: 'id')->sortable(),
+                TextColumn::make('harga_per_kg')->label('Harga/kg')->money('IDR', locale: 'id', decimalPlaces: 0),
+                TextColumn::make('nilai_rupiah')->label('Total')->money('IDR', locale: 'id', decimalPlaces: 0)->sortable(),
                 TextColumn::make('pencatat.nama')->label('Dicatat oleh')->toggleable(),
                 TextColumn::make('bankSampah.nama_bank_sampah')->label('Bank Sampah')->visible(fn (): bool => auth()->user()?->isAdmin() ?? false),
             ])

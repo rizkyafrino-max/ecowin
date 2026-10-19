@@ -31,9 +31,10 @@ class NasabahPolicy
         return $user->isStaff() && $user->canManageBankSampah($nasabah->bank_sampah_id);
     }
 
+    /** Hapus data (opsional): hanya Admin dan hanya nasabah yang sudah tidak aktif. Lihat PenghapusanAkunService. */
     public function delete(User $user, Nasabah $nasabah): bool
     {
-        return false;
+        return $user->isAdmin() && $user->isActive() && $nasabah->status !== 'aktif' && ! ($nasabah->user?->isActive() ?? false);
     }
 
     public function deleteAny(User $user): bool

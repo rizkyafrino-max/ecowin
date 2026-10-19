@@ -2,6 +2,8 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Storage;
 
 Artisan::command('inspire', function () {
@@ -30,3 +32,13 @@ Artisan::command('ecowin:amankan-berkas', function () {
 
     $this->info("{$dipindah} berkas dipindahkan ke penyimpanan privat.");
 })->purpose('Pindahkan berkas sensitif dari storage publik ke privat');
+
+/*
+| Notifikasi dalam aplikasi lebih dari 90 hari dihapus otomatis (dijadwalkan harian; butuh `php artisan schedule:run` tiap menit di server).
+*/
+Artisan::command('ecowin:bersihkan-notifikasi', function () {
+    $n = DB::table('notifikasi')->where('created_at', '<', now()->subDays(90))->delete();
+    $this->info("Notifikasi lama dihapus: {$n}");
+})->purpose('Hapus notifikasi lebih dari 90 hari');
+
+Schedule::command('ecowin:bersihkan-notifikasi')->dailyAt('03:15');

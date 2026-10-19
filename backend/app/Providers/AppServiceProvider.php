@@ -33,6 +33,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Placeholder singkat agar tidak terpotong pada kolom sempit di HP.
+        \Filament\Forms\Components\Select::configureUsing(fn (\Filament\Forms\Components\Select $select) => $select->placeholder('Pilih…'));
+
         // Saat test: gagal bila ada atribut yang diisi tapi tidak fillable.
         Model::preventSilentlyDiscardingAttributes($this->app->runningUnitTests());
 

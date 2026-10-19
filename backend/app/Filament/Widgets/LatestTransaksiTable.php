@@ -35,7 +35,7 @@ class LatestTransaksiTable extends TableWidget
                 TextColumn::make('nasabah.nama')->label('Nasabah'),
                 TextColumn::make('hargaSampah.jenisSampah.nama_jenis')->label('Jenis'),
                 TextColumn::make('berat_kg')->label('Berat')->suffix(' kg')->numeric(2),
-                TextColumn::make('nilai_rupiah')->label('Nilai')->money('IDR', locale: 'id')->alignEnd(),
+                TextColumn::make('nilai_rupiah')->label('Nilai')->money('IDR', locale: 'id', decimalPlaces: 0)->alignEnd(),
             ])
             ->paginated(false)
             ->defaultSort('id', 'desc');

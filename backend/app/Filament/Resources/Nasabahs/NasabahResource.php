@@ -82,7 +82,7 @@ class NasabahResource extends Resource
                 TextColumn::make('nama')->searchable()->sortable(),
                 TextColumn::make('user.email')->label('Email Google')->searchable()->toggleable(),
                 TextColumn::make('no_hp')->label('No. HP')->searchable(),
-                TextColumn::make('saldo')->money('IDR', locale: 'id')->sortable(),
+                TextColumn::make('saldo')->money('IDR', locale: 'id', decimalPlaces: 0)->sortable(),
                 TextColumn::make('status_verifikasi')->label('Verifikasi')->badge()
                     ->formatStateUsing(fn (string $state): string => $state === 'verified' ? 'Terverifikasi' : 'Menunggu')
                     ->color(fn (string $state): string => $state === 'verified' ? 'success' : 'warning'),
@@ -120,6 +120,25 @@ class NasabahResource extends Resource
                         Notification::make()->title('Pendaftaran ditolak')->success()->send();
                     }),
                 EditAction::make(),
+                Action::make('hapus_data')
+                    ->label('Hapus data')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->visible(fn (Nasabah $record): bool => auth()->user()?->can('delete', $record) ?? false)
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus data nasabah ini?')
+                    ->modalDescription('Data pribadi (nama, HP, alamat, NIK, foto identitas, akun Google) dihapus permanen dan tidak bisa dikembalikan. Riwayat transaksi tetap tersimpan secara anonim untuk pembukuan. Syarat: saldo Rp 0 dan tidak ada permintaan yang menunggu.')
+                    ->modalSubmitActionLabel('Ya, hapus data')
+                    ->action(function (Nasabah $record): void {
+                        try {
+                            app(\App\Services\PenghapusanAkunService::class)->hapusNasabah(auth()->user(), $record);
+                        } catch (\Illuminate\Validation\ValidationException $e) {
+                            Notification::make()->danger()->title('Tidak bisa dihapus')->body(collect($e->errors())->flatten()->first())->send();
+
+                            return;
+                        }
+                        Notification::make()->success()->title('Data nasabah dihapus')->send();
+                    }),
                 Action::make('cetak_kartu')->label('QR Card')->icon('heroicon-o-qr-code')
                     ->url(fn (Nasabah $record): string => route('admin.nasabah.kartu', $record))->openUrlInNewTab(),
             ])

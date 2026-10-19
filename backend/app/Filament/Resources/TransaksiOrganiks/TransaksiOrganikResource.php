@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TransaksiOrganiks;
 
+use App\Filament\Forms\DecimalInput;
 use App\Filament\Actions\AjukanKoreksiAction;
 use App\Filament\Concerns\ScopesToCurrentUser;
 use App\Filament\Resources\TransaksiOrganiks\Pages\CreateTransaksiOrganik;
@@ -56,11 +57,11 @@ class TransaksiOrganikResource extends Resource
                     ->default(fn () => request()->integer('nasabah_id') ?: null),
                 DatePicker::make('tanggal')->default(now())->maxDate(now())->required(),
                 TextInput::make('jenis_organik')->label('Jenis sampah organik')->placeholder('Sisa sayur, daun, sisa makanan')->required()->maxLength(100),
-                TextInput::make('berat_kg')->label('Berat')->suffix('kg')->numeric()->minValue(0.01)->maxValue(10000)->required()->live(onBlur: true),
+                DecimalInput::make('berat_kg')->label('Berat')->suffix('kg')->batasMin(0.01)->batasMax(10000)->required()->live(onBlur: true)->placeholder('0,5'),
                 TextInput::make('lokasi')->label('Lokasi pengolahan')->maxLength(255),
                 Select::make('metode_pengolahan')->options(TransaksiOrganik::METODE)->default('komposter')->required()->live(),
                 Placeholder::make('estimasi')->label('Estimasi hasil kompos')
-                    ->content(fn (Get $get): string => number_format(app(KomposCalculator::class)->estimasi((float) $get('berat_kg'), $get('metode_pengolahan')), 2, ',', '.').' kg'),
+                    ->content(fn (Get $get): string => number_format(app(KomposCalculator::class)->estimasi((float) \App\Support\Desimal::parse($get('berat_kg')), $get('metode_pengolahan')), 2, ',', '.').' kg'),
             ])->columns(2),
             Section::make('Pemeriksaan bahan')->schema([
                 Toggle::make('checklist_bebas_plastik')->label('Bebas plastik')->accepted()->required(),
