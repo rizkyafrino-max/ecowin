@@ -141,6 +141,24 @@ private fun PengaturanPemberitahuan() {
                     "Dapat kabar setoran dan penarikan walau aplikasi tertutup (dicek tiap ±15 menit). Di layar kunci isi pesan disembunyikan; nominal baru terlihat setelah HP dibuka. Mati otomatis saat Anda keluar akun.",
                     color = Slate500, fontSize = 12.sp,
                 )
+                if (aktif) {
+                    var nada by remember { mutableStateOf(NotifikasiHp.nada(konteks)) }
+                    Text("Nada notifikasi", fontWeight = FontWeight.SemiBold, fontSize = 12.sp, color = Slate900, modifier = Modifier.padding(top = 6.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+                        NotifikasiHp.Nada.entries.forEach { n ->
+                            val dipilih = n == nada
+                            Text(
+                                n.label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
+                                color = if (dipilih) Color.White else Slate500,
+                                modifier = Modifier
+                                    .background(if (dipilih) Emerald else EmeraldSoft, RoundedCornerShape(50))
+                                    .clickable { nada = n; NotifikasiHp.setNada(konteks, n); NotifikasiHp.pratinjau(konteks, n) }
+                                    .padding(horizontal = 12.dp, vertical = 7.dp),
+                            )
+                        }
+                    }
+                    Text("Ketuk untuk memilih dan mendengar contohnya. Bisa juga diubah di Pengaturan HP > Aplikasi > EcoWin > Notifikasi.", color = Slate500, fontSize = 11.sp)
+                }
                 if (ditolak) Text("Izin pemberitahuan ditolak. Aktifkan lewat Pengaturan HP > Aplikasi > EcoWin > Notifikasi.", color = Red, fontSize = 12.sp)
             }
             Switch(

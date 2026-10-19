@@ -62,6 +62,7 @@ object NotifikasiHp {
     private const val KERJA = "ecowin-notifikasi"
     private const val PREFS = "ecowin_notif_hp"
     private const val KEY_AKTIF = "aktif"
+    private const val KEY_NADA = "nada"
 
     private fun prefs(c: Context) = c.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
@@ -88,29 +89,68 @@ object NotifikasiHp {
         WorkManager.getInstance(c.applicationContext).enqueueUniquePeriodicWork(KERJA, ExistingPeriodicWorkPolicy.KEEP, kerja)
     }
 
+    /** Nada notifikasi pilihan nasabah. Kanal Android tidak bisa diganti suaranya setelah dibuat, jadi tiap nada punya kanal sendiri. */
+    enum class Nada(val kode: String, val label: String, val raw: Int?) {
+        Ecowin("ecowin", "EcoWin", R.raw.nada_ecowin),
+        Daun("daun", "Daun", R.raw.nada_daun),
+        Koin("koin", "Koin", R.raw.nada_koin),
+        Sistem("sistem", "Bawaan HP", null),
+    }
+
+    fun nada(c: Context): Nada = Nada.entries.firstOrNull { it.kode == prefs(c).getString(KEY_NADA, null) } ?: Nada.Ecowin
+
+    /** Menyimpan pilihan nada dan langsung menyiapkan kanalnya (kanal nada lain dihapus agar pengaturan HP tetap rapi). */
+    fun setNada(c: Context, n: Nada) {
+        prefs(c).edit().putString(KEY_NADA, n.kode).apply()
+        siapkanKanal(c.applicationContext)
+    }
+
+    private fun siapkanKanal(app: Context): String {
+        val n = nada(app)
+        val id = "${KANAL}_${n.kode}"
+        if (Build.VERSION.SDK_INT < 26) return id
+        val nm = app.getSystemService(NotificationManager::class.java)
+        nm.notificationChannels.filter { it.id.startsWith(KANAL) && it.id != id }.forEach { nm.deleteNotificationChannel(it.id) }
+        if (nm.getNotificationChannel(id) == null) {
+            val kanal = NotificationChannel(id, "Kabar EcoWin", NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = "Setoran, penarikan, dan aktivitas akun Anda."
+                lockscreenVisibility = android.app.Notification.VISIBILITY_PRIVATE
+                setShowBadge(true)
+                val uri = n.raw?.let { android.net.Uri.parse("android.resource://${app.packageName}/$it") } ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
+                setSound(uri, android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION).setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
+            }
+            nm.createNotificationChannel(kanal)
+        }
+        return id
+    }
+
+    /** Memutar contoh nada saat nasabah memilih (hormati volume notifikasi; tidak memutar bila HP senyap). */
+    fun pratinjau(c: Context, n: Nada) {
+        val app = c.applicationContext
+        val attr = android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION).setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
+        runCatching {
+            if (n.raw != null) {
+                android.media.MediaPlayer.create(app, n.raw, attr, android.media.AudioManager.AUDIO_SESSION_ID_GENERATE)?.apply { setOnCompletionListener { it.release() }; start() }
+            } else {
+                android.media.RingtoneManager.getRingtone(app, android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION))?.play()
+            }
+        }
+    }
+
     internal fun tampilkan(c: Context, r: RingkasanNotif) {
         val app = c.applicationContext
         if (!izinDiberikan(app) || !NotificationManagerCompat.from(app).areNotificationsEnabled()) return
-        val nm = app.getSystemService(NotificationManager::class.java)
-        if (Build.VERSION.SDK_INT >= 26 && nm.getNotificationChannel(KANAL) == null) {
-            nm.createNotificationChannel(
-                NotificationChannel(KANAL, "Kabar EcoWin", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                    description = "Setoran, penarikan, dan aktivitas akun Anda."
-                    lockscreenVisibility = android.app.Notification.VISIBILITY_PRIVATE
-                    setShowBadge(true)
-                },
-            )
-        }
+        val kanal = siapkanKanal(app)
         val buka = Intent(app, MainActivity::class.java).setAction(AKSI_BUKA).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val tujuan = PendingIntent.getActivity(app, 0, buka, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-        val umum = NotificationCompat.Builder(app, KANAL)
+        val umum = NotificationCompat.Builder(app, kanal)
             .setSmallIcon(R.drawable.ic_notif)
             .setContentTitle("EcoWin")
             .setContentText("Ada kabar baru. Buka kunci HP untuk melihat.")
             .build()
         val judul = if (r.jumlah == 1) r.terbaru.judul else "${r.jumlah} kabar baru di EcoWin"
         val isi = if (r.jumlah == 1) r.terbaru.isi else "Ketuk untuk melihat semuanya."
-        val notif = NotificationCompat.Builder(app, KANAL)
+        val notif = NotificationCompat.Builder(app, kanal)
             .setSmallIcon(R.drawable.ic_notif)
             .setColor(0xFF059669.toInt())
             .setLargeIcon(android.graphics.BitmapFactory.decodeResource(app.resources, R.mipmap.ic_launcher))
