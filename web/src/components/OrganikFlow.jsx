@@ -14,7 +14,7 @@ export default function OrganikFlow({ compact = false }) {
       <ol className={`mt-3 grid gap-3 ${compact ? '' : 'sm:grid-cols-3'}`}>
         {steps.map((s, i) => (
           <li key={s.title} className="flex items-start gap-3 rounded-2xl bg-surface p-3.5">
-            <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-tint text-primary"><s.icon className="h-5 w-5" aria-hidden /></span>
+            <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-tint text-primary-deep"><s.icon className="h-5 w-5" aria-hidden /></span>
             <div className="min-w-0">
               <p className="flex items-center gap-1 text-sm font-semibold">{s.title}{i < steps.length - 1 && <ChevronRight className="hidden h-3.5 w-3.5 text-muted sm:block" aria-hidden />}</p>
               <p className="mt-0.5 text-xs leading-relaxed text-muted">{s.text}</p>

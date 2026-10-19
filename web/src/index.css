@@ -15,6 +15,7 @@
   --color-ink: #0f172a;
   --color-muted: #64748b;
   --color-line: #e2e8f0;
+  --color-field: #8392a6; /* garis tepi kolom isian: kontras >= 3:1 (WCAG 1.4.11) */
 
   --color-warn: #d97706;
   --color-warn-tint: #fffbeb;

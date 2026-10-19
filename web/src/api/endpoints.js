@@ -25,6 +25,11 @@ export const EcoApi = {
   ajukanTitik: (data) => api('/organik/biopori/lokasi', { method: 'POST', body: data }),
   buatBiopori: (formData) => api('/organik/biopori', { method: 'POST', body: formData }),
 
+  notifikasi: () => api('/notifikasi'),
+  jumlahNotif: () => api('/notifikasi/jumlah'),
+  bacaNotif: (id) => api(`/notifikasi/${id}/baca`, { method: 'POST' }),
+  bacaSemuaNotif: () => api('/notifikasi/baca-semua', { method: 'POST' }),
+
   penarikan: (page = 1) => api('/penarikan', { query: { page } }),
   ajukanPenarikan: (data) => api('/penarikan', { method: 'POST', body: data }),
 };

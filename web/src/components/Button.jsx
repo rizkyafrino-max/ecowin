@@ -1,9 +1,9 @@
 import { Loader2 } from 'lucide-react';
 
-const base = 'inline-flex items-center justify-center gap-2 rounded-full font-semibold transition active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none';
+const base = 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-semibold transition active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none';
 const variants = {
   primary: 'bg-primary text-white hover:bg-primary-deep shadow-sm',
-  soft: 'bg-tint text-primary hover:bg-emerald-100',
+  soft: 'bg-tint text-primary-deep hover:bg-emerald-100',
   outline: 'border border-line bg-surface text-ink hover:bg-canvas',
   danger: 'bg-danger text-white hover:bg-red-700',
   ghost: 'text-muted hover:bg-canvas hover:text-ink',

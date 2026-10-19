@@ -4,7 +4,7 @@ import Button from './Button';
 export function EmptyState({ icon: Icon = Inbox, title, message, action }) {
   return (
     <div className="flex flex-col items-center px-6 py-12 text-center">
-      <span className="flex h-14 w-14 items-center justify-center rounded-3xl bg-tint text-primary"><Icon className="h-7 w-7" aria-hidden /></span>
+      <span className="flex h-14 w-14 items-center justify-center rounded-3xl bg-tint text-primary-deep"><Icon className="h-7 w-7" aria-hidden /></span>
       <p className="mt-4 font-semibold">{title}</p>
       {message && <p className="mt-1 max-w-xs text-sm text-muted">{message}</p>}
       {action && <div className="mt-5">{action}</div>}

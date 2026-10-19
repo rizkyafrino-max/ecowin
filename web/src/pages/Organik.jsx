@@ -14,6 +14,7 @@ import StatusBadge from '../components/StatusBadge';
 import { LoadingState } from '../components/States';
 import { useQuery } from '../hooks/useQuery';
 import { usePaged } from '../hooks/usePaged';
+import { autoKoma, keAngka, keTitik } from '../utils/angka';
 import { prepareImage } from '../utils/image';
 
 const PetaBiopori = lazy(() => import('../components/PetaBiopori'));
@@ -50,7 +51,7 @@ function Lokasi({ lokasi, onLapor, onAjukan }) {
           {pengajuan.map((t) => (
             <Card key={t.id} className="!p-4">
               <div className="flex items-start justify-between gap-3">
-                <p className="flex items-center gap-2 font-semibold"><MapPin className="h-4 w-4 text-primary" aria-hidden />{t.nama_lokasi}</p>
+                <p className="flex items-center gap-2 font-semibold"><MapPin className="h-4 w-4 text-primary-deep" aria-hidden />{t.nama_lokasi}</p>
                 <StatusBadge status={t.verifikasi} />
               </div>
               <p className="mt-2 text-xs text-muted">
@@ -64,7 +65,7 @@ function Lokasi({ lokasi, onLapor, onAjukan }) {
         {resmi.map((t) => (
           <Card key={t.id} className="!p-4">
             <div className="flex items-start justify-between gap-3">
-              <p className="flex items-center gap-2 font-semibold"><MapPin className="h-4 w-4 text-primary" aria-hidden />{t.nama_lokasi}</p>
+              <p className="flex items-center gap-2 font-semibold"><MapPin className="h-4 w-4 text-primary-deep" aria-hidden />{t.nama_lokasi}</p>
               <StatusBadge status={t.status_panen} />
             </div>
             <p className="mt-2 text-xs text-muted">Terakhir diisi: {tanggal(t.terakhir_diisi_at)} · Estimasi panen: {tanggal(t.estimasi_panen_at)}</p>
@@ -106,7 +107,8 @@ function Form({ onDone, lokasi, initialId }) {
     e.preventDefault();
     const local = {};
     if (!form.titik_biopori_id) local.titik_biopori_id = `Pilih lokasi ${metode}.`;
-    if (!(Number(form.berat_kg) > 0)) local.berat_kg = 'Isi perkiraan berat lebih dari 0 kg.';
+    if (!(keAngka(form.berat_kg) > 0)) local.berat_kg = 'Isi perkiraan berat lebih dari 0 kg.';
+    else if (keAngka(form.berat_kg) > 100) local.berat_kg = 'Berat maksimal 100 kg.';
     if (!foto) local.foto_bukti = 'Foto bukti wajib diunggah.';
     setErrors(local);
     if (Object.keys(local).length) return;
@@ -116,7 +118,7 @@ function Form({ onDone, lokasi, initialId }) {
     body.append('metode_pengolahan', metode.toLowerCase());
     body.append('tanggal_pemasukan', new Date(form.tanggal_pemasukan).toISOString());
     body.append('jenis_sampah', form.jenis_sampah);
-    body.append('berat_kg', form.berat_kg);
+    body.append('berat_kg', keTitik(form.berat_kg));
     if (form.catatan) body.append('catatan', form.catatan);
     body.append('foto_bukti', foto);
 
@@ -143,7 +145,7 @@ function Form({ onDone, lokasi, initialId }) {
       <Input label="Tanggal & waktu" type="datetime-local" max={localNow()} value={form.tanggal_pemasukan} onChange={set('tanggal_pemasukan')} error={errors.tanggal_pemasukan} />
       <div className="grid gap-4 sm:grid-cols-2">
         <Input label="Jenis sampah organik" value={form.jenis_sampah} onChange={set('jenis_sampah')} error={errors.jenis_sampah} maxLength={100} />
-        <Input label="Perkiraan berat (kg)" type="number" inputMode="decimal" step="0.1" min="0.1" max="100" value={form.berat_kg} onChange={set('berat_kg')} error={errors.berat_kg} placeholder="mis. 1.5" />
+        <Input label="Perkiraan berat (kg)" type="text" inputMode="decimal" autoComplete="off" maxLength={6} value={form.berat_kg} onChange={(e) => setForm((f) => ({ ...f, berat_kg: autoKoma(e.target.value) }))} error={errors.berat_kg} placeholder="mis. 1,5" hint="Ketik 05 untuk 0,5 kg." />
       </div>
       <Textarea label="Catatan (opsional)" value={form.catatan} onChange={set('catatan')} error={errors.catatan} maxLength={1000} />
 
@@ -214,23 +216,23 @@ export default function Organik() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Organik" subtitle="Kelola aktivitas organikmu. Organik tidak menjadi saldo rupiah." action={<Button size="sm" icon={Plus} onClick={tambah}>Tambah Aktivitas</Button>} />
+      <PageHeader title="Organik" subtitle="Kelola aktivitas organikmu. Organik tidak menjadi saldo rupiah." action={<Button size="sm" icon={Plus} onClick={tambah}><span className="sm:hidden">Tambah</span><span className="hidden sm:inline">Tambah Aktivitas</span></Button>} />
       <Card className="flex items-center gap-4">
-        <span className="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-tint text-primary"><Recycle className="h-7 w-7" aria-hidden /></span>
+        <span className="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-tint text-primary-deep"><Recycle className="h-7 w-7" aria-hidden /></span>
         <div>
           <p className="text-sm text-muted">Total Organik</p>
           <p className="text-2xl font-extrabold tabular-nums">{total === undefined ? '…' : kg(total)}</p>
           {ringkasan.data?.organik && <p className="text-xs text-muted">Estimasi kompos {kg(ringkasan.data.organik.estimasi_kompos_kg)}</p>}
         </div>
       </Card>
-      {done && <p className="flex items-center gap-2 rounded-2xl bg-tint p-3.5 text-sm font-semibold text-primary" role="status"><CheckCircle2 className="h-5 w-5" aria-hidden />Aktivitas terkirim. Menunggu pemeriksaan petugas.</p>}
+      {done && <p className="flex items-center gap-2 rounded-2xl bg-tint p-3.5 text-sm font-semibold text-primary-deep" role="status"><CheckCircle2 className="h-5 w-5" aria-hidden />Aktivitas terkirim. Menunggu pemeriksaan petugas.</p>}
       <OrganikFlow />
-      <h3 className="-mb-3 font-bold">Aktivitas Terbaru</h3>
+      <h3 className="-mb-2 pt-1 font-bold leading-snug">Aktivitas Terbaru</h3>
       <PagedList list={list} empty={{ icon: Leaf, title: 'Belum ada aktivitas', message: 'Tambahkan aktivitas organik pertama Anda dengan foto bukti.', action: <Button size="sm" onClick={tambah}>Tambah Aktivitas</Button> }}
         renderItem={(a) => (a.jenis === 'setoran'
           ? <OrganikRow item={a.raw} />
           : <ActivityCard onClick={() => setSheet(a.raw)} title={a.raw.jenis_sampah} subtitle={`${a.raw.metode ?? 'Biopori'} · ${a.raw.lokasi ?? 'Lokasi'} · ${tanggal(a.raw.tanggal_pemasukan)}`} status={a.raw.status} right={<p className="text-sm font-bold tabular-nums">{kg(a.raw.berat_kg)}</p>} />)} />
-      {titikTerkirim && <p className="flex items-center gap-2 rounded-2xl bg-tint p-3.5 text-sm font-semibold text-primary" role="status"><CheckCircle2 className="h-5 w-5" aria-hidden />Titik diajukan. Menunggu persetujuan petugas.</p>}
+      {titikTerkirim && <p className="flex items-center gap-2 rounded-2xl bg-tint p-3.5 text-sm font-semibold text-primary-deep" role="status"><CheckCircle2 className="h-5 w-5" aria-hidden />Titik diajukan. Menunggu persetujuan petugas.</p>}
       <Lokasi lokasi={lokasi} onLapor={(t) => { setDone(false); setPilihLokasi(t.id); setSheet('baru'); }} onAjukan={() => { setTitikTerkirim(false); setSheet('titik'); }} />
 
       <BottomSheet open={sheet === 'baru'} onClose={() => setSheet(null)} title="Tambah aktivitas organik">

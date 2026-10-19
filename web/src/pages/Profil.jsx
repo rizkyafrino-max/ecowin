@@ -41,7 +41,7 @@ export default function Profil() {
           <div className="flex items-center gap-4">
             {user?.avatar
               ? <img src={user.avatar} alt="" referrerPolicy="no-referrer" className="h-16 w-16 rounded-full object-cover" />
-              : <span className="flex h-16 w-16 items-center justify-center rounded-full bg-tint text-xl font-bold text-primary">{inisial(user?.nama)}</span>}
+              : <span className="flex h-16 w-16 items-center justify-center rounded-full bg-tint text-xl font-bold text-primary-deep">{inisial(user?.nama)}</span>}
             <div className="min-w-0">
               <p className="truncate text-lg font-bold">{user?.nama}</p>
               <p className="flex items-center gap-1.5 truncate text-sm text-muted"><Mail className="h-3.5 w-3.5 flex-none" aria-hidden />{user?.email}</p>
@@ -55,7 +55,7 @@ export default function Profil() {
             <Textarea label="Alamat (RT/RW)" value={form.alamat_rt_rw} onChange={set('alamat_rt_rw')} error={errors.alamat_rt_rw} maxLength={255} />
             <Input label="Email Google" value={user?.email ?? ''} disabled readOnly hint="Email tidak dapat diubah. Hubungi petugas Bank Sampah bila perlu." />
             <Button type="submit" size="lg" className="w-full sm:w-auto" loading={busy}>Simpan perubahan</Button>
-            {saved && <p className="flex items-center gap-2 text-sm font-semibold text-primary" role="status"><CheckCircle2 className="h-4 w-4" aria-hidden />Profil diperbarui.</p>}
+            {saved && <p className="flex items-center gap-2 text-sm font-semibold text-primary-deep" role="status"><CheckCircle2 className="h-4 w-4" aria-hidden />Profil diperbarui.</p>}
           </form>
         </Card>
         <QRCard data={qr.data} loading={qr.loading} />

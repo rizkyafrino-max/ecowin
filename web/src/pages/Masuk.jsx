@@ -19,7 +19,7 @@ const GoogleG = () => (
 const Brand = ({ light = false }) => (
   <div className="flex items-center gap-3">
     <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-black"><img src={emblem} alt="" className="h-7 w-auto" /></span>
-    <span className={`text-2xl font-extrabold tracking-tight ${light ? 'text-ink' : ''}`}>Eco<span className="text-primary">Win</span></span>
+    <span className={`text-2xl font-extrabold tracking-tight ${light ? 'text-ink' : ''}`}>Eco<span className="text-primary-deep">Win</span></span>
   </div>
 );
 
@@ -57,7 +57,7 @@ export default function Masuk({ daftar = false }) {
         <Brand light />
         <div>
           <h1 className="text-[1.75rem] font-extrabold leading-[1.1] tracking-tight sm:text-4xl lg:text-5xl">
-            Kelola Sampah.<br /><span className="text-primary">Jaga Masa Depan.</span>
+            Kelola Sampah.<br /><span className="text-primary-deep">Jaga Masa Depan.</span>
           </h1>
           <p className="mt-3 max-w-[34ch] text-[15px] leading-relaxed text-slate-600 lg:mt-4 lg:text-lg">Bank sampah digital untuk lingkungan yang lebih baik.</p>
         </div>
@@ -80,12 +80,12 @@ export default function Masuk({ daftar = false }) {
 
           <button type="button" onClick={start} disabled={busy}
             className="mt-7 flex min-h-[56px] w-full items-center justify-center gap-3 rounded-2xl border border-slate-300 bg-surface text-base font-semibold text-ink transition hover:border-primary hover:bg-tint hover:shadow-[0_0_0_3px_rgba(5,150,105,0.14)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 active:translate-y-px disabled:cursor-wait disabled:opacity-70">
-            {busy ? <Loader2 className="h-5 w-5 animate-spin text-primary" aria-hidden /> : <GoogleG />}
+            {busy ? <Loader2 className="h-5 w-5 animate-spin text-primary-deep" aria-hidden /> : <GoogleG />}
             <span>{busy ? 'Mengalihkan ke Google…' : daftar ? 'Daftar dengan Google' : 'Lanjutkan dengan Google'}</span>
           </button>
 
           <p className="mt-5 flex items-start gap-2.5 text-sm leading-relaxed text-muted">
-            <ShieldCheck className="mt-0.5 h-[18px] w-[18px] flex-none text-primary" aria-hidden />
+            <ShieldCheck className="mt-0.5 h-[18px] w-[18px] flex-none text-primary-deep" aria-hidden />
             <span>Akun Google harus memiliki email terverifikasi dan terdaftar di EcoWin.</span>
           </p>
 

@@ -1,6 +1,6 @@
 import { forwardRef, useId } from 'react';
 
-const control = 'w-full rounded-2xl border border-line bg-surface px-4 text-[15px] text-ink placeholder:text-muted/70 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:bg-canvas';
+const control = 'w-full rounded-2xl border-[1.5px] border-field bg-surface px-4 text-[15px] font-medium text-ink shadow-sm placeholder:font-normal placeholder:text-muted hover:border-muted focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20 aria-[invalid=true]:border-danger disabled:border-dashed disabled:bg-canvas disabled:text-muted';
 
 export function Field({ label, error, hint, children, htmlFor }) {
   return (

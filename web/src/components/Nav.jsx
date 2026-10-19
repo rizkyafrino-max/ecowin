@@ -22,14 +22,14 @@ export function Sidebar({ pathname }) {
         <span className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-black">
           <img src={emblem} alt="" className="h-7 w-auto" />
         </span>
-        <span className="ml-3 hidden text-xl font-extrabold lg:block">Eco<span className="text-primary">Win</span></span>
+        <span className="ml-3 hidden text-xl font-extrabold lg:block">Eco<span className="text-primary-deep">Win</span></span>
       </div>
       <nav className="flex-1 space-y-1 px-3 py-2">
         {[...NAV_ITEMS, { to: '/fitur', label: 'Semua Fitur', icon: LayoutGrid }].map((item) => {
           const forced = isActive(item, pathname);
           return (
             <NavLink key={item.to} to={item.to} end={item.end} title={item.label}
-              className={({ isActive: a }) => `flex items-center justify-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold transition lg:justify-start ${(forced ?? a) ? 'bg-primary text-white shadow-sm' : 'text-muted hover:bg-tint hover:text-primary'}`}>
+              className={({ isActive: a }) => `flex items-center justify-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold transition lg:justify-start ${(forced ?? a) ? 'bg-primary text-white shadow-sm' : 'text-muted hover:bg-tint hover:text-primary-deep'}`}>
               <item.icon className="h-5 w-5 flex-none" aria-hidden />
               <span className="hidden lg:inline">{item.label}</span>
             </NavLink>
@@ -50,7 +50,7 @@ export function BottomNav({ pathname, hidden = false }) {
     const forced = isActive(item, pathname);
     return (
       <NavLink key={item.to} to={item.to} end={item.end}
-        className={({ isActive: a }) => `flex min-w-[56px] flex-col items-center justify-center gap-[3px] rounded-xl px-2.5 py-[7px] text-[10px] font-bold transition sm:min-w-[62px] ${(forced ?? a) ? 'bg-tint text-primary' : 'text-muted hover:bg-tint hover:text-primary'}`}>
+        className={({ isActive: a }) => `flex min-w-[56px] flex-col items-center justify-center gap-[3px] rounded-xl px-2.5 py-[7px] text-[10px] font-bold transition sm:min-w-[62px] ${(forced ?? a) ? 'bg-tint text-primary-deep' : 'text-muted hover:bg-tint hover:text-primary-deep'}`}>
         <item.icon className="h-[21px] w-[21px]" strokeWidth={1.8} aria-hidden />
         {item.label}
       </NavLink>

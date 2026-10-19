@@ -8,6 +8,7 @@ import { bagiTitik } from '../utils/biopori';
 import { tanggal } from '../utils/format';
 import Button from './Button';
 import Card from './Card';
+import PipaPutar from './PipaPutar';
 import StatusBadge from './StatusBadge';
 
 // Marker memakai ikon SVG sendiri (tanpa berkas gambar bawaan Leaflet): BioporiPrint = hijau + ikon printer.
@@ -67,16 +68,19 @@ export default function PetaBiopori({ titik = [], onLapor }) {
             {dipeta.map((t) => (
               <Marker key={t.id} position={[Number(t.latitude), Number(t.longitude)]} icon={t.bioporiprint ? IKON_PRINT : IKON_BIASA}>
                 <Popup>
-                  <div className="min-w-[200px] text-[13px]">
+                  <div className="flex min-w-[250px] items-start gap-3 text-[13px]">
+                    <div className="min-w-0 flex-1">
                     <p className="text-sm font-bold">{t.nama_lokasi}</p>
                     <div className="mt-1.5 flex flex-wrap gap-1.5">
                       <StatusBadge status={t.status_panen} />
-                      {t.bioporiprint && <span className="inline-flex items-center gap-1 rounded-full bg-tint px-2.5 py-1 text-xs font-semibold text-primary"><Printer className="h-3 w-3" aria-hidden />BioporiPrint</span>}
+                      {t.bioporiprint && <span className="inline-flex items-center gap-1 rounded-full bg-tint px-2.5 py-1 text-xs font-semibold text-primary-deep"><Printer className="h-3 w-3" aria-hidden />BioporiPrint</span>}
                     </div>
                     {t.deskripsi_lokasi && <p className="mt-2 text-muted">{t.deskripsi_lokasi}</p>}
                     <p className="mt-2 text-muted">Terakhir diisi: <b className="text-ink">{tanggal(t.terakhir_diisi_at)}</b></p>
                     <p className="text-muted">Estimasi panen: <b className="text-ink">{tanggal(t.estimasi_panen_at)}</b></p>
                     {onLapor && <Button size="sm" className="mt-3 w-full" icon={Camera} onClick={() => onLapor(t)}>Lapor di sini</Button>}
+                    </div>
+                    <PipaPutar ukuran={84} />
                   </div>
                 </Popup>
               </Marker>

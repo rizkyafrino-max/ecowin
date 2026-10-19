@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Fitur from './pages/Fitur';
 import AuthCallback from './pages/AuthCallback';
 import Masuk from './pages/Masuk';
+import Notifikasi from './pages/Notifikasi';
 import Organik from './pages/Organik';
 import Penarikan from './pages/Penarikan';
 import Profil from './pages/Profil';
@@ -37,6 +38,7 @@ export default function App() {
             <Route path="saldo" element={<Saldo />} />
             <Route path="penarikan" element={<Penarikan />} />
             <Route path="profil" element={<Profil />} />
+            <Route path="notifikasi" element={<Notifikasi />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
