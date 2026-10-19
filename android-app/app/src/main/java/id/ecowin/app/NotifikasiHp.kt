@@ -113,6 +113,7 @@ object NotifikasiHp {
         val notif = NotificationCompat.Builder(app, KANAL)
             .setSmallIcon(R.drawable.ic_notif)
             .setColor(0xFF059669.toInt())
+            .setLargeIcon(android.graphics.BitmapFactory.decodeResource(app.resources, R.mipmap.ic_launcher))
             .setContentTitle(judul)
             .setContentText(isi)
             .setStyle(NotificationCompat.BigTextStyle().bigText(isi))
