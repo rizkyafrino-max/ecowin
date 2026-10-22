@@ -63,6 +63,7 @@ object NotifikasiHp {
     private const val PREFS = "ecowin_notif_hp"
     private const val KEY_AKTIF = "aktif"
     private const val KEY_NADA = "nada"
+    private const val KEY_JADWAL_V2 = "jadwal_v2"
 
     private fun prefs(c: Context) = c.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
@@ -83,10 +84,18 @@ object NotifikasiHp {
         NotificationManagerCompat.from(c.applicationContext).cancel(ID_NOTIF)
     }
 
-    fun jadwalkan(c: Context) {
+    /** Jadwal ulang sekali setelah perbaikan backoff: pekerjaan lama yang terlanjur tertunda berjam-jam ikut dibersihkan. */
+    fun perluJadwalUlang(c: Context): Boolean {
+        val p = prefs(c)
+        if (p.getBoolean(KEY_JADWAL_V2, false)) return false
+        p.edit().putBoolean(KEY_JADWAL_V2, true).apply()
+        return true
+    }
+
+    fun jadwalkan(c: Context, ulang: Boolean = false) {
         val syarat = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
         val kerja = PeriodicWorkRequestBuilder<NotifikasiWorker>(15, TimeUnit.MINUTES).setConstraints(syarat).build()
-        WorkManager.getInstance(c.applicationContext).enqueueUniquePeriodicWork(KERJA, ExistingPeriodicWorkPolicy.KEEP, kerja)
+        WorkManager.getInstance(c.applicationContext).enqueueUniquePeriodicWork(KERJA, if (ulang) ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE else ExistingPeriodicWorkPolicy.KEEP, kerja)
     }
 
     /** Nada notifikasi pilihan nasabah. Kanal Android tidak bisa diganti suaranya setelah dibuat, jadi tiap nada punya kanal sendiri. */
@@ -193,10 +202,10 @@ class NotifikasiWorker(context: Context, params: WorkerParameters) : CoroutineWo
         } catch (e: HttpException) {
             catat("http ${e.code()}")
             if (e.code() == 401 || e.code() == 403) { NotifikasiHp.berhenti(c); return Result.success() }
-            return Result.retry()
+            return Result.success() // jangan retry: backoff WorkManager menggandakan jeda sampai 5 jam; cukup coba lagi di putaran berikutnya
         } catch (e: IOException) {
             catat("jaringan: ${e.javaClass.simpleName}")
-            return Result.retry()
+            return Result.success() // jangan retry: backoff WorkManager menggandakan jeda sampai 5 jam; cukup coba lagi di putaran berikutnya
         }
         if (!session.hasSession()) { NotifikasiHp.berhenti(c); return Result.success() } // sesi dicabut saat refresh token
 
@@ -212,5 +221,13 @@ class NotifikasiWorker(context: Context, params: WorkerParameters) : CoroutineWo
             session.setNotifTerakhir(it.idTertinggi)
         }
         return Result.success()
+    }
+}
+
+/** Setelah aplikasi diperbarui, jadwal pengecek dibuat ulang (tanpa perlu membuka aplikasi) agar tidak terjebak jadwal lama. */
+class JadwalUlangReceiver : android.content.BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action != Intent.ACTION_MY_PACKAGE_REPLACED) return
+        if (NotifikasiHp.aktif(context) && SessionStore(context).hasSession()) NotifikasiHp.jadwalkan(context, ulang = true)
     }
 }

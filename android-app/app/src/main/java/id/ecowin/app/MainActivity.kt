@@ -81,7 +81,7 @@ class MainActivity : ComponentActivity() {
         session = SessionStore(this)
         client = ApiClient(session)
         googleAuth = GoogleAuth(this)
-        if (NotifikasiHp.aktif(this) && session.hasSession()) NotifikasiHp.jadwalkan(this)
+        if (NotifikasiHp.aktif(this) && session.hasSession()) NotifikasiHp.jadwalkan(this, ulang = NotifikasiHp.perluJadwalUlang(this))
         bukaDariPemberitahuan(intent)
 
         setContent {
