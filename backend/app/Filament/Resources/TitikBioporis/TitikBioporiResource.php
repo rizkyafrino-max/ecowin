@@ -50,6 +50,19 @@ class TitikBioporiResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
+    /** Jumlah lokasi yang menunggu verifikasi (sesuai hak akses pengguna), supaya petugas tahu ada yang perlu diperiksa. */
+    public static function getNavigationBadge(): ?string
+    {
+        $n = static::getEloquentQuery()->where('verifikasi', TitikBiopori::VERIFIKASI_PENDING)->count();
+
+        return $n > 0 ? (string) $n : null;
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'warning';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([

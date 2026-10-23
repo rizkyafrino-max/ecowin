@@ -52,6 +52,11 @@ class AktivitasBioporiResource extends Resource
         return $count > 0 ? (string) $count : null;
     }
 
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'warning';
+    }
+
     public static function infolist(Schema $schema): Schema
     {
         return $schema->components([

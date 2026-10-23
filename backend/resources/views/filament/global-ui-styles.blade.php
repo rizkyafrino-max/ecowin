@@ -226,18 +226,10 @@ html,html.dark{color-scheme:light!important;background:var(--eco-canvas)!importa
 /* ===== Halaman Organik (cluster): tab, judul, tabel ===== */
 .fi-page-has-sub-navigation .fi-breadcrumbs{display:none!important}
 
-.fi-page-has-sub-navigation .fi-tabs.fi-page-sub-navigation-tabs{margin-bottom:1.25rem!important;background:transparent!important;box-shadow:none!important;border:0!important;border-bottom:1px solid var(--eco-line)!important;border-radius:0!important;padding:0!important;max-width:none!important;width:100%;justify-content:flex-start;gap:.25rem;margin:0!important}
-.fi-page-has-sub-navigation .fi-tabs-item{border-radius:0!important;background:transparent!important;padding:.8rem 1.05rem!important;font-weight:600;color:var(--eco-muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s ease,border-color .15s ease}
-.fi-page-has-sub-navigation .fi-tabs-item:hover{color:var(--eco-primary)}
-.fi-page-has-sub-navigation .fi-tabs-item.fi-active{color:var(--eco-primary)!important;border-bottom-color:var(--eco-primary)}
-.fi-page-has-sub-navigation .fi-tabs-item.fi-active .fi-tabs-item-label{color:var(--eco-primary)!important}
 .fi-page-has-sub-navigation .fi-header-heading{font-size:1.6rem!important}
 /* Organik di HP: tab bisa digeser, judul + tombol sebaris, kartu angka ringkas */
 @media(max-width:767px){
 .fi-page-sub-navigation-dropdown{display:none!important}
-.fi-tabs.fi-page-sub-navigation-tabs{display:flex!important;overflow-x:auto;white-space:nowrap;scrollbar-width:none;margin-inline:-1rem!important;padding-inline:1rem!important;width:auto!important;margin-bottom:1rem!important}
-.fi-tabs.fi-page-sub-navigation-tabs::-webkit-scrollbar{display:none}
-.fi-page-has-sub-navigation .fi-tabs-item{padding:.7rem .85rem!important;font-size:.85rem;flex:none}
 .fi-page-has-sub-navigation .fi-header{flex-direction:row!important;align-items:center!important;justify-content:space-between;gap:.75rem;margin-bottom:.75rem}
 .fi-page-has-sub-navigation .fi-header-actions-ctn .fi-btn{padding:.5rem .85rem!important;font-size:.8rem!important;box-shadow:none!important}
 .fi-page-has-sub-navigation .fi-wi-stats-overview-stat{padding:.75rem .85rem!important}
@@ -403,4 +395,26 @@ input[type="checkbox"].fi-checkbox-input:focus-visible,input[type="radio"].fi-ra
 .fi-fo-field-label-content{font-size:.8125rem;font-weight:700}
 .fi-fo-checkbox-list .fi-fo-checkbox-list-option-label{white-space:nowrap}
 .fi-form-actions,.fi-sc-actions{margin-top:.5rem}
+
+/* Tab sub-navigasi (mis. Organik): tombol segmented yang jelas bisa diklik, tab aktif terisi warna peran (menggantikan gaya garis bawah lama) */
+.fi-page-sub-navigation-tabs{display:flex!important;margin-inline:0!important;flex-wrap:wrap;gap:.35rem;width:fit-content;max-width:100%;padding:.35rem!important;margin-bottom:1.25rem!important;background:#EEF2F7;border:1px solid var(--eco-line)!important;border-radius:18px}
+.fi-page-sub-navigation-tabs .fi-tabs-item{display:inline-flex!important;align-items:center;gap:.5rem;padding:.6rem 1.05rem!important;border-radius:13px!important;border:1px solid transparent;background:transparent;font-size:.875rem;font-weight:700;color:var(--eco-muted)!important;transition:background .15s ease,color .15s ease,box-shadow .15s ease}
+.fi-page-sub-navigation-tabs .fi-tabs-item:hover{background:#fff;color:#0F172A!important}
+.fi-page-sub-navigation-tabs .fi-tabs-item.fi-active{background:var(--eco-primary)!important;color:#fff!important;box-shadow:0 4px 12px rgba(var(--eco-rgb),.28)}
+.fi-page-sub-navigation-tabs .fi-tabs-item.fi-active *{color:#fff!important}
+.fi-page-sub-navigation-tabs .fi-tabs-item .fi-badge{margin-inline-start:.15rem}
+.fi-page-sub-navigation-tabs .fi-tabs-item.fi-active .fi-badge{background:rgba(255,255,255,.22)!important;--tw-ring-color:rgba(255,255,255,.4)}
+@media(max-width:640px){.fi-page-sub-navigation-tabs{width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.fi-page-sub-navigation-tabs .fi-tabs-item{white-space:nowrap;flex:none}}
+/* Kontrol pengelompokan tabel: dua kotak pilihan sejajar, bukan gelembung bulat */
+.fi-ta-grouping-settings-fields{display:flex!important;flex-wrap:wrap;align-items:center;gap:.5rem}
+.fi-ta-grouping-settings-fields label{margin:0}
+.fi-ta-grouping-settings-fields .fi-input-wrp{border-radius:12px!important;min-height:2.5rem;background:#fff;align-items:center}
+.fi-ta-grouping-settings-fields .fi-input-wrp-prefix{padding-inline:.75rem .5rem}
+.fi-ta-grouping-settings-fields .fi-input-wrp-label{font-size:.78rem;font-weight:600;color:var(--eco-muted)}
+.fi-ta-grouping-settings-fields .fi-select-input{height:2.4rem;padding-block:0!important;line-height:2.4rem;font-size:.85rem;font-weight:600}
+/* Header kolom aksi menyatu dengan baris header lain; tombol aksi header (mis. Scan QR) tetap di kiri */
+.fi-ta-table th.fi-ta-actions-header-cell{background:#F8FAFC!important}
+.fi-ta-header-ctn>.fi-ta-header>.fi-ta-actions{margin-inline:0 auto!important}
+.fi-ta-header-ctn>.fi-ta-header-toolbar>.fi-ta-actions{margin-inline:0!important}
+.fi-ta-filters-dropdown .fi-badge.eco-nol{display:none!important}
 </style>

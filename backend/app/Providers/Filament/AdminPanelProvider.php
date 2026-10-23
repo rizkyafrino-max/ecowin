@@ -72,6 +72,7 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::BODY_START, fn (): View => view('filament.launch-screen'))
             ->renderHook(PanelsRenderHook::BODY_END, fn (): View => view('filament.decimal-input-script'))
             ->renderHook(PanelsRenderHook::BODY_END, fn (): View => view('filament.global-footer'))
+            ->renderHook(PanelsRenderHook::BODY_END, fn (): View => view('filament.ui-fixes-script'))
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
