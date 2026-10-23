@@ -38,6 +38,8 @@ class PengumumanResource extends Resource
 
     protected static ?string $pluralModelLabel = 'pengumuman';
 
+    protected static ?string $slug = 'pengumuman';
+
     protected static string|UnitEnum|null $navigationGroup = 'Operasional';
 
     public static function getEloquentQuery(): Builder

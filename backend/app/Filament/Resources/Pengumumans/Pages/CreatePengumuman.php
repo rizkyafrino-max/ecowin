@@ -19,19 +19,26 @@ class CreatePengumuman extends CreateRecord
 
     protected function getCreateFormAction(): Action
     {
-        // Pengumuman tidak bisa ditarik setelah terkirim, jadi selalu minta konfirmasi dengan jumlah penerima.
-        return parent::getCreateFormAction()
+        // Pengumuman tidak bisa ditarik setelah terkirim. Tombol kirim biasa (submit) melewati modal konfirmasi, jadi dipakai
+        // aksi biasa yang memvalidasi dulu, menampilkan konfirmasi dengan jumlah penerima, baru memanggil create().
+        return Action::make('create')
             ->label('Kirim pengumuman')
+            ->keyBindings(['mod+s'])
+            ->mountUsing(fn () => $this->form->getState()) // kolom wajib kosong/tidak valid: tampilkan galat, jangan buka konfirmasi
             ->requiresConfirmation()
             ->modalHeading('Kirim pengumuman?')
             ->modalDescription(function (): string {
                 $user = auth()->user();
                 $bankId = $user->isAdmin() ? ($this->data['bank_sampah_id'] ?? null) : $user->bank_sampah_id;
                 $n = app(PengumumanService::class)->hitungPenerima($bankId ? (int) $bankId : null);
+                $jadwal = ! empty($this->data['kirim_pada']) ? ' pada '.\Illuminate\Support\Carbon::parse($this->data['kirim_pada'])->format('d M Y H:i') : '';
 
-                return "Pengumuman akan diterima {$n} nasabah aktif dan tidak bisa ditarik setelah terkirim.";
+                return $jadwal !== ''
+                    ? "Pengumuman akan dijadwalkan{$jadwal} untuk {$n} nasabah aktif dan hanya bisa dibatalkan sebelum waktunya."
+                    : "Pengumuman akan langsung diterima {$n} nasabah aktif dan tidak bisa ditarik setelah terkirim.";
             })
-            ->modalSubmitActionLabel('Ya, kirim');
+            ->modalSubmitActionLabel('Ya, kirim')
+            ->action(fn () => $this->create());
     }
 
     protected function handleRecordCreation(array $data): Model
