@@ -373,4 +373,34 @@ input[type="checkbox"].fi-checkbox-input:focus-visible,input[type="radio"].fi-ra
 .fi-ta-table .fi-badge{font-weight:700}
 .eco-report-row b,.eco-report-row span{overflow-wrap:anywhere;min-width:0}
 .eco-report-row{align-items:baseline}
+
+/* ===== Perbaikan UI admin (audit tampilan nyata, 23 Okt 2026) ===== */
+/* Tabel: lebih padat dan ada bayangan di tepi bila masih bisa digeser ke samping (sebelumnya kolom terakhir terpotong tanpa petunjuk) */
+.fi-ta-table{font-size:.8125rem}
+.fi-ta-header-cell{padding:.65rem .5rem .65rem .75rem!important;white-space:nowrap}
+.fi-ta-header-cell:first-child{padding-left:1rem!important}
+.fi-ta-cell{padding-inline:.5rem .25rem!important}
+.fi-ta-cell:first-child{padding-left:1rem!important}
+.fi-ta-content-ctn{background:linear-gradient(to right,#fff 30%,rgba(255,255,255,0)) left center,linear-gradient(to left,#fff 30%,rgba(255,255,255,0)) right center,radial-gradient(farthest-side at 0 50%,rgba(15,23,42,.16),rgba(15,23,42,0)) left center,radial-gradient(farthest-side at 100% 50%,rgba(15,23,42,.16),rgba(15,23,42,0)) right center;background-repeat:no-repeat;background-size:44px 100%,44px 100%,16px 100%,16px 100%;background-attachment:local,local,scroll,scroll}
+.fi-ta-content-ctn::-webkit-scrollbar{height:10px}
+.fi-ta-content-ctn::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:99px;border:2px solid #fff}
+.fi-ta-content-ctn::-webkit-scrollbar-track{background:transparent}
+/* Bilah alat tabel: tombol aksi (mis. Scan QR) di kiri, pencarian dan filter di kanan, dalam satu baris */
+.fi-ta-header-ctn{display:flex!important;flex-wrap:wrap;align-items:center;gap:.5rem .75rem;padding:.75rem 1rem!important}
+.fi-ta-header,.fi-ta-header-toolbar{display:contents!important}
+.fi-ta-header-ctn>.fi-ta-header-toolbar>div:last-child{margin-inline-start:auto}
+/* Kolom aksi tetap terlihat di kanan saat tabel digeser ke samping */
+.fi-ta-table th.fi-ta-actions-header-cell,.fi-ta-table td:has(>.fi-ta-actions){position:sticky;right:0;z-index:2;background:#fff}
+.fi-ta-table td:has(>.fi-ta-actions){box-shadow:-10px 0 10px -10px rgba(15,23,42,.22)}
+.fi-ta-table .fi-ta-row:hover td:has(>.fi-ta-actions){background:#F8FAFC}
+.fi-ta-filters-dropdown .fi-icon-btn svg{width:1.15rem;height:1.15rem}
+.fi-ta-filters-dropdown .fi-icon-btn svg path{fill:none;stroke:currentColor;stroke-width:1.5}
+.fi-ta-filters-dropdown .fi-icon-btn{border:1px solid var(--eco-line);border-radius:12px;background:#fff}
+.fi-ta-record-actions .fi-link,.fi-ta-actions .fi-link{white-space:nowrap}
+/* Formulir: bagian selebar penuh, bantalan dalam lebih ramping, kolom isian tidak mengecil */
+.fi-sc-form .fi-section-content{padding:1.1rem 1.25rem!important}
+.fi-sc-form .fi-section-header{padding:.9rem 1.25rem!important}
+.fi-fo-field-label-content{font-size:.8125rem;font-weight:700}
+.fi-fo-checkbox-list .fi-fo-checkbox-list-option-label{white-space:nowrap}
+.fi-form-actions,.fi-sc-actions{margin-top:.5rem}
 </style>

@@ -86,7 +86,7 @@ class TitikBioporiResource extends Resource
                 TextColumn::make('nama_lokasi')->label('Lokasi')->searchable()->placeholder(fn (TitikBiopori $r) => $r->alamat_rt_rw),
                 TextColumn::make('nasabah.nama')->label('Penanggung jawab')->placeholder('-')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('tanggal_tanam')->label('Dibuat')->date('d M Y')->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('terakhir_diisi_at')->label('Terakhir diisi')->dateTime('d M Y')->placeholder('Belum'),
+                TextColumn::make('terakhir_diisi_at')->label('Terakhir diisi')->dateTime('d M Y')->placeholder('Belum')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('estimasi_panen_at')->label('Estimasi panen')->date('d M Y')->placeholder('-')->sortable(),
                 TextColumn::make('status_panen')->label('Status panen')->badge()
                     ->state(fn (TitikBiopori $r): string => $r->statusPanenEfektif())
@@ -94,7 +94,7 @@ class TitikBioporiResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'siap_panen' => 'warning', 'sudah_panen' => 'success', default => 'gray',
                     }),
-                TextColumn::make('hasil_kompos_kg')->label('Hasil kompos')->suffix(' kg')->placeholder('-'),
+                TextColumn::make('hasil_kompos_kg')->label('Hasil kompos')->suffix(' kg')->placeholder('-')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('status')->badge()->color(fn (string $state): string => match ($state) {
                     'aktif' => 'success', 'penuh' => 'warning', default => 'gray',
                 }),

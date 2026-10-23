@@ -47,6 +47,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogoHeight('2.4rem')
             ->favicon(asset('images/ecowin-emblem.png'))
             ->sidebarCollapsibleOnDesktop()
+            ->sidebarWidth('16.5rem') // bawaan 20rem terlalu lebar: memakan ruang tabel dan formulir
             ->navigationGroups([
                 NavigationGroup::make('Operasional'),
                 NavigationGroup::make('Anorganik'),

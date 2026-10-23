@@ -80,8 +80,8 @@ class NasabahResource extends Resource
             ->columns([
                 TextColumn::make('nomor_nasabah')->label('No.')->searchable()->copyable(),
                 TextColumn::make('nama')->searchable()->sortable(),
-                TextColumn::make('user.email')->label('Email Google')->searchable()->toggleable(),
-                TextColumn::make('no_hp')->label('No. HP')->searchable(),
+                TextColumn::make('user.email')->label('Email Google')->searchable()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('no_hp')->label('No. HP')->searchable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('saldo')->money('IDR', locale: 'id', decimalPlaces: 0)->sortable(),
                 TextColumn::make('status_verifikasi')->label('Verifikasi')->badge()
                     ->formatStateUsing(fn (string $state): string => $state === 'verified' ? 'Terverifikasi' : 'Menunggu')

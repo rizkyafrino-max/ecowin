@@ -82,15 +82,15 @@ class PengumumanResource extends Resource
             ->columns([
                 TextColumn::make('created_at')->label('Dibuat')->dateTime('d M Y H:i'),
                 TextColumn::make('judul')->searchable()->limit(40),
-                TextColumn::make('isi')->limit(70)->wrap()->toggleable(),
-                TextColumn::make('bankSampah.nama_bank_sampah')->label('Tujuan')->placeholder('Semua bank sampah'),
+                TextColumn::make('isi')->limit(70)->wrap()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('bankSampah.nama_bank_sampah')->label('Tujuan')->placeholder('Semua bank sampah')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('pembuat.nama')->label('Pengirim'),
                 TextColumn::make('jenis')->label('Jenis')->badge()->color('gray')
                     ->state(fn (Pengumuman $p): string => $p->jadwal_pengumpulan_id ? 'Otomatis' : 'Manual'),
                 TextColumn::make('status')->label('Status')->badge()
                     ->state(fn (Pengumuman $p): string => $p->sudahTerkirim() ? 'Terkirim' : 'Terjadwal')
                     ->color(fn (string $state): string => $state === 'Terkirim' ? 'success' : 'warning'),
-                TextColumn::make('kirim_pada')->label('Waktu kirim')->dateTime('d M Y H:i'),
+                TextColumn::make('kirim_pada')->label('Waktu kirim')->dateTime('d M Y H:i')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('jumlah_penerima')->label('Penerima')->numeric()->placeholder('-')
                     ->state(fn (Pengumuman $p): ?int => $p->sudahTerkirim() ? $p->jumlah_penerima : null),
             ])

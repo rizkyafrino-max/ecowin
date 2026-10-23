@@ -93,9 +93,9 @@ class TransaksiAnorganikResource extends Resource
                 TextColumn::make('nasabah.nama')->label('Nasabah')->searchable(),
                 TextColumn::make('hargaSampah.jenisSampah.nama_jenis')->label('Jenis'),
                 TextColumn::make('berat_kg')->label('Berat')->suffix(' kg')->sortable(),
-                TextColumn::make('harga_per_kg')->label('Harga/kg')->money('IDR', locale: 'id', decimalPlaces: 0),
+                TextColumn::make('harga_per_kg')->label('Harga/kg')->money('IDR', locale: 'id', decimalPlaces: 0)->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('nilai_rupiah')->label('Total')->money('IDR', locale: 'id', decimalPlaces: 0)->sortable(),
-                TextColumn::make('pencatat.nama')->label('Dicatat oleh')->toggleable(),
+                TextColumn::make('pencatat.nama')->label('Dicatat oleh')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('bankSampah.nama_bank_sampah')->label('Bank Sampah')->visible(fn (): bool => auth()->user()?->isAdmin() ?? false),
             ])
             ->filters([

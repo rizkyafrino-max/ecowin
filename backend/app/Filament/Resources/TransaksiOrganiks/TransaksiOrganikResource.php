@@ -81,7 +81,7 @@ class TransaksiOrganikResource extends Resource
                 TextColumn::make('jenis_organik')->label('Jenis'),
                 TextColumn::make('berat_kg')->label('Berat')->suffix(' kg'),
                 TextColumn::make('metode_pengolahan')->label('Metode')->badge()->formatStateUsing(fn (?string $state): string => TransaksiOrganik::METODE[$state] ?? (string) $state),
-                TextColumn::make('estimasi_kompos_kg')->label('Est. kompos')->suffix(' kg'),
+                TextColumn::make('estimasi_kompos_kg')->label('Est. kompos')->suffix(' kg')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('status_pengolahan')->label('Status')->badge()->formatStateUsing(fn (?string $state): string => TransaksiOrganik::STATUS_PENGOLAHAN[$state] ?? (string) $state),
                 TextColumn::make('bankSampah.nama_bank_sampah')->label('Bank Sampah')->visible(fn (): bool => auth()->user()?->isAdmin() ?? false),
             ])

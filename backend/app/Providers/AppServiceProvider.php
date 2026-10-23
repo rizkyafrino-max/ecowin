@@ -33,6 +33,11 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Formulir panel: bagian (Section) tersusun ke bawah selebar penuh, dan isian di dalamnya dua kolom di layar sedang ke atas.
+        // Dua kartu bersisian membuat kolom isian hanya ±160px sehingga teks terpotong. Pengaturan eksplisit per formulir tetap menang.
+        \Filament\Schemas\Schema::configureUsing(fn (\Filament\Schemas\Schema $schema) => $schema->columns(1));
+        \Filament\Schemas\Components\Section::configureUsing(fn (\Filament\Schemas\Components\Section $section) => $section->columns(['default' => 1, 'md' => 2]));
+
         // Placeholder singkat agar tidak terpotong pada kolom sempit di HP.
         \Filament\Forms\Components\Select::configureUsing(fn (\Filament\Forms\Components\Select $select) => $select->placeholder('Pilih…'));
 
