@@ -42,7 +42,8 @@ class PengumumanService
 
     public function kirim(int $id): bool
     {
-        return DB::transaction(function () use ($id): bool {
+        $ids = [];
+        $terkirim = DB::transaction(function () use ($id, &$ids): bool {
             $p = Pengumuman::query()->whereKey($id)->lockForUpdate()->first();
             if ($p === null || $p->sudahTerkirim()) {
                 return false;
@@ -50,7 +51,10 @@ class PengumumanService
 
             $sekarang = now();
             $jumlah = 0;
-            $this->penerima($p->bank_sampah_id)->select('users.id')->orderBy('users.id')->chunk(500, function ($baris) use ($p, $sekarang, &$jumlah): void {
+            $this->penerima($p->bank_sampah_id)->select('users.id')->orderBy('users.id')->chunk(500, function ($baris) use ($p, $sekarang, &$jumlah, &$ids): void {
+                foreach ($baris as $u) {
+                    $ids[] = (int) $u->id;
+                }
                 $data = $baris->map(fn ($u): array => [
                     'user_id' => $u->id,
                     'tipe' => 'pengumuman',
@@ -68,6 +72,13 @@ class PengumumanService
 
             return true;
         });
+
+        // Bangunkan perangkat setelah transaksi selesai agar kunci baris tidak tertahan oleh panggilan jaringan.
+        if ($terkirim && $ids !== []) {
+            app(PushService::class)->bangunkan($ids);
+        }
+
+        return $terkirim;
     }
 
     /** Nasabah berstatus aktif (akun dan profil), tidak dihapus, pada bank sampah tujuan. */

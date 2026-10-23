@@ -80,6 +80,7 @@ object NotifikasiHp {
     /** Mematikan total: opt-in, jadwal, dan pemberitahuan yang sedang tampil. Dipanggil saat logout/sesi berakhir. */
     fun berhenti(c: Context) {
         prefs(c).edit().putBoolean(KEY_AKTIF, false).apply()
+        Push.matikanLokal(c)
         WorkManager.getInstance(c.applicationContext).cancelUniqueWork(KERJA)
         NotificationManagerCompat.from(c.applicationContext).cancel(ID_NOTIF)
     }
@@ -176,50 +177,58 @@ object NotifikasiHp {
     }
 }
 
-/** Pengecek berkala. Tidak melakukan apa pun tanpa sesi, tanpa opt-in, atau saat aplikasi terbuka. */
-class NotifikasiWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
-    /** Log status saja (tanpa isi pesan) dan hanya di build debug. */
-    private fun catat(status: String) { if (BuildConfig.DEBUG) android.util.Log.i("EcoWinNotif", status) }
+/** Log status saja (tanpa isi pesan) dan hanya di build debug. */
+private fun catat(status: String) { if (BuildConfig.DEBUG) android.util.Log.i("EcoWinNotif", status) }
 
+/**
+ * Mengecek notifikasi baru ke server dan menampilkannya. Dipakai pengecek berkala (WorkManager) dan ping FCM.
+ * Tidak melakukan apa pun tanpa sesi, tanpa opt-in, atau saat aplikasi terbuka. Tidak pernah melempar galat jaringan:
+ * bila gagal, putaran/ping berikutnya yang mencoba lagi (retry WorkManager membuat jeda membengkak sampai 5 jam).
+ */
+internal suspend fun periksaNotifikasi(c: Context, paksa: Boolean = false) {
+    val session = SessionStore(c)
+    if (!session.hasSession() || !NotifikasiHp.aktif(c)) {
+        catat("berhenti: sesi=${session.hasSession()} aktif=${NotifikasiHp.aktif(c)}")
+        NotifikasiHp.berhenti(c)
+        return
+    }
+    val terlihat = !paksa && withContext(Dispatchers.Main) { ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) }
+    if (terlihat) { catat("dilewati: aplikasi sedang terlihat"); return } // lonceng di dalam aplikasi sudah cukup
+
+    val respons = try {
+        ApiClient(session).api.notifikasi()
+    } catch (e: HttpException) {
+        catat("http ${e.code()}")
+        if (e.code() == 401 || e.code() == 403) NotifikasiHp.berhenti(c)
+        return
+    } catch (e: IOException) {
+        catat("jaringan: ${e.javaClass.simpleName}")
+        return
+    }
+    if (!session.hasSession()) { NotifikasiHp.berhenti(c); return } // sesi dicabut saat refresh token
+
+    val terakhir = session.notifTerakhir()
+    catat("cek: ${respons.data.size} notifikasi, acuan=$terakhir")
+    if (terakhir < 0) { // pengecekan pertama: jadikan acuan, jangan membanjiri dengan kabar lama
+        session.setNotifTerakhir(respons.data.maxOfOrNull { it.id } ?: 0)
+        return
+    }
+    ringkasBaru(respons.data, terakhir)?.let {
+        catat("menampilkan ${it.jumlah} kabar baru")
+        NotifikasiHp.tampilkan(c, it)
+        session.setNotifTerakhir(it.idTertinggi)
+    }
+}
+
+/** Pengecek berkala (cadangan bila FCM belum disiapkan atau tertunda oleh sistem). */
+class NotifikasiWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     companion object {
         const val EXTRA_PAKSA = "paksa"
     }
 
     override suspend fun doWork(): Result {
-        val c = applicationContext
-        val session = SessionStore(c)
-        if (!session.hasSession() || !NotifikasiHp.aktif(c)) {
-            catat("berhenti: sesi=${session.hasSession()} aktif=${NotifikasiHp.aktif(c)}")
-            NotifikasiHp.berhenti(c)
-            return Result.success()
-        }
         val paksa = BuildConfig.DEBUG && inputData.getBoolean(EXTRA_PAKSA, false) // hanya untuk uji di build debug
-        val terlihat = !paksa && withContext(Dispatchers.Main) { ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) }
-        if (terlihat) { catat("dilewati: aplikasi sedang terlihat"); return Result.success() } // aplikasi sedang dipakai; lonceng di dalam aplikasi sudah cukup
-
-        val respons = try {
-            ApiClient(session).api.notifikasi()
-        } catch (e: HttpException) {
-            catat("http ${e.code()}")
-            if (e.code() == 401 || e.code() == 403) { NotifikasiHp.berhenti(c); return Result.success() }
-            return Result.success() // jangan retry: backoff WorkManager menggandakan jeda sampai 5 jam; cukup coba lagi di putaran berikutnya
-        } catch (e: IOException) {
-            catat("jaringan: ${e.javaClass.simpleName}")
-            return Result.success() // jangan retry: backoff WorkManager menggandakan jeda sampai 5 jam; cukup coba lagi di putaran berikutnya
-        }
-        if (!session.hasSession()) { NotifikasiHp.berhenti(c); return Result.success() } // sesi dicabut saat refresh token
-
-        val terakhir = session.notifTerakhir()
-        catat("cek: ${respons.data.size} notifikasi, acuan=$terakhir")
-        if (terakhir < 0) { // pengecekan pertama: jadikan acuan, jangan membanjiri dengan kabar lama
-            session.setNotifTerakhir(respons.data.maxOfOrNull { it.id } ?: 0)
-            return Result.success()
-        }
-        ringkasBaru(respons.data, terakhir)?.let {
-            catat("menampilkan ${it.jumlah} kabar baru")
-            NotifikasiHp.tampilkan(c, it)
-            session.setNotifTerakhir(it.idTertinggi)
-        }
+        periksaNotifikasi(applicationContext, paksa)
         return Result.success()
     }
 }

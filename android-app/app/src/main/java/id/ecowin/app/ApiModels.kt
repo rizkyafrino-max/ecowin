@@ -200,3 +200,6 @@ data class NotifikasiDto(
 data class NotifikasiResponse(val data: List<NotifikasiDto> = emptyList(), val belumDibaca: Int = 0)
 
 data class JumlahNotifDto(val belumDibaca: Int = 0)
+
+/** Token FCM perangkat untuk membangunkan aplikasi saat ada notifikasi (tanpa isi pesan). */
+data class PerangkatRequest(val token: String)

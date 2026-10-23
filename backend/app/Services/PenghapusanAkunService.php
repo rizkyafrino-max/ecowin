@@ -98,6 +98,7 @@ class PenghapusanAkunService
     private function hapusPribadiUser(User $user, string $nama): void
     {
         $user->tokens()->delete();
+        \App\Models\PerangkatPush::query()->where('user_id', $user->id)->delete();
         DB::table('sessions')->where('user_id', $user->id)->delete();
 
         $user->forceFill([

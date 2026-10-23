@@ -30,6 +30,12 @@ interface EcoWinApi {
     @GET("auth/me")
     suspend fun me(): DataWrapper<UserDto>
 
+    @POST("perangkat")
+    suspend fun daftarPerangkat(@Body body: PerangkatRequest)
+
+    @retrofit2.http.HTTP(method = "DELETE", path = "perangkat", hasBody = true)
+    suspend fun lepasPerangkat(@Body body: PerangkatRequest)
+
     @POST("auth/logout")
     suspend fun logout()
 

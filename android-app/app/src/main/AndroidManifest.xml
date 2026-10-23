@@ -31,6 +31,18 @@
             </intent-filter>
         </activity>
 
+        <!-- Token FCM baru dibuat setelah nasabah menyalakan pemberitahuan (opt-in), bukan otomatis saat aplikasi dipasang. -->
+        <meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false" />
+        <meta-data android:name="firebase_analytics_collection_enabled" android:value="false" />
+
+        <service
+            android:name=".EcoWinFcmService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <receiver
             android:name=".JadwalUlangReceiver"
             android:exported="false">

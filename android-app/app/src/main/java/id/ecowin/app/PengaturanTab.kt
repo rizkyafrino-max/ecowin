@@ -30,6 +30,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 private fun deskripsi(n: NotifikasiHp.Nada) = when (n) {
     NotifikasiHp.Nada.Ecowin -> "Tiga denting naik, nada khas EcoWin"
@@ -50,8 +51,9 @@ fun PengaturanTab() {
     var aktif by remember { mutableStateOf(NotifikasiHp.aktif(konteks) && NotifikasiHp.izinDiberikan(konteks)) }
     var ditolak by remember { mutableStateOf(false) }
     var nada by remember { mutableStateOf(NotifikasiHp.nada(konteks)) }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     val minta = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { ok ->
-        if (ok) { NotifikasiHp.nyalakan(konteks); aktif = true; ditolak = false } else ditolak = true
+        if (ok) { NotifikasiHp.nyalakan(konteks); aktif = true; ditolak = false; scope.launch { Push.daftarkan(konteks) } } else ditolak = true
     }
 
     TabList {
@@ -67,8 +69,8 @@ fun PengaturanTab() {
                     Switch(
                         checked = aktif,
                         onCheckedChange = { nyala ->
-                            if (!nyala) { NotifikasiHp.berhenti(konteks); aktif = false }
-                            else if (NotifikasiHp.izinDiberikan(konteks)) { NotifikasiHp.nyalakan(konteks); aktif = true; ditolak = false }
+                            if (!nyala) { scope.launch { Push.lepas(konteks) }; NotifikasiHp.berhenti(konteks); aktif = false }
+                            else if (NotifikasiHp.izinDiberikan(konteks)) { NotifikasiHp.nyalakan(konteks); aktif = true; ditolak = false; scope.launch { Push.daftarkan(konteks) } }
                             else minta.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                         },
                         colors = SwitchDefaults.colors(checkedTrackColor = Emerald),

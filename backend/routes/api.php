@@ -66,6 +66,9 @@ Route::middleware(['auth:sanctum', 'active', 'abilities:access'])->name('api.')-
         Route::get('/qr', [NasabahController::class, 'qr'])->name('alias.qr');
         Route::get('/transaksi', [TransaksiAnorganikController::class, 'index'])->name('alias.transaksi');
         // Notifikasi dalam aplikasi (hanya milik pengguna yang login)
+        // Token FCM perangkat (hanya untuk membangunkan aplikasi; isi notifikasi tetap diambil lewat API ini)
+        Route::post('/perangkat', [\App\Http\Controllers\Api\PerangkatController::class, 'store'])->middleware('throttle:30,1')->name('perangkat.store');
+        Route::delete('/perangkat', [\App\Http\Controllers\Api\PerangkatController::class, 'destroy'])->middleware('throttle:30,1')->name('perangkat.destroy');
         Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
         Route::get('/notifikasi/jumlah', [NotifikasiController::class, 'jumlah'])->name('notifikasi.jumlah');
         Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'bacaSemua'])->name('notifikasi.baca-semua');

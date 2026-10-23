@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Notifikasi;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -28,6 +29,8 @@ class NotifikasiService
                 'isi' => Str::limit($isi, 300, '…'),
                 'aksi' => $aksi,
             ])->save();
+            // "Ping" tanpa isi ke perangkat nasabah; dijalankan setelah transaksi pemanggil selesai.
+            DB::afterCommit(fn () => app(PushService::class)->bangunkan([$penerima->id]));
         } catch (Throwable $e) {
             report($e);
         }

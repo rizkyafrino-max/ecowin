@@ -81,7 +81,10 @@ class MainActivity : ComponentActivity() {
         session = SessionStore(this)
         client = ApiClient(session)
         googleAuth = GoogleAuth(this)
-        if (NotifikasiHp.aktif(this) && session.hasSession()) NotifikasiHp.jadwalkan(this, ulang = NotifikasiHp.perluJadwalUlang(this))
+        if (NotifikasiHp.aktif(this) && session.hasSession()) {
+            NotifikasiHp.jadwalkan(this, ulang = NotifikasiHp.perluJadwalUlang(this))
+            lifecycleScope.launch { Push.daftarkan(this@MainActivity) } // segarkan pendaftaran perangkat (token bisa berganti)
+        }
         bukaDariPemberitahuan(intent)
 
         setContent {
@@ -180,6 +183,7 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
             onUserChanged = { state = AppState.LoggedIn(it) },
             onLogout = {
                 scope.launch {
+                    runCatching { Push.lepas(konteks) } // lepas token perangkat selagi sesi masih sah
                     runCatching { client.api.logout() }
                     session.clear()
                     NotifikasiHp.berhenti(konteks)
