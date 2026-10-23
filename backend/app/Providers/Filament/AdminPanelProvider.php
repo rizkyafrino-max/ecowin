@@ -69,7 +69,6 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([])
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): View => view('filament.global-ui-styles'))
-            ->renderHook(PanelsRenderHook::HEAD_END, fn (): View => view('filament.ui-v3'))
             ->renderHook(PanelsRenderHook::BODY_START, fn (): View => view('filament.launch-screen'))
             ->renderHook(PanelsRenderHook::BODY_END, fn (): View => view('filament.decimal-input-script'))
             ->renderHook(PanelsRenderHook::BODY_END, fn (): View => view('filament.global-footer'))
