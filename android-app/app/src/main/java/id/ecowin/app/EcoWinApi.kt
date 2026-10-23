@@ -75,6 +75,13 @@ interface EcoWinApi {
     @GET("notifikasi/jumlah")
     suspend fun jumlahNotif(): JumlahNotifDto
 
+    @retrofit2.http.DELETE("notifikasi/{id}")
+    suspend fun hapusNotif(@retrofit2.http.Path("id") id: Long): JumlahNotifDto
+
+    /** hanyaDibaca = 1 menghapus hanya yang sudah dibaca; null menghapus semua. */
+    @retrofit2.http.DELETE("notifikasi")
+    suspend fun hapusSemuaNotif(@retrofit2.http.Query("hanya_dibaca") hanyaDibaca: Int?): JumlahNotifDto
+
     @POST("notifikasi/{id}/baca")
     suspend fun bacaNotif(@retrofit2.http.Path("id") id: Long): JumlahNotifDto
 

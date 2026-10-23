@@ -10,6 +10,7 @@ Panduan singkat untuk memindahkan EcoWin dari mesin lokal ke server sungguhan. S
 - MySQL 8 (SQLite hanya untuk pengembangan/tes).
 - Notifikasi instan (opsional): ikuti FIREBASE.md; tanpa itu aplikasi memakai pengecekan berkala.
 - Penjadwal: tambahkan cron `* * * * * php /path/backend/artisan schedule:run` (membersihkan notifikasi > 90 hari tiap malam dan mengirim pengumuman terjadwal tiap menit).
+- Jadwal pengumpulan (menu Admin > Jadwal Pengumpulan) memakai penjadwal yang sama: pengingat ke nasabah dikirim otomatis tiap menit saat jatuh waktunya.
 
 ## 1. Backend (Laravel)
 

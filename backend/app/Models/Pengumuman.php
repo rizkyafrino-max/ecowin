@@ -31,6 +31,11 @@ class Pengumuman extends Model
         return $this->belongsTo(BankSampah::class, 'bank_sampah_id');
     }
 
+    public function jadwal(): BelongsTo
+    {
+        return $this->belongsTo(JadwalPengumpulan::class, 'jadwal_pengumpulan_id');
+    }
+
     public function sudahTerkirim(): bool
     {
         return $this->terkirim_at !== null;
@@ -45,8 +50,9 @@ class Pengumuman extends Model
         if ($user->isAdmin()) {
             return $query;
         }
+        // Petugas hanya melihat pengumuman yang ia buat sendiri untuk bank sampahnya (bukan pengumuman Admin).
         if ($user->isPetugas() && $user->bank_sampah_id !== null) {
-            return $query->where('bank_sampah_id', $user->bank_sampah_id);
+            return $query->where('bank_sampah_id', $user->bank_sampah_id)->where('dibuat_oleh', $user->id);
         }
 
         return $query->whereRaw('1 = 0');

@@ -29,6 +29,8 @@ export const EcoApi = {
   jumlahNotif: () => api('/notifikasi/jumlah'),
   bacaNotif: (id) => api(`/notifikasi/${id}/baca`, { method: 'POST' }),
   bacaSemuaNotif: () => api('/notifikasi/baca-semua', { method: 'POST' }),
+  hapusNotif: (id) => api(`/notifikasi/${id}`, { method: 'DELETE' }),
+  hapusNotifSemua: (hanyaDibaca = false) => api(`/notifikasi${hanyaDibaca ? '?hanya_dibaca=1' : ''}`, { method: 'DELETE' }),
 
   penarikan: (page = 1) => api('/penarikan', { query: { page } }),
   ajukanPenarikan: (data) => api('/penarikan', { method: 'POST', body: data }),

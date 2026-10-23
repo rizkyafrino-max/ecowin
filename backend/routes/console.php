@@ -34,12 +34,15 @@ Artisan::command('ecowin:amankan-berkas', function () {
 })->purpose('Pindahkan berkas sensitif dari storage publik ke privat');
 
 /*
-| Notifikasi dalam aplikasi lebih dari 90 hari dihapus otomatis (dijadwalkan harian; butuh `php artisan schedule:run` tiap menit di server).
+| Notifikasi dan riwayat pengumuman (yang sudah terkirim) lebih dari 30 hari dihapus otomatis (dijadwalkan harian; butuh
+| `php artisan schedule:run` tiap menit di server). Jejak pengiriman tetap ada di audit log.
 */
 Artisan::command('ecowin:bersihkan-notifikasi', function () {
-    $n = DB::table('notifikasi')->where('created_at', '<', now()->subDays(90))->delete();
-    $this->info("Notifikasi lama dihapus: {$n}");
-})->purpose('Hapus notifikasi lebih dari 90 hari');
+    $batas = now()->subDays(30);
+    $n = DB::table('notifikasi')->where('created_at', '<', $batas)->delete();
+    $p = DB::table('pengumuman')->whereNotNull('terkirim_at')->where('terkirim_at', '<', $batas)->delete();
+    $this->info("Notifikasi lama dihapus: {$n}; riwayat pengumuman lama dihapus: {$p}");
+})->purpose('Hapus notifikasi dan riwayat pengumuman lebih dari 30 hari');
 
 Schedule::command('ecowin:bersihkan-notifikasi')->dailyAt('03:15');
 
@@ -52,3 +55,13 @@ Artisan::command('ecowin:kirim-pengumuman', function () {
 })->purpose('Kirim pengumuman terjadwal yang sudah jatuh waktu');
 
 Schedule::command('ecowin:kirim-pengumuman')->everyMinute()->withoutOverlapping();
+
+/*
+| Pengingat jadwal pengumpulan sampah per bank sampah (diatur Admin), dikirim otomatis sebelum kegiatan dimulai.
+*/
+Artisan::command('ecowin:kirim-jadwal-pengumpulan', function () {
+    $n = app(\App\Services\JadwalPengumpulanService::class)->kirimYangJatuhTempo();
+    $this->info("Pengingat jadwal terkirim: {$n}");
+})->purpose('Kirim pengingat jadwal pengumpulan sampah yang jatuh waktu');
+
+Schedule::command('ecowin:kirim-jadwal-pengumpulan')->everyMinute()->withoutOverlapping();

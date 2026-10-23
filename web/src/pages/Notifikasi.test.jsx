@@ -17,14 +17,23 @@ const nasabah = { id: 1, nama: 'Siti Rahma', email: 'siti@gmail.com', role: 'nas
 let notif;
 let dibacaId;
 let bacaSemua;
+let panggilanHapus;
 
 function mockApi() {
   vi.spyOn(globalThis, 'fetch').mockImplementation(async (url, init) => {
     const p = new URL(url).pathname.replace('/api', '');
     if (p === '/auth/me') return json(200, { data: nasabah });
     if (p === '/notifikasi/jumlah') return json(200, { belum_dibaca: notif.filter((n) => !n.dibaca).length });
-    if (p === '/notifikasi') return json(200, { data: notif, belum_dibaca: notif.filter((n) => !n.dibaca).length });
+    if (p === '/notifikasi' && init?.method !== 'DELETE') return json(200, { data: notif, belum_dibaca: notif.filter((n) => !n.dibaca).length });
     if (p === '/notifikasi/baca-semua' && init?.method === 'POST') { bacaSemua = true; notif = notif.map((n) => ({ ...n, dibaca: true })); return json(200, { belum_dibaca: 0 }); }
+    if (p === '/notifikasi' && init?.method === 'DELETE') {
+      const hanyaDibaca = new URL(url).searchParams.get('hanya_dibaca') === '1';
+      panggilanHapus.push(hanyaDibaca ? 'dibaca' : 'semua');
+      notif = hanyaDibaca ? notif.filter((n) => !n.dibaca) : [];
+      return json(200, { dihapus: 1, belum_dibaca: notif.filter((n) => !n.dibaca).length });
+    }
+    const hp = p.match(/^\/notifikasi\/(\d+)$/);
+    if (hp && init?.method === 'DELETE') { panggilanHapus.push(Number(hp[1])); notif = notif.filter((n) => n.id !== Number(hp[1])); return json(200, { belum_dibaca: notif.filter((n) => !n.dibaca).length }); }
     const m = p.match(/^\/notifikasi\/(\d+)\/baca$/);
     if (m && init?.method === 'POST') { dibacaId = Number(m[1]); notif = notif.map((n) => (n.id === dibacaId ? { ...n, dibaca: true } : n)); return json(200, { belum_dibaca: notif.filter((n) => !n.dibaca).length }); }
     if (p === '/me/saldo') return json(200, { saldo: 5000, saldo_tersedia: 5000, saldo_ditahan: 0, total_pemasukan: 5000, total_penarikan: 0 });
@@ -40,6 +49,7 @@ beforeEach(() => {
   vi.restoreAllMocks();
   dibacaId = null;
   bacaSemua = false;
+  panggilanHapus = [];
   notif = [
     { id: 2, tipe: 'penarikan_disetujui', judul: 'Penarikan disetujui', isi: 'Penarikan Rp 5.000 disetujui.', aksi: 'saldo', dibaca: false, created_at: new Date().toISOString() },
     { id: 1, tipe: 'setoran_anorganik', judul: 'Setoran tercatat', isi: '3,00 kg Kardus bernilai Rp 6.000.', aksi: 'transaksi', dibaca: true, created_at: new Date().toISOString() },
@@ -71,6 +81,44 @@ describe('Notifikasi nasabah', () => {
     fireEvent.click(await screen.findByRole('button', { name: /Tandai dibaca/ }));
     await waitFor(() => expect(bacaSemua).toBe(true));
     await waitFor(() => expect(screen.queryByText('Baru')).toBeNull());
+  });
+
+  it('menghapus satu notifikasi lewat tombol hapus', async () => {
+    mockApi();
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /Hapus notifikasi: Setoran tercatat/ }));
+    await waitFor(() => expect(panggilanHapus).toEqual([1]));
+    await waitFor(() => expect(screen.queryByText('Setoran tercatat')).toBeNull());
+    expect(screen.getByText('Penarikan disetujui')).toBeInTheDocument();
+  });
+
+  it('hapus yang sudah dibaca meminta konfirmasi dan hanya menghapus yang sudah dibaca', async () => {
+    mockApi();
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /Hapus yang sudah dibaca/ }));
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    expect(panggilanHapus).toEqual([]); // belum dihapus sebelum dikonfirmasi
+    fireEvent.click(screen.getByRole('button', { name: 'Ya, hapus' }));
+    await waitFor(() => expect(panggilanHapus).toEqual(['dibaca']));
+    await waitFor(() => expect(screen.queryByText('Setoran tercatat')).toBeNull());
+    expect(screen.getByText('Penarikan disetujui')).toBeInTheDocument();
+  });
+
+  it('hapus semua bisa dibatalkan, dan bila dikonfirmasi mengosongkan daftar', async () => {
+    mockApi();
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Hapus semua' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Batal' }));
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(panggilanHapus).toEqual([]);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Hapus semua' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Ya, hapus' }));
+    await waitFor(() => expect(panggilanHapus).toEqual(['semua']));
+    expect(await screen.findByText('Belum ada notifikasi')).toBeInTheDocument();
   });
 
   it('keadaan kosong menampilkan pesan yang jelas', async () => {

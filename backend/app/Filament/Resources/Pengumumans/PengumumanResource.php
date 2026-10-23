@@ -18,6 +18,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
@@ -72,6 +73,11 @@ class PengumumanResource extends Resource
     {
         return $table
             ->defaultSort('id', 'desc')
+            ->groups([
+                Group::make('bank_sampah_id')->label('Bank sampah')->collapsible()
+                    ->getTitleFromRecordUsing(fn (Pengumuman $r): string => $r->bankSampah?->label ?? 'Semua bank sampah'),
+            ])
+            ->defaultGroup('bank_sampah_id')
             ->modifyQueryUsing(fn (Builder $query) => $query->with(['pembuat', 'bankSampah']))
             ->columns([
                 TextColumn::make('created_at')->label('Dibuat')->dateTime('d M Y H:i'),
@@ -79,6 +85,8 @@ class PengumumanResource extends Resource
                 TextColumn::make('isi')->limit(70)->wrap()->toggleable(),
                 TextColumn::make('bankSampah.nama_bank_sampah')->label('Tujuan')->placeholder('Semua bank sampah'),
                 TextColumn::make('pembuat.nama')->label('Pengirim'),
+                TextColumn::make('jenis')->label('Jenis')->badge()->color('gray')
+                    ->state(fn (Pengumuman $p): string => $p->jadwal_pengumpulan_id ? 'Otomatis' : 'Manual'),
                 TextColumn::make('status')->label('Status')->badge()
                     ->state(fn (Pengumuman $p): string => $p->sudahTerkirim() ? 'Terkirim' : 'Terjadwal')
                     ->color(fn (string $state): string => $state === 'Terkirim' ? 'success' : 'warning'),

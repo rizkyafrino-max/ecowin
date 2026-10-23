@@ -72,6 +72,8 @@ Route::middleware(['auth:sanctum', 'active', 'abilities:access'])->name('api.')-
         Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
         Route::get('/notifikasi/jumlah', [NotifikasiController::class, 'jumlah'])->name('notifikasi.jumlah');
         Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'bacaSemua'])->name('notifikasi.baca-semua');
+        Route::delete('/notifikasi/{id}', [NotifikasiController::class, 'hapus'])->whereNumber('id')->name('notifikasi.hapus');
+        Route::delete('/notifikasi', [NotifikasiController::class, 'hapusSemua'])->name('notifikasi.hapus-semua');
         Route::post('/notifikasi/{id}/baca', [NotifikasiController::class, 'baca'])->whereNumber('id')->name('notifikasi.baca');
         Route::get('/biopori', [BioporiController::class, 'index'])->name('alias.biopori.index');
         Route::post('/biopori', [BioporiController::class, 'store'])->middleware('throttle:uploads')->name('alias.biopori.store');

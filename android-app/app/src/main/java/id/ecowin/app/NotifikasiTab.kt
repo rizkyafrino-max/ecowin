@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -59,6 +62,7 @@ private fun tujuanNotif(aksi: String?): Tab? = when (aksi) {
 @Composable
 fun NotifikasiTab(client: ApiClient, refreshKey: Int, onBerubah: () -> Unit, go: (Tab) -> Unit) {
     var lokal by remember { mutableIntStateOf(0) }
+    var konfirmasi by remember { mutableStateOf<String?>(null) } // "dibaca" | "semua"
     val scope = rememberCoroutineScope()
     val data = rememberLoadable(client, refreshKey, lokal) { client.api.notifikasi() }
 
@@ -85,6 +89,38 @@ fun NotifikasiTab(client: ApiClient, refreshKey: Int, onBerubah: () -> Unit, go:
                                     }
                                 }
                                 .padding(horizontal = 14.dp, vertical = 8.dp),
+                        )
+                    }
+                    if (respons.data.isNotEmpty()) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if (respons.data.any { it.dibaca }) {
+                                Text(
+                                    "Hapus yang sudah dibaca", color = Slate900, fontWeight = FontWeight.SemiBold, fontSize = 12.sp,
+                                    modifier = Modifier.border(1.dp, Slate200, RoundedCornerShape(50)).clickable { konfirmasi = "dibaca" }.padding(horizontal = 12.dp, vertical = 7.dp),
+                                )
+                            }
+                            Text(
+                                "Hapus semua", color = Red, fontWeight = FontWeight.SemiBold, fontSize = 12.sp,
+                                modifier = Modifier.clickable { konfirmasi = "semua" }.padding(horizontal = 12.dp, vertical = 7.dp),
+                            )
+                        }
+                    }
+                    konfirmasi?.let { jenis ->
+                        AlertDialog(
+                            onDismissRequest = { konfirmasi = null },
+                            title = { Text(if (jenis == "semua") "Hapus semua notifikasi?" else "Hapus yang sudah dibaca?") },
+                            text = { Text(if (jenis == "semua") "Semua notifikasi Anda akan dihapus dan tidak bisa dikembalikan." else "Notifikasi yang sudah dibaca akan dihapus. Yang belum dibaca tetap ada.") },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    konfirmasi = null
+                                    scope.launch {
+                                        runCatching { client.api.hapusSemuaNotif(if (jenis == "dibaca") 1 else null) }
+                                        lokal++
+                                        onBerubah()
+                                    }
+                                }) { Text("Ya, hapus", color = Red, fontWeight = FontWeight.Bold) }
+                            },
+                            dismissButton = { TextButton(onClick = { konfirmasi = null }) { Text("Batal") } },
                         )
                     }
                     if (respons.data.isEmpty()) {
@@ -118,7 +154,20 @@ fun NotifikasiTab(client: ApiClient, refreshKey: Int, onBerubah: () -> Unit, go:
                                 Text(n.isi, color = Slate500, fontSize = 13.sp)
                                 Text(tanggal(n.createdAt, withTime = true), color = Slate500, fontSize = 11.sp)
                             }
+                            IconButton(
+                                onClick = {
+                                    scope.launch {
+                                        runCatching { client.api.hapusNotif(n.id) }
+                                        lokal++
+                                        onBerubah()
+                                    }
+                                },
+                                modifier = Modifier.size(40.dp),
+                            ) { Icon(Lucide.Trash2, contentDescription = "Hapus notifikasi: ${n.judul}", tint = Slate500, modifier = Modifier.size(18.dp)) }
                         }
+                    }
+                    if (respons.data.isNotEmpty()) {
+                        Text("Notifikasi dihapus otomatis setelah 30 hari.", color = Slate500, fontSize = 11.sp, modifier = Modifier.fillMaxWidth().padding(top = 4.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                     }
                 }
             }

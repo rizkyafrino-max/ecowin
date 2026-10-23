@@ -1,4 +1,5 @@
-import { ArrowDownLeft, ArrowUpRight, BadgeCheck, Bell, CheckCheck, Leaf, MapPin, Megaphone, Recycle, XCircle } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, BadgeCheck, Bell, CheckCheck, Leaf, MapPin, Megaphone, Recycle, Trash2, XCircle } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EcoApi } from '../api/endpoints';
 import Button from '../components/Button';
@@ -29,6 +30,9 @@ export default function Notifikasi() {
   const daftar = useQuery(() => EcoApi.notifikasi(), []);
   const items = daftar.data?.data ?? [];
   const adaBelum = items.some((n) => !n.dibaca);
+  const adaDibaca = items.some((n) => n.dibaca);
+  const [konfirmasi, setKonfirmasi] = useState(null); // 'dibaca' | 'semua' | null
+  const [galatHapus, setGalatHapus] = useState('');
 
   const buka = async (n) => {
     if (!n.dibaca) {
@@ -45,6 +49,22 @@ export default function Notifikasi() {
     daftar.reload();
   };
 
+  const hapusSatu = async (n) => {
+    setGalatHapus('');
+    try { await EcoApi.hapusNotif(n.id); } catch { setGalatHapus('Notifikasi gagal dihapus. Coba lagi.'); }
+    refresh();
+    daftar.reload();
+  };
+
+  const hapusBanyak = async () => {
+    const hanyaDibaca = konfirmasi === 'dibaca';
+    setKonfirmasi(null);
+    setGalatHapus('');
+    try { await EcoApi.hapusNotifSemua(hanyaDibaca); } catch { setGalatHapus('Notifikasi gagal dihapus. Coba lagi.'); }
+    refresh();
+    daftar.reload();
+  };
+
   return (
     <div className="space-y-5">
       <PageHeader title="Notifikasi" subtitle="Kabar terbaru tentang setoran, penarikan, dan aktivitas Anda."
@@ -57,13 +77,28 @@ export default function Notifikasi() {
       ) : null}
 
       {items.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          {adaDibaca && <Button size="sm" variant="outline" icon={Trash2} onClick={() => setKonfirmasi('dibaca')}>Hapus yang sudah dibaca</Button>}
+          <Button size="sm" variant="ghost" icon={Trash2} onClick={() => setKonfirmasi('semua')}>Hapus semua</Button>
+        </div>
+      )}
+      {konfirmasi && (
+        <div role="alertdialog" aria-label="Konfirmasi hapus notifikasi" className="flex flex-wrap items-center gap-3 rounded-2xl border border-danger/30 bg-danger-tint p-4 text-sm">
+          <span className="flex-1 font-semibold text-danger">{konfirmasi === 'semua' ? 'Hapus semua notifikasi? Tindakan ini tidak bisa dibatalkan.' : 'Hapus semua notifikasi yang sudah dibaca?'}</span>
+          <Button size="sm" variant="danger" onClick={hapusBanyak}>Ya, hapus</Button>
+          <Button size="sm" variant="outline" onClick={() => setKonfirmasi(null)}>Batal</Button>
+        </div>
+      )}
+      {galatHapus && <p role="alert" className="text-sm font-semibold text-danger">{galatHapus}</p>}
+
+      {items.length > 0 && (
         <ul className="space-y-3" aria-label="Daftar notifikasi">
           {items.map((n) => {
             const { Icon, kelas } = gaya(n.tipe);
             return (
-              <li key={n.id}>
+              <li key={n.id} className="relative">
                 <button type="button" onClick={() => buka(n)}
-                  className={`flex w-full items-start gap-3 rounded-3xl border bg-surface p-4 text-left transition hover:shadow-md ${n.dibaca ? 'border-line' : 'border-primary/40 shadow-sm'}`}>
+                  className={`flex w-full items-start gap-3 rounded-3xl border bg-surface p-4 pr-14 text-left transition hover:shadow-md ${n.dibaca ? 'border-line' : 'border-primary/40 shadow-sm'}`}>
                   <span className={`flex h-11 w-11 flex-none items-center justify-center rounded-2xl ${kelas}`}><Icon className="h-5 w-5" aria-hidden /></span>
                   <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-2">
@@ -74,11 +109,16 @@ export default function Notifikasi() {
                     <span className="mt-1 block text-xs text-muted">{tanggal(n.created_at, true)}</span>
                   </span>
                 </button>
+                <button type="button" onClick={() => hapusSatu(n)} aria-label={`Hapus notifikasi: ${n.judul}`}
+                  className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-muted transition hover:bg-danger-tint hover:text-danger">
+                  <Trash2 className="h-4 w-4" aria-hidden />
+                </button>
               </li>
             );
           })}
         </ul>
       )}
+      {items.length > 0 && <p className="text-center text-xs text-muted">Notifikasi dihapus otomatis setelah 30 hari.</p>}
     </div>
   );
 }
