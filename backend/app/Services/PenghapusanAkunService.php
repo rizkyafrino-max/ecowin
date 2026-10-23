@@ -100,12 +100,15 @@ class PenghapusanAkunService
         $user->tokens()->delete();
         \App\Models\PerangkatPush::query()->where('user_id', $user->id)->delete();
         DB::table('sessions')->where('user_id', $user->id)->delete();
+        app(\App\Services\FotoProfilService::class)->hapus($user); // buang berkas foto profil
 
         $user->forceFill([
             'nama' => $nama,
             'email' => 'terhapus-'.$user->id.'-'.Str::lower(Str::random(8)).'@ecowin.invalid',
             'google_id' => null,
             'avatar' => null,
+            'jenis_kelamin' => null,
+            'foto_profil' => null,
             'remember_token' => null,
             'status' => User::STATUS_NONAKTIF,
         ])->save();

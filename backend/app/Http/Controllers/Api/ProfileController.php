@@ -28,6 +28,10 @@ class ProfileController extends Controller
             if (isset($data['nama'])) {
                 $user->forceFill(['nama' => $data['nama']])->save();
             }
+            if (array_key_exists('jenis_kelamin', $data)) {
+                $before['jenis_kelamin'] = $user->jenis_kelamin;
+                $user->forceFill(['jenis_kelamin' => $data['jenis_kelamin']])->save();
+            }
 
             if ($user->nasabah) {
                 $before += $user->nasabah->only(['no_hp', 'alamat_rt_rw']);

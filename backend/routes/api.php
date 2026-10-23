@@ -41,6 +41,8 @@ Route::middleware(['auth:sanctum', 'active', 'abilities:access'])->name('api.')-
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.put');
+    Route::post('/profile/foto', [\App\Http\Controllers\Api\FotoProfilController::class, 'store'])->middleware('throttle:uploads')->name('profile.foto.store');
+    Route::delete('/profile/foto', [\App\Http\Controllers\Api\FotoProfilController::class, 'destroy'])->middleware('throttle:uploads')->name('profile.foto.destroy');
 
     Route::get('/dashboard', [DashboardController::class, 'summary'])->name('dashboard.alias');
     Route::get('/dashboard/summary', [DashboardController::class, 'summary'])->name('dashboard.summary');

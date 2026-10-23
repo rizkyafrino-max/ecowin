@@ -42,6 +42,13 @@ interface EcoWinApi {
     @PATCH("profile")
     suspend fun updateProfile(@Body body: ProfileUpdateRequest): DataWrapper<UserDto>
 
+    @retrofit2.http.Multipart
+    @POST("profile/foto")
+    suspend fun gantiFoto(@retrofit2.http.Part foto: okhttp3.MultipartBody.Part): DataWrapper<UserDto>
+
+    @retrofit2.http.DELETE("profile/foto")
+    suspend fun hapusFoto(): DataWrapper<UserDto>
+
     @GET("dashboard/summary")
     suspend fun dashboard(): DashboardDto
 

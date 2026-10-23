@@ -163,7 +163,7 @@ class UnifiedLoginTest extends TestCase
     private function payload(array $override = []): array
     {
         return [
-            'nama' => 'Warga Baru', 'no_hp' => '081234567890', 'alamat_rt_rw' => 'Jl. Melati No. 7 RT 01/05',
+            'nama' => 'Warga Baru', 'no_hp' => '081234567890', 'alamat_rt_rw' => 'Jl. Melati No. 7 RT 01/05', 'jenis_kelamin' => 'L',
             'bank_sampah_id' => BankSampah::factory()->create()->id, 'setuju' => '1', ...$override,
         ];
     }

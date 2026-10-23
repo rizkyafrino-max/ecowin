@@ -40,6 +40,23 @@
         </div>
 
         <fieldset class="ecl-field ecl-banks">
+            <legend>Jenis kelamin</legend>
+            @php($jk = (string) old('jenis_kelamin', $form['jenis_kelamin'] ?? ''))
+            <div class="ecl-jk">
+                @foreach (['L' => ['Laki-laki', 'avatar-laki.jpg'], 'P' => ['Perempuan', 'avatar-perempuan.jpg']] as $nilai => [$label, $gambar])
+                    <label class="ecl-bank">
+                        <input type="radio" name="jenis_kelamin" value="{{ $nilai }}" @checked($jk === $nilai) required>
+                        <img class="ecl-jk-img" src="{{ asset('images/'.$gambar) }}" alt="" width="42" height="42">
+                        <span class="ecl-bank-txt"><b>{{ $label }}</b></span>
+                        <span class="ecl-bank-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
+                    </label>
+                @endforeach
+            </div>
+            <p class="ecl-hint">Menentukan foto profil bawaan. Anda bisa menggantinya dengan foto sendiri nanti.</p>
+            @error('jenis_kelamin')<p class="ecl-field-err" role="alert">{{ $message }}</p>@enderror
+        </fieldset>
+
+        <fieldset class="ecl-field ecl-banks">
             <legend>Pilih Bank Sampah RT/RW Anda</legend>
             @php($terpilih = (string) old('bank_sampah_id', $form['bank_sampah_id'] ?? ''))
             @foreach ($banks as $bank)

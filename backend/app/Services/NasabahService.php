@@ -105,6 +105,7 @@ class NasabahService
                 'google_id' => $identity->googleId,
                 'email_verified_at' => now(),
                 'avatar' => $identity->avatar,
+                'jenis_kelamin' => in_array($data['jenis_kelamin'] ?? null, ['L', 'P'], true) ? $data['jenis_kelamin'] : null,
                 'role' => Role::Nasabah->value,
                 'status' => User::STATUS_AKTIF,
                 'bank_sampah_id' => $bank->id,

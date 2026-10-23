@@ -66,7 +66,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Token Google tidak valid.', 'errors' => ['id_token' => [$e->getMessage()]]], 401);
         }
 
-        $nasabah = $this->nasabah->daftarMandiri($identity, $request->safe()->only(['nama', 'no_hp', 'alamat_rt_rw', 'bank_sampah_id']));
+        $nasabah = $this->nasabah->daftarMandiri($identity, $request->safe()->only(['nama', 'no_hp', 'alamat_rt_rw', 'jenis_kelamin', 'bank_sampah_id']));
         $user = $nasabah->user;
         $pair = $this->tokens->issue($user, (string) $request->input('device_name', 'android'));
 

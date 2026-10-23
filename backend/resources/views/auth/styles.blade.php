@@ -136,6 +136,8 @@
         .ecl-bank{position:relative;display:flex;align-items:center;gap:.8rem;padding:.8rem .9rem;min-height:64px;border:1.5px solid #CBD5E1;border-radius:14px;background:#fff;cursor:pointer;transition:border-color .15s ease,background .15s ease,box-shadow .15s ease}
         .ecl-bank:hover{border-color:#10B981}
         .ecl-bank input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+        .ecl-jk{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+        .ecl-jk-img{width:42px;height:42px;flex:none;border-radius:999px;object-fit:cover;background:#ECFDF5}
         .ecl-bank-ico{width:42px;height:42px;flex:none;border-radius:12px;background:#ECFDF5;color:#059669;display:flex;align-items:center;justify-content:center}
         .ecl-bank-ico svg{width:22px;height:22px}
         .ecl-bank-txt{flex:1;min-width:0}

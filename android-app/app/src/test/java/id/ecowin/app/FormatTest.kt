@@ -85,4 +85,24 @@ class FormatTest {
         assertEquals("0", soloAngka("0"))
         assertEquals("10005", soloAngka("1.000,5"))
     }
+
+    @Test
+    fun avatarServer_hanyaJalurDikenalDanAsalDariApiSendiri() {
+        val kode = "a".repeat(32)
+        val dasar = "http://127.0.0.1:8000/api/"
+        assertEquals("http://127.0.0.1:8000/foto/$kode", safeAvatarUrl("http://127.0.0.1:8000/foto/$kode", dasar))
+        assertEquals("http://127.0.0.1:8000/images/avatar-laki.jpg", safeAvatarUrl("http://localhost:8000/images/avatar-laki.jpg", dasar))
+        assertEquals("https://api.ecowin.id/images/avatar-perempuan.jpg", safeAvatarUrl("https://api.ecowin.id/images/avatar-perempuan.jpg", "https://api.ecowin.id/api/"))
+        // host dari server tidak pernah dipakai: asal selalu dari alamat API aplikasi
+        assertEquals("https://api.ecowin.id/foto/$kode", safeAvatarUrl("https://evil.example.com/foto/$kode", "https://api.ecowin.id/api/"))
+        // jalur tidak dikenal atau bermuatan tambahan ditolak
+        assertNull(safeAvatarUrl("https://api.ecowin.id/foto/pendek", "https://api.ecowin.id/api/"))
+        assertNull(safeAvatarUrl("https://api.ecowin.id/foto/" + "b".repeat(33), "https://api.ecowin.id/api/"))
+        assertNull(safeAvatarUrl("https://api.ecowin.id/images/avatar-x.jpg", "https://api.ecowin.id/api/"))
+        assertNull(safeAvatarUrl("https://api.ecowin.id/foto/$kode?x=1", "https://api.ecowin.id/api/"))
+        assertNull(safeAvatarUrl("https://api.ecowin.id/foto/$kode#a", "https://api.ecowin.id/api/"))
+        assertNull(safeAvatarUrl("https://u:p@api.ecowin.id/foto/$kode", "https://api.ecowin.id/api/"))
+        assertNull(safeAvatarUrl("https://api.ecowin.id/foto/../etc", "https://api.ecowin.id/api/"))
+        assertNull(safeAvatarUrl("https://api.ecowin.id/foto/$kode", "ftp://api.ecowin.id/api/"))
+    }
 }

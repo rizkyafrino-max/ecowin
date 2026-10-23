@@ -64,6 +64,7 @@ fun RegisterScreen(
     var alamat by rememberSaveable { mutableStateOf("") }
     var bankId by rememberSaveable { mutableStateOf<Long?>(null) }
     var setuju by rememberSaveable { mutableStateOf(false) }
+    var jenisKelamin by rememberSaveable { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     var banks by remember { mutableStateOf<List<BankPublikDto>>(emptyList()) }
@@ -82,6 +83,7 @@ fun RegisterScreen(
             nama.trim().length < 3 -> "Isi nama lengkap."
             noHp.length < 9 -> "Nomor HP tidak valid."
             alamat.trim().length < 5 -> "Isi alamat."
+            jenisKelamin.isEmpty() -> "Pilih jenis kelamin."
             bankId == null -> "Pilih Bank Sampah."
             !setuju -> "Anda harus menyetujui pernyataan."
             else -> null
@@ -93,7 +95,7 @@ fun RegisterScreen(
         scope.launch {
             try {
                 val response = client.api.register(
-                    RegisterRequest(token, android.os.Build.MODEL ?: "android", nama.trim(), noHp, alamat.trim(), bank, true),
+                    RegisterRequest(token, android.os.Build.MODEL ?: "android", nama.trim(), noHp, alamat.trim(), jenisKelamin, bank, true),
                 )
                 onRegistered(response)
             } catch (e: Exception) {
@@ -160,6 +162,7 @@ fun RegisterScreen(
                         alamat, { alamat = it.take(255) }, label = { Text("Alamat (jalan, RT/RW)") },
                         placeholder = { Text("Jl. Melati No. 7, RT 01/RW 05") }, minLines = 2, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth(),
                     )
+                    PilihJenisKelamin(jenisKelamin.ifEmpty { null }, { jenisKelamin = it })
                 }
 
                 Text("Pilih Bank Sampah", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Slate900)

@@ -5,6 +5,8 @@ export const EcoApi = {
   me: () => api('/auth/me'),
   logout: () => api('/auth/logout', { method: 'POST' }),
   updateProfile: (data) => api('/profile', { method: 'PATCH', body: data }),
+  gantiFoto: (blob) => { const fd = new FormData(); fd.append('foto', blob, 'foto.jpg'); return api('/profile/foto', { method: 'POST', body: fd }); },
+  hapusFoto: () => api('/profile/foto', { method: 'DELETE' }),
 
   dashboard: () => api('/dashboard/summary'),
   statistik: (bulan = 6) => api('/dashboard/statistics', { query: { bulan } }),

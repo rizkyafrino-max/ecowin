@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/admin');
 
+// Foto profil unggahan (kode acak 32 karakter; hanya JPEG olahan server). Ringan dan bisa di-cache lama.
+Route::get('/foto/{kode}', \App\Http\Controllers\FotoProfilTampilController::class)->where('kode', '[A-Za-z0-9]{32}')->middleware('throttle:300,1')->name('foto-profil');
+
 // Satu halaman login untuk semua role. /masuk meneruskan parameter PKCE dari aplikasi web Nasabah.
 Route::get('/masuk', fn (Illuminate\Http\Request $r) => redirect()->route('filament.admin.auth.login', array_filter($r->only('app', 'c'))));
 

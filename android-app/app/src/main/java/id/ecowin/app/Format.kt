@@ -44,13 +44,31 @@ fun inisial(nama: String?): String = nama?.trim()?.firstOrNull()?.uppercase() ?:
  * URL foto profil yang aman dimuat: wajib https dan host milik Google (googleusercontent.com).
  * Nilai lain (http, host asing, skema aneh) ditolak agar aplikasi tidak memuat sumber sembarang.
  */
-fun safeAvatarUrl(url: String?): String? {
+fun safeAvatarUrl(url: String?, apiBase: String = BuildConfig.API_BASE_URL): String? {
     if (url.isNullOrBlank() || url.length > 512) return null
     val uri = runCatching { java.net.URI(url.trim()) }.getOrNull() ?: return null
+    if (uri.userInfo != null) return null
     val host = uri.host?.lowercase() ?: return null
-    if (uri.scheme != "https" || uri.userInfo != null) return null
-    if (host != "googleusercontent.com" && !host.endsWith(".googleusercontent.com")) return null
-    return uri.toString()
+    if (uri.scheme == "https" && (host == "googleusercontent.com" || host.endsWith(".googleusercontent.com"))) return uri.toString()
+    return avatarServerEcoWin(uri, apiBase)
+}
+
+private val JalurAvatarServer = Regex("^/(foto/[A-Za-z0-9]{32}|images/avatar-(laki|perempuan)\\.jpg)$")
+
+/**
+ * Foto profil dari server EcoWin (foto unggahan atau avatar bawaan). Hanya jalur yang dikenal yang diterima, tanpa query/fragmen,
+ * dan alamat asalnya SELALU dibentuk ulang dari alamat API aplikasi sendiri: host dalam data dari server tidak pernah dipakai,
+ * sehingga tidak bisa mengarahkan aplikasi memuat gambar dari tempat lain.
+ */
+private fun avatarServerEcoWin(uri: java.net.URI, apiBase: String): String? {
+    if (uri.rawQuery != null || uri.rawFragment != null) return null
+    val jalur = uri.rawPath ?: return null
+    if (!JalurAvatarServer.matches(jalur)) return null
+    val dasar = runCatching { java.net.URI(apiBase.trim()) }.getOrNull() ?: return null
+    val skema = dasar.scheme?.lowercase()
+    if (skema != "https" && skema != "http") return null
+    val otoritas = dasar.rawAuthority ?: return null
+    return "$skema://$otoritas$jalur"
 }
 
 /**

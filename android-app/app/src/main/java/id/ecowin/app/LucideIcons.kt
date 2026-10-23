@@ -112,6 +112,10 @@ object Lucide {
         "M7 14h10a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1Z"
     ) }
 
+    val Camera: ImageVector by lazy { icon("Camera",
+        "M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z",
+        "M9 13a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+    ) }
     val Trash2: ImageVector by lazy { icon("Trash2",
         "M3 6h18",
         "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6",

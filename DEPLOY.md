@@ -141,3 +141,6 @@ cd android-app
 - [ ] Uji cetak dan ekspor laporan sebagai Admin (semua bank) dan Petugas (hanya bank sendiri).
 - [ ] Periksa `storage/logs` tidak berisi token atau data pribadi.
 - [ ] Server tile peta sudah diganti ke penyedia yang sesuai (bagian 1).
+
+## Foto profil
+Foto unggahan pengguna disimpan (sudah diolah: JPEG 384x384, tanpa metadata) di `backend/storage/app/private/profil/` dan disajikan lewat `/foto/{kode}`. Sertakan folder ini dalam backup `storage/`. Avatar bawaan (`backend/public/images/avatar-laki.jpg` dan `avatar-perempuan.jpg`) dapat diganti; jalankan `node tools/avatar-kecil.cjs` untuk memperbarui salinan kecil di web dan Android.

@@ -57,6 +57,7 @@ object PhotoUtils {
         val output = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
 
         val target = File(context.cacheDir, "foto/upload-${UUID.randomUUID()}.jpg")
+        target.parentFile?.mkdirs()
         target.outputStream().use { output.compress(Bitmap.CompressFormat.JPEG, QUALITY, it) }
         if (output != bitmap) output.recycle()
         bitmap.recycle()

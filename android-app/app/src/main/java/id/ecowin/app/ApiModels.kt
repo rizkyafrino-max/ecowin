@@ -15,6 +15,7 @@ data class RegisterRequest(
     val nama: String,
     val noHp: String,
     val alamatRtRw: String,
+    val jenisKelamin: String? = null,
     val bankSampahId: Long,
     val setuju: Boolean,
 )
@@ -49,6 +50,8 @@ data class UserDto(
     val nama: String?,
     val email: String?,
     val avatar: String?,
+    val jenisKelamin: String? = null,
+    val punyaFoto: Boolean = false,
     val role: String,
     val bankSampahId: Long?,
     val nasabah: NasabahDto?,
@@ -156,7 +159,7 @@ data class PenarikanDto(
 
 data class PenarikanRequest(val jumlah: Long, val catatan: String?)
 
-data class ProfileUpdateRequest(val nama: String?, val noHp: String?, val alamatRtRw: String?)
+data class ProfileUpdateRequest(val nama: String?, val noHp: String?, val alamatRtRw: String?, val jenisKelamin: String? = null)
 
 data class AnorganikSummary(val totalBeratKg: Double = 0.0, val jumlahTransaksi: Int = 0, val totalNilai: Long = 0)
 
