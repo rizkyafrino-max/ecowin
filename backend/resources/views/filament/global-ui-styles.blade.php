@@ -380,8 +380,8 @@ input[type="checkbox"].fi-checkbox-input:focus-visible,input[type="radio"].fi-ra
 /* Bilah alat tabel: tombol aksi (mis. Scan QR) di kiri, pencarian dan filter di kanan, dalam satu baris */
 .fi-ta-header-ctn{display:flex!important;flex-wrap:wrap;align-items:center;gap:.5rem .75rem;padding:.75rem 1rem!important}
 .fi-ta-header,.fi-ta-header-toolbar{display:contents!important}
-.fi-ta-header-ctn>.fi-ta-header-toolbar>div:last-child{margin-inline-start:auto;flex:1 1 260px;display:flex;align-items:center;justify-content:flex-end;gap:.5rem;min-width:0}
-.fi-ta-search-field{flex:1 1 auto;max-width:420px;min-width:0}
+.fi-ta-header-ctn>.fi-ta-header-toolbar>div:last-child{margin-inline-start:auto;flex:0 1 auto;display:flex;align-items:center;justify-content:flex-end;gap:.5rem;min-width:0}
+.fi-ta-search-field{flex:0 1 240px;width:240px;max-width:100%;min-width:0}
 .fi-ta-grouping-settings{flex:none}
 @media(max-width:640px){.fi-ta-header-ctn>.fi-ta-header-toolbar>div:last-child{flex:1 1 0}.fi-ta-search-field{max-width:none}}
 /* Kolom aksi tetap terlihat di kanan saat tabel digeser ke samping */
