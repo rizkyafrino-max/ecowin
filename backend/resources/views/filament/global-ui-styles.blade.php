@@ -380,7 +380,10 @@ input[type="checkbox"].fi-checkbox-input:focus-visible,input[type="radio"].fi-ra
 /* Bilah alat tabel: tombol aksi (mis. Scan QR) di kiri, pencarian dan filter di kanan, dalam satu baris */
 .fi-ta-header-ctn{display:flex!important;flex-wrap:wrap;align-items:center;gap:.5rem .75rem;padding:.75rem 1rem!important}
 .fi-ta-header,.fi-ta-header-toolbar{display:contents!important}
-.fi-ta-header-ctn>.fi-ta-header-toolbar>div:last-child{margin-inline-start:auto}
+.fi-ta-header-ctn>.fi-ta-header-toolbar>div:last-child{margin-inline-start:auto;flex:1 1 260px;display:flex;align-items:center;justify-content:flex-end;gap:.5rem;min-width:0}
+.fi-ta-search-field{flex:1 1 auto;max-width:420px;min-width:0}
+.fi-ta-grouping-settings{flex:none}
+@media(max-width:640px){.fi-ta-header-ctn>.fi-ta-header-toolbar>div:last-child{flex:1 1 0}.fi-ta-search-field{max-width:none}}
 /* Kolom aksi tetap terlihat di kanan saat tabel digeser ke samping */
 .fi-ta-table th.fi-ta-actions-header-cell,.fi-ta-table td:has(>.fi-ta-actions){position:sticky;right:0;z-index:2;background:#fff}
 .fi-ta-table td:has(>.fi-ta-actions){box-shadow:-10px 0 10px -10px rgba(15,23,42,.22)}
@@ -406,7 +409,7 @@ input[type="checkbox"].fi-checkbox-input:focus-visible,input[type="radio"].fi-ra
 .fi-page-sub-navigation-tabs .fi-tabs-item.fi-active .fi-badge{background:rgba(255,255,255,.22)!important;--tw-ring-color:rgba(255,255,255,.4)}
 @media(max-width:640px){.fi-page-sub-navigation-tabs{width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.fi-page-sub-navigation-tabs .fi-tabs-item{white-space:nowrap;flex:none}}
 /* Kontrol pengelompokan tabel: dua kotak pilihan sejajar, bukan gelembung bulat */
-.fi-ta-grouping-settings-fields{display:flex!important;flex-wrap:wrap;align-items:center;gap:.5rem}
+.fi-ta-grouping-settings-fields{flex-wrap:wrap;align-items:center;gap:.5rem}
 .fi-ta-grouping-settings-fields label{margin:0}
 .fi-ta-grouping-settings-fields .fi-input-wrp{border-radius:12px!important;min-height:2.5rem;background:#fff;align-items:center}
 .fi-ta-grouping-settings-fields .fi-input-wrp-prefix{padding-inline:.75rem .5rem}
@@ -417,4 +420,6 @@ input[type="checkbox"].fi-checkbox-input:focus-visible,input[type="radio"].fi-ra
 .fi-ta-header-ctn>.fi-ta-header>.fi-ta-actions{margin-inline:0 auto!important}
 .fi-ta-header-ctn>.fi-ta-header-toolbar>.fi-ta-actions{margin-inline:0!important}
 .fi-ta-filters-dropdown .fi-badge.eco-nol{display:none!important}
+/* Di HP (kartu, bukan tabel geser) kolom aksi tidak menempel dan tanpa bayangan */
+@media(max-width:640px){.fi-ta-table td:has(>.fi-ta-actions){position:static!important;box-shadow:none!important;background:transparent!important}.fi-ta-table .fi-ta-row:hover td:has(>.fi-ta-actions){background:transparent!important}}
 </style>
