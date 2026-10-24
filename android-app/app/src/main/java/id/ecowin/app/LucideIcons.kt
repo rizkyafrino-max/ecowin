@@ -116,6 +116,9 @@ object Lucide {
         "M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z",
         "M9 13a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
     ) }
+    val X: ImageVector by lazy { icon("X", "M18 6 6 18", "m6 6 12 12") }
+    val ChevronLeft: ImageVector by lazy { icon("ChevronLeft", "m15 18-6-6 6-6") }
+    val ChevronDown: ImageVector by lazy { icon("ChevronDown", "m6 9 6 6 6-6") }
     val Trash2: ImageVector by lazy { icon("Trash2",
         "M3 6h18",
         "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6",

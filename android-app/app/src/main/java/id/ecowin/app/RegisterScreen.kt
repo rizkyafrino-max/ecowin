@@ -24,7 +24,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -148,17 +147,17 @@ fun RegisterScreen(
                 }
 
                 Column(
-                    Modifier.fillMaxWidth().background(Color.White, RoundedCornerShape(20.dp)).border(1.dp, Slate200, RoundedCornerShape(20.dp)).padding(16.dp),
+                    Modifier.fillMaxWidth().background(Color.White, RoundedCornerShape(20.dp)).border(1.dp, Slate200, RoundedCornerShape(20.dp)).padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    OutlinedTextField(nama, { nama = it.take(150) }, label = { Text("Nama lengkap") }, singleLine = true, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth())
-                    OutlinedTextField(
+                    EcoTextField(nama, { nama = it.take(150) }, label = { Text("Nama lengkap") }, singleLine = true, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth())
+                    EcoTextField(
                         noHp, { noHp = it.filter { c -> c.isDigit() || c == '+' }.take(16) },
                         label = { Text("Nomor HP") }, placeholder = { Text("081234567890") }, singleLine = true,
                         supportingText = { Text("Nomor aktif agar petugas dapat menghubungi Anda.") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth(),
                     )
-                    OutlinedTextField(
+                    EcoTextField(
                         alamat, { alamat = it.take(255) }, label = { Text("Alamat (jalan, RT/RW)") },
                         placeholder = { Text("Jl. Melati No. 7, RT 01/RW 05") }, minLines = 2, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth(),
                     )

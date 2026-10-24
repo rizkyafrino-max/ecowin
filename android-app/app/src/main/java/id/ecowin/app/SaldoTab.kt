@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,7 +34,9 @@ import kotlinx.coroutines.launch
 fun SaldoTab(client: ApiClient, user: UserDto, refreshKey: Int) {
     var tarik by rememberSaveable { mutableStateOf(false) }
     if (tarik) {
-        PenarikanScreen(client, user, refreshKey, onBack = { tarik = false })
+        androidx.compose.runtime.CompositionLocalProvider(LocalJudulHalaman provides null) {
+            PenarikanScreen(client, user, refreshKey, onBack = { tarik = false })
+        }
         return
     }
 
@@ -77,6 +78,7 @@ fun SaldoTab(client: ApiClient, user: UserDto, refreshKey: Int) {
 }
 
 /** Halaman Tarik Saldo: saldo tersedia, nominal + pilihan cepat, catatan, konfirmasi, lalu riwayat penarikan. */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 private fun PenarikanScreen(client: ApiClient, user: UserDto, refreshKey: Int, onBack: () -> Unit) {
     var localRefresh by remember { mutableIntStateOf(0) }
@@ -92,11 +94,17 @@ private fun PenarikanScreen(client: ApiClient, user: UserDto, refreshKey: Int, o
     var confirm by remember { mutableStateOf(false) }
     var sending by remember { mutableStateOf(false) }
     val tersedia = saldo.data?.saldoTersedia
+    androidx.activity.compose.BackHandler(onBack = onBack)
 
     TabList {
         item {
-            TextButton(onClick = onBack) { Text("← Kembali ke Saldo", color = Emerald) }
-            Text("Ajukan penarikan. Petugas akan memeriksa dan menyetujuinya.", color = Slate500, fontSize = 14.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                androidx.compose.material3.IconButton(onClick = onBack) { androidx.compose.material3.Icon(Lucide.ChevronLeft, contentDescription = "Kembali ke Saldo", tint = Slate900) }
+                Column {
+                    Text("Tarik saldo", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
+                    Text("Ajukan penarikan. Petugas akan memeriksa dan menyetujuinya.", color = Slate500, fontSize = 14.sp, modifier = Modifier.padding(top = 2.dp))
+                }
+            }
         }
 
         if (belumVerifikasi) {
@@ -112,12 +120,12 @@ private fun PenarikanScreen(client: ApiClient, user: UserDto, refreshKey: Int, o
             EcoCard {
                 Text("Saldo tersedia", color = Slate500, fontSize = 13.sp)
                 Text(if (tersedia == null) "…" else rupiah(tersedia), fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = Emerald)
-                OutlinedTextField(
+                EcoTextField(
                     jumlah, { jumlah = soloAngka(it) },
                     label = { Text("Nominal penarikan (Rp)") }, placeholder = { Text("mis. 20000") }, singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(vertical = 4.dp)) {
+                androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(vertical = 4.dp)) {
                     listOf(10000L, 20000L, 50000L).forEach { v ->
                         Text(
                             rupiah(v), color = Emerald, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
@@ -131,9 +139,9 @@ private fun PenarikanScreen(client: ApiClient, user: UserDto, refreshKey: Int, o
                         )
                     }
                 }
-                OutlinedTextField(catatan, { catatan = it.take(500) }, label = { Text("Catatan (opsional)") }, modifier = Modifier.fillMaxWidth())
+                EcoTextField(catatan, { catatan = it.take(500) }, label = { Text("Catatan (opsional)") }, modifier = Modifier.fillMaxWidth())
                 message?.let { Text(it, color = if (success) Emerald else Red, fontSize = 13.sp) }
-                PrimaryButton("Ajukan penarikan", enabled = !belumVerifikasi) {
+                PrimaryButton("Ajukan penarikan", enabled = !belumVerifikasi, icon = Lucide.ArrowUpFromLine) {
                     val nominal = jumlah.toLongOrNull()
                     success = false
                     message = when {

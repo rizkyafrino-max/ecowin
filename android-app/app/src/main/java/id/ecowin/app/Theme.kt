@@ -10,6 +10,8 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 
 val Emerald = Color(0xFF059669)
 val EmeraldSoft = Color(0xFFECFDF5)
@@ -37,27 +39,33 @@ val Inter = FontFamily(
 
 private fun interTypography(): Typography {
     val d = Typography()
+    fun androidx.compose.ui.text.TextStyle.eco() = copy(fontFamily = Inter, letterSpacing = 0.sp, lineHeight = 1.4.em)
     return d.copy(
-        displayLarge = d.displayLarge.copy(fontFamily = Inter),
-        displayMedium = d.displayMedium.copy(fontFamily = Inter),
-        displaySmall = d.displaySmall.copy(fontFamily = Inter),
-        headlineLarge = d.headlineLarge.copy(fontFamily = Inter),
-        headlineMedium = d.headlineMedium.copy(fontFamily = Inter),
-        headlineSmall = d.headlineSmall.copy(fontFamily = Inter),
-        titleLarge = d.titleLarge.copy(fontFamily = Inter),
-        titleMedium = d.titleMedium.copy(fontFamily = Inter),
-        titleSmall = d.titleSmall.copy(fontFamily = Inter),
-        bodyLarge = d.bodyLarge.copy(fontFamily = Inter),
-        bodyMedium = d.bodyMedium.copy(fontFamily = Inter),
-        bodySmall = d.bodySmall.copy(fontFamily = Inter),
-        labelLarge = d.labelLarge.copy(fontFamily = Inter),
-        labelMedium = d.labelMedium.copy(fontFamily = Inter),
-        labelSmall = d.labelSmall.copy(fontFamily = Inter),
+        displayLarge = d.displayLarge.eco(),
+        displayMedium = d.displayMedium.eco(),
+        displaySmall = d.displaySmall.eco(),
+        headlineLarge = d.headlineLarge.eco(),
+        headlineMedium = d.headlineMedium.eco(),
+        headlineSmall = d.headlineSmall.eco(),
+        titleLarge = d.titleLarge.eco(),
+        titleMedium = d.titleMedium.eco(),
+        titleSmall = d.titleSmall.eco(),
+        bodyLarge = d.bodyLarge.eco(),
+        bodyMedium = d.bodyMedium.eco(),
+        bodySmall = d.bodySmall.eco(),
+        labelLarge = d.labelLarge.eco(),
+        labelMedium = d.labelMedium.eco(),
+        labelSmall = d.labelSmall.eco(),
     )
 }
 
 @Composable
 fun EcoWinTheme(content: @Composable () -> Unit) {
+    // Ukuran huruf mengikuti Web (16px = 1x): skala huruf sistem di bawah 1x tidak dipakai agar tampilan sama dengan Web; skala besar (aksesibilitas) tetap dihormati sampai 1,3x.
+    val kepadatan = androidx.compose.ui.platform.LocalDensity.current
+    androidx.compose.runtime.CompositionLocalProvider(
+        androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(kepadatan.density, kepadatan.fontScale.coerceIn(1f, 1.3f)),
+    ) {
     MaterialTheme(
         typography = interTypography(),
         colorScheme = lightColorScheme(
@@ -75,4 +83,5 @@ fun EcoWinTheme(content: @Composable () -> Unit) {
         ),
         content = content,
     )
+    }
 }

@@ -1,10 +1,11 @@
-import { Camera, CheckCircle2, Mail, Trash2 } from 'lucide-react';
+import { Camera, CheckCircle2, LogOut, Mail, Trash2 } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { EcoApi } from '../api/endpoints';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import { Input, Textarea } from '../components/Field';
 import PageHeader from '../components/PageHeader';
+import { ConfirmationDialog } from '../components/Modal';
 import QRCard from '../components/QRCard';
 import { useAuth } from '../context/AuthContext';
 import { useQuery } from '../hooks/useQuery';
@@ -17,7 +18,9 @@ const JENIS_KELAMIN = [
 ];
 
 export default function Profil() {
-  const { user, refreshUser } = useAuth();
+  const { user, refreshUser, signOut } = useAuth();
+  const [keluar, setKeluar] = useState(false);
+  const [keluarBusy, setKeluarBusy] = useState(false);
   const qr = useQuery(() => EcoApi.qr(), []);
   const n = user?.nasabah;
   const [form, setForm] = useState({ nama: user?.nama ?? '', no_hp: n?.no_hp ?? '', alamat_rt_rw: n?.alamat_rt_rw ?? '', jenis_kelamin: user?.jenis_kelamin ?? '' });
@@ -103,9 +106,9 @@ export default function Profil() {
                 {JENIS_KELAMIN.map((j) => {
                   const aktif = form.jenis_kelamin === j.nilai;
                   return (
-                    <label key={j.nilai} className={`flex cursor-pointer items-center gap-3 rounded-2xl border p-3 transition ${aktif ? 'border-primary bg-tint ring-2 ring-primary/20' : 'border-field hover:border-primary/50'}`}>
+                    <label key={j.nilai} className={`flex min-w-0 cursor-pointer items-center gap-2 rounded-2xl border p-2 transition sm:gap-3 sm:p-3 ${aktif ? 'border-primary bg-tint ring-2 ring-primary/20' : 'border-field hover:border-primary/50'}`}>
                       <input type="radio" name="jenis_kelamin" value={j.nilai} checked={aktif} onChange={set('jenis_kelamin')} className="sr-only" />
-                      <img src={j.gambar} alt="" className="h-10 w-10 flex-none rounded-full object-cover" />
+                      <img src={j.gambar} alt="" className="h-9 w-9 flex-none rounded-full object-cover sm:h-10 sm:w-10" />
                       <span className="text-sm font-semibold">{j.label}</span>
                     </label>
                   );
@@ -121,8 +124,13 @@ export default function Profil() {
             {saved && <p className="flex items-center gap-2 text-sm font-semibold text-primary-deep" role="status"><CheckCircle2 className="h-4 w-4" aria-hidden />Profil diperbarui.</p>}
           </form>
         </Card>
-        <QRCard data={qr.data} loading={qr.loading} />
+        <div className="space-y-5">
+          <QRCard data={qr.data} loading={qr.loading} />
+          <Button type="button" variant="danger" icon={LogOut} className="w-full" onClick={() => setKeluar(true)}>Keluar</Button>
+        </div>
       </div>
+      <ConfirmationDialog open={keluar} title="Keluar dari EcoWin?" message="Anda harus masuk lagi dengan akun Google untuk mengakses EcoWin."
+        confirmLabel="Keluar" loading={keluarBusy} onConfirm={async () => { setKeluarBusy(true); await signOut(); }} onClose={() => setKeluar(false)} />
     </div>
   );
 }

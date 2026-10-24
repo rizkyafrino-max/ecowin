@@ -75,8 +75,8 @@ fun LoginScreen(
                     Text("Win", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Emerald)
                 }
             }
-            Text("Kelola Sampah.", fontSize = 30.sp, lineHeight = 33.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
-            Text("Jaga Masa Depan.", fontSize = 30.sp, lineHeight = 33.sp, fontWeight = FontWeight.ExtraBold, color = Emerald)
+            Text("Kelola Sampah.", fontSize = 28.sp, lineHeight = 31.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
+            Text("Jaga Masa Depan.", fontSize = 28.sp, lineHeight = 31.sp, fontWeight = FontWeight.ExtraBold, color = Emerald)
             Text("Bank sampah digital untuk lingkungan yang lebih baik.", color = Color(0xFF475569), fontSize = 15.sp)
         }
 
@@ -99,8 +99,8 @@ fun LoginScreen(
                 "MASUK KE ECOWIN", color = Color(0xFF047857), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp,
                 modifier = Modifier.background(EmeraldSoft, RoundedCornerShape(999.dp)).border(1.dp, Color(0xFFA7F3D0), RoundedCornerShape(999.dp)).padding(horizontal = 12.dp, vertical = 5.dp),
             )
-            Text("Selamat datang", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
-            Text("Masuk dengan akun Google Anda untuk melihat saldo, setoran, dan aktivitas organik.", color = Slate500, fontSize = 14.sp)
+            Text("Selamat datang", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
+            Text("Masuk dengan akun Google Anda untuk melihat saldo, setoran, dan aktivitas organik.", color = Slate500, fontSize = 15.sp)
 
             message?.let {
                 Text(
@@ -145,14 +145,14 @@ fun LoginScreen(
 
             Row(Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Top) {
                 Icon(Lucide.ShieldCheck, contentDescription = null, tint = Emerald, modifier = Modifier.size(16.dp).padding(top = 2.dp))
-                Text("Akun Google harus memiliki email terverifikasi dan terdaftar di EcoWin.", color = Slate500, fontSize = 13.sp)
+                Text("Akun Google harus memiliki email terverifikasi dan terdaftar di EcoWin.", color = Slate500, fontSize = 14.sp)
             }
 
             Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.Center) {
                 Text("Belum punya akun? ", color = Slate500, fontSize = 14.sp)
                 Text("Daftar sebagai nasabah", color = Color(0xFF047857), fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.clickable { registering = true })
             }
-            Text("Langkah kecil, dampak besar.", color = Color(0xFF047857), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 6.dp))
+            Text("© ${java.time.Year.now().value} EcoWin · Bank Sampah Digital Berkelanjutan", color = Color(0xFF94A3B8), fontSize = 12.sp, modifier = Modifier.padding(top = 16.dp))
         }
     }
 }

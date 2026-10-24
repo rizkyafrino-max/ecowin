@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -122,11 +121,11 @@ fun AjukanTitikForm(client: ApiClient, onDone: () -> Unit, onCancel: () -> Unit)
         Text("Ajukan titik Biopori baru", fontWeight = FontWeight.Bold)
         Text("Titik diperiksa petugas Bank Sampah. Setelah disetujui, titik tampil di peta dan bisa dipakai untuk melapor.", color = Slate500, fontSize = 12.sp)
 
-        OutlinedTextField(
+        EcoTextField(
             nama, { nama = it.take(100) }, label = { Text("Nama lokasi") }, placeholder = { Text("Contoh: Pojok taman RT 03") },
             singleLine = true, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth(),
         )
-        OutlinedTextField(
+        EcoTextField(
             keterangan, { keterangan = it.take(255) }, label = { Text("Keterangan (opsional)") },
             minLines = 2, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth(),
         )

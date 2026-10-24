@@ -1,6 +1,8 @@
 package id.ecowin.app
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.clickable
@@ -18,6 +20,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -27,6 +31,7 @@ import androidx.compose.ui.unit.sp
  * Organik tidak menghasilkan saldo rupiah.
  */
 @Composable
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 fun OrganikTab(client: ApiClient, refreshKey: Int) {
     var formOpen by rememberSaveable { mutableStateOf(false) }
     var titikFormOpen by rememberSaveable { mutableStateOf(false) }
@@ -36,14 +41,26 @@ fun OrganikTab(client: ApiClient, refreshKey: Int) {
     val aktivitas = rememberLoadable(client, refreshKey, localRefresh) { client.api.aktivitasBiopori().data }
     val lokasi = rememberLoadable(client, refreshKey, localRefresh) { client.api.lokasiBiopori().data }
 
-    TabList {
-        item {
-            if (formOpen) {
+    if (formOpen) {
+        // Seperti Web: formulir tambah aktivitas muncul sebagai lembar dari bawah.
+        androidx.compose.material3.ModalBottomSheet(onDismissRequest = { formOpen = false }, containerColor = androidx.compose.ui.graphics.Color.White) {
+            Column(Modifier.fillMaxWidth().verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(start = 20.dp, end = 20.dp, bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Tambah aktivitas organik", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
+                    androidx.compose.material3.IconButton(onClick = { formOpen = false }) { Icon(Lucide.X, contentDescription = "Tutup", tint = Slate500) }
+                }
                 TambahAktivitasForm(client, lokasi, onDone = { formOpen = false; localRefresh++ }, onCancel = { formOpen = false })
-            } else {
-                PrimaryButton("+ Tambah Aktivitas") { formOpen = true }
             }
         }
+    }
+
+    TabList(aksi = {
+        if (!formOpen) {
+            androidx.compose.material3.Button(onClick = { formOpen = true }, modifier = Modifier.height(36.dp), shape = RoundedCornerShape(50), contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp)) {
+                Text("+ Tambah", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+            }
+        }
+    }) {
 
         item {
             val totalSetoran = setoran.data.orEmpty().sumOf { it.beratKg }

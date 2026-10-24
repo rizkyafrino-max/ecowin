@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -86,32 +85,19 @@ fun TambahAktivitasForm(client: ApiClient, lokasi: Loadable<List<TitikBioporiDto
         }
     }
 
-    EcoCard {
-        Text("Tambah aktivitas organik", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-        LabelValue("Metode pengolahan", "BioporiPrint")
-
-        Text("Lokasi BioporiPrint", color = Slate500, fontSize = 13.sp)
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        EcoFieldBox("Metode pengolahan") { Text("BioporiPrint", fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Slate900) }
         val daftar = lokasi.data.orEmpty().filter { it.status == "aktif" && it.bioporiprint && (it.verifikasi ?: "approved") == "approved" }
         if (daftar.isEmpty()) EmptyText("Tidak ada lokasi BioporiPrint aktif.")
-        daftar.forEach { t ->
-            Row(
-                Modifier.fillMaxWidth().clickable { titikId = t.id },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                RadioButton(selected = titikId == t.id, onClick = { titikId = t.id })
-                Text(t.namaLokasi ?: "Lokasi #${t.id}")
-            }
-        }
-
-        OutlinedTextField(jenis, { jenis = it.take(100) }, label = { Text("Jenis sampah organik") }, placeholder = { Text("Sisa sayur, daun, …") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(
+        EcoSelect("Lokasi BioporiPrint", daftar.firstOrNull { it.id == titikId }?.let { it.namaLokasi ?: "Lokasi #${it.id}" }, "Pilih lokasi", daftar.map { it.id to (it.namaLokasi ?: "Lokasi #${it.id}") }, { titikId = it })
+        EcoFieldBox("Tanggal & waktu") { Text(tanggal(waktu), fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Slate900) }
+        EcoTextField(jenis, { jenis = it.take(100) }, label = { Text("Jenis sampah organik") }, placeholder = { Text("Sisa sayur, daun, …") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        EcoTextField(
             berat, { berat = autoKoma(it).take(6) },
             label = { Text("Perkiraan berat (kg)") }, placeholder = { Text("mis. 1,5") }, supportingText = { Text("Ketik 05 untuk 0,5 kg.") }, singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.fillMaxWidth(),
         )
-        OutlinedTextField(catatan, { catatan = it.take(1000) }, label = { Text("Catatan (opsional)") }, modifier = Modifier.fillMaxWidth())
-
-        LabelValue("Tanggal & waktu", tanggal(waktu))
+        EcoTextField(catatan, { catatan = it.take(1000) }, label = { Text("Catatan (opsional)") }, modifier = Modifier.fillMaxWidth())
 
         preview?.let {
             Image(it, contentDescription = "Foto bukti", contentScale = ContentScale.Crop, modifier = Modifier.fillMaxWidth().height(200.dp).padding(vertical = 4.dp))
@@ -165,6 +151,5 @@ fun TambahAktivitasForm(client: ApiClient, lokasi: Loadable<List<TitikBioporiDto
                 }
             }
         }
-        TextButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) { Text("Batal") }
     }
 }
