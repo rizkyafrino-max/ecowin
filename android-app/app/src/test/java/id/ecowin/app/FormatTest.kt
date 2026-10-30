@@ -105,4 +105,21 @@ class FormatTest {
         assertNull(safeAvatarUrl("https://api.ecowin.id/foto/../etc", "https://api.ecowin.id/api/"))
         assertNull(safeAvatarUrl("https://api.ecowin.id/foto/$kode", "ftp://api.ecowin.id/api/"))
     }
+
+    private fun tokenUji(payload: String): String {
+        val b64 = { x: String -> java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(x.toByteArray()) }
+        return b64("{\"alg\":\"RS256\"}") + "." + b64(payload) + ".tandatangan"
+    }
+
+    @Test
+    fun namaDariTokenGoogle_mengambilNamaDanMenolakBentukTidakSesuai() {
+        assertEquals("Budi Santoso", namaDariTokenGoogle(tokenUji("{\"name\":\"Budi Santoso\",\"email\":\"b@x.id\"}")))
+        assertEquals("Siti Rahma", namaDariTokenGoogle(tokenUji("{\"name\":\"  Siti\\nRahma \"}")))
+        assertNull(namaDariTokenGoogle(tokenUji("{\"email\":\"b@x.id\"}")))
+        assertNull(namaDariTokenGoogle(tokenUji("{\"name\":\"A\"}")))
+        assertNull(namaDariTokenGoogle("bukan-token"))
+        assertNull(namaDariTokenGoogle("a.b.c"))
+        assertNull(namaDariTokenGoogle(null))
+        assertNull(namaDariTokenGoogle("x".repeat(5000)))
+    }
 }
