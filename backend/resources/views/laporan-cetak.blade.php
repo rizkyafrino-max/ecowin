@@ -25,7 +25,7 @@
         .btn.alt{background:#fff;color:var(--ink);border:1.5px solid #8392A6}
         .sheet{width:210mm;min-height:297mm;margin:18px auto;padding:16mm 15mm;background:#fff;box-shadow:0 10px 40px rgba(15,23,42,.14)}
         .head{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:3px solid var(--em)}
-        .head img{width:46px;height:46px;border-radius:12px;background:#000;padding:6px}
+        .head img{width:46px;height:46px;border-radius:12px;background:#fff;border:1px solid #E2E8F0;padding:6px}
         .head h1{margin:0;font-size:20px;letter-spacing:-.01em}.head h1 i{font-style:normal;color:var(--em)}
         .head p{margin:2px 0 0;color:var(--mut)}
         .meta{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 24px;margin:14px 0 4px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#F8FAFC}

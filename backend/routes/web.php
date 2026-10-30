@@ -18,13 +18,15 @@ Route::get('/foto/{kode}', \App\Http\Controllers\FotoProfilTampilController::cla
 Route::get('/masuk', fn (Illuminate\Http\Request $r) => redirect()->route('filament.admin.auth.login', array_filter($r->only('app', 'c'))));
 
 // Pendaftaran Nasabah mandiri (identitas Google diverifikasi server, role selalu nasabah).
-Route::middleware('throttle:auth')->group(function (): void {
+// Halaman (GET) memakai batas yang lebih longgar agar banyak orang dari satu jaringan (Wi-Fi RT/RW, IP bersama operator)
+// tidak saling memblokir; pengiriman data (POST) tetap memakai batas ketat "auth".
+Route::middleware('throttle:auth-page')->group(function (): void {
     Route::get('/daftar', [RegistrationController::class, 'show'])->name('daftar');
     Route::get('/daftar/lengkapi', [RegistrationController::class, 'lengkapi'])->name('daftar.lengkapi');
-    Route::post('/daftar/lengkapi', [RegistrationController::class, 'simpan'])->name('daftar.simpan');
 });
+Route::post('/daftar/lengkapi', [RegistrationController::class, 'simpan'])->middleware('throttle:auth')->name('daftar.simpan');
 
-Route::middleware(['guest', 'throttle:auth'])->group(function (): void {
+Route::middleware(['guest', 'throttle:auth-page'])->group(function (): void {
     Route::get('/auth/google/redirect', [GoogleWebAuthController::class, 'redirect'])->name('auth.google.redirect');
     Route::get('/auth/google/callback', [GoogleWebAuthController::class, 'callback'])->name('auth.google.callback');
 });

@@ -66,40 +66,37 @@ fun LoginScreen(
         Modifier.fillMaxSize().background(EmeraldSoft).statusBarsPadding().navigationBarsPadding().verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Identitas + ilustrasi
-        Column(Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, top = 28.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Merek, lalu judul dan ilustrasi kecil sebaris agar kartu masuk langsung terlihat
+        Column(Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Image(painterResource(R.drawable.ecowin_emblem), contentDescription = null, modifier = Modifier.size(42.dp).background(Color.Black, RoundedCornerShape(14.dp)).padding(6.dp))
+                Image(painterResource(R.drawable.ecowin_emblem), contentDescription = null, modifier = Modifier.size(42.dp).background(Color.White, RoundedCornerShape(14.dp)).border(1.dp, Slate200, RoundedCornerShape(14.dp)).padding(6.dp))
                 Row {
                     Text("Eco", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
                     Text("Win", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Emerald)
                 }
             }
-            Text("Kelola Sampah.", fontSize = 28.sp, lineHeight = 31.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
-            Text("Jaga Masa Depan.", fontSize = 28.sp, lineHeight = 31.sp, fontWeight = FontWeight.ExtraBold, color = Emerald)
-            Text("Bank sampah digital untuk lingkungan yang lebih baik.", color = Color(0xFF475569), fontSize = 15.sp)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(Modifier.weight(1f)) {
+                    Text("Kelola Sampah.", fontSize = 24.sp, lineHeight = 28.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
+                    Text("Jaga Masa Depan.", fontSize = 24.sp, lineHeight = 28.sp, fontWeight = FontWeight.ExtraBold, color = Emerald)
+                }
+                Image(painterResource(R.drawable.ill_ecowin), contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.size(width = 96.dp, height = 72.dp))
+            }
         }
-
-        Image(
-            painterResource(R.drawable.ill_ecowin),
-            contentDescription = null,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.fillMaxWidth(0.72f).heightIn(max = 220.dp).padding(vertical = 12.dp),
-        )
 
         // Panel autentikasi
         Column(
             Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 24.dp)
                 .background(Color.White, RoundedCornerShape(24.dp))
                 .border(1.dp, Slate200, RoundedCornerShape(24.dp))
-                .padding(22.dp),
+                .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Text(
                 "MASUK KE ECOWIN", color = Color(0xFF047857), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp,
                 modifier = Modifier.background(EmeraldSoft, RoundedCornerShape(999.dp)).border(1.dp, Color(0xFFA7F3D0), RoundedCornerShape(999.dp)).padding(horizontal = 12.dp, vertical = 5.dp),
             )
-            Text("Selamat datang", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
+            Text("Selamat datang", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
             Text("Masuk dengan akun Google Anda untuk melihat saldo, setoran, dan aktivitas organik.", color = Slate500, fontSize = 15.sp)
 
             message?.let {

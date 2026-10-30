@@ -19,7 +19,7 @@ export function Sidebar({ pathname }) {
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-20 flex-col border-r border-line bg-surface md:flex lg:w-64" aria-label="Navigasi utama">
       <div className="flex h-20 items-center justify-center px-4 lg:justify-start">
-        <span className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-black">
+        <span className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl border border-line bg-white">
           <img src={emblem} alt="" className="h-7 w-auto" />
         </span>
         <span className="ml-3 hidden text-xl font-extrabold lg:block">Eco<span className="text-primary-deep">Win</span></span>

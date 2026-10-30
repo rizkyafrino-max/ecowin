@@ -18,7 +18,7 @@ const GoogleG = () => (
 
 const Brand = ({ light = false }) => (
   <div className="flex items-center gap-3">
-    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-black"><img src={emblem} alt="" className="h-7 w-auto" /></span>
+    <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-line bg-white"><img src={emblem} alt="" className="h-7 w-auto" /></span>
     <span className={`text-2xl font-extrabold tracking-tight ${light ? 'text-ink' : ''}`}>Eco<span className="text-primary-deep">Win</span></span>
   </div>
 );
@@ -51,27 +51,27 @@ export default function Masuk({ daftar = false }) {
   };
 
   return (
-    <main className="min-h-dvh bg-tint lg:grid lg:grid-cols-[1.05fr_1fr] lg:bg-surface">
+    <main className="min-h-dvh max-lg:flex max-lg:flex-col bg-tint lg:grid lg:grid-cols-[1.05fr_1fr] lg:bg-surface">
       {/* Panel ilustrasi: desktop penuh, mobile ringkas */}
-      <section className="flex flex-col gap-5 px-6 pb-2 pt-6 sm:px-10 lg:justify-between lg:bg-tint lg:p-14">
-        <Brand light />
+      <section className="max-lg:mt-auto grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-3.5 px-5 pb-1 pt-5 sm:px-10 lg:flex lg:flex-col lg:items-stretch lg:justify-between lg:gap-5 lg:bg-tint lg:p-14">
+        <div className="col-span-2 lg:col-auto"><Brand light /></div>
         <div>
-          <h1 className="text-[1.75rem] font-extrabold leading-[1.1] tracking-tight sm:text-4xl lg:text-5xl">
+          <h1 className="text-[1.4rem] font-extrabold leading-[1.15] tracking-tight sm:text-4xl lg:text-5xl">
             Kelola Sampah.<br /><span className="text-primary-deep">Jaga Masa Depan.</span>
           </h1>
-          <p className="mt-3 max-w-[34ch] text-[15px] leading-relaxed text-slate-600 lg:mt-4 lg:text-lg">Bank sampah digital untuk lingkungan yang lebih baik.</p>
+          <p className="mt-3 hidden max-w-[34ch] text-[15px] leading-relaxed text-slate-600 sm:block lg:mt-4 lg:text-lg">Bank sampah digital untuk lingkungan yang lebih baik.</p>
         </div>
-        <img src="/ecowin-illustration.svg" alt="" width="480" height="360" className="mx-auto h-auto w-[min(70%,300px)] lg:w-[min(100%,520px)]" />
+        <img src="/ecowin-illustration.svg" alt="" width="480" height="360" className="h-auto w-[92px] sm:w-[130px] lg:mx-auto lg:w-[min(100%,400px)]" />
         <p className="hidden items-center gap-3 text-[15px] font-semibold text-primary-deep lg:flex"><span className="h-0.5 w-7 rounded bg-secondary" />Langkah kecil, dampak besar.</p>
       </section>
 
       {/* Panel autentikasi */}
-      <section className="flex items-center justify-center px-4 pb-8 pt-4 sm:px-10 lg:p-12">
-        <div className="w-full max-w-[440px] rounded-[24px] border border-line bg-surface p-6 shadow-soft sm:p-8 lg:border-0 lg:p-0 lg:shadow-none">
+      <section className="flex items-center justify-center max-lg:mb-auto px-4 pb-8 pt-3 sm:px-10 lg:p-12">
+        <div className="w-full max-w-[440px] rounded-[24px] border border-line bg-surface p-5 shadow-soft sm:p-8 lg:border-0 lg:p-0 lg:shadow-none">
           <span className="inline-block rounded-full border border-emerald-200 bg-tint px-3 py-1 text-[11px] font-bold tracking-wider text-primary-deep">
             {daftar ? 'DAFTAR NASABAH' : 'MASUK KE ECOWIN'}
           </span>
-          <h2 className="mt-4 text-3xl font-extrabold tracking-tight">{daftar ? 'Buat akun EcoWin' : 'Selamat datang'}</h2>
+          <h2 className="mt-3 text-[1.45rem] font-extrabold tracking-tight sm:mt-4 sm:text-3xl">{daftar ? 'Buat akun EcoWin' : 'Selamat datang'}</h2>
           <p className="mt-2 text-[15px] leading-relaxed text-muted">
             {daftar ? 'Daftar sebagai nasabah Bank Sampah RT/RW Anda dengan akun Google.' : 'Masuk dengan akun Google Anda untuk melihat saldo, setoran, dan aktivitas organik.'}
           </p>
@@ -79,7 +79,7 @@ export default function Masuk({ daftar = false }) {
           {error && <p className="mt-5 rounded-2xl border border-red-200 bg-danger-tint p-3.5 text-sm text-danger" role="alert">{error}</p>}
 
           <button type="button" onClick={start} disabled={busy}
-            className="mt-7 flex min-h-[56px] w-full items-center justify-center gap-3 rounded-2xl border border-slate-300 bg-surface text-base font-semibold text-ink transition hover:border-primary hover:bg-tint hover:shadow-[0_0_0_3px_rgba(5,150,105,0.14)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 active:translate-y-px disabled:cursor-wait disabled:opacity-70">
+            className="mt-5 flex min-h-[56px] w-full items-center justify-center gap-3 rounded-2xl border border-slate-300 bg-surface text-base font-semibold text-ink transition hover:border-primary hover:bg-tint hover:shadow-[0_0_0_3px_rgba(5,150,105,0.14)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 active:translate-y-px disabled:cursor-wait disabled:opacity-70">
             {busy ? <Loader2 className="h-5 w-5 animate-spin text-primary-deep" aria-hidden /> : <GoogleG />}
             <span>{busy ? 'Mengalihkan ke Google…' : daftar ? 'Daftar dengan Google' : 'Lanjutkan dengan Google'}</span>
           </button>

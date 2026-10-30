@@ -4,7 +4,7 @@
 </span>
 <style>
     .eco-brand{display:inline-flex;align-items:center;gap:.6rem;height:2.4rem}
-    .eco-brand-tile{width:2.4rem;height:2.4rem;border-radius:.7rem;background:#000;display:inline-flex;align-items:center;justify-content:center;flex:none}
+    .eco-brand-tile{width:2.4rem;height:2.4rem;border-radius:.7rem;background:#fff;border:1px solid #E2E8F0;display:inline-flex;align-items:center;justify-content:center;flex:none}
     .eco-brand-tile img{height:1.55rem;width:auto}
     .eco-brand-text{font-size:1.3rem;font-weight:800;color:#0F172A;line-height:1}
     .eco-brand-text b{color:#16A34A;font-weight:800}

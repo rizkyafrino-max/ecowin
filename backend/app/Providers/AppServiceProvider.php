@@ -68,6 +68,12 @@ class AppServiceProvider extends ServiceProvider
             Limit::perHour(60)->by('auth-ip-hour:'.$request->ip()),
         ]);
 
+        // Halaman masuk/daftar dan peralihan ke Google: lebih longgar dari 'auth' karena hanya menampilkan halaman atau mengalihkan.
+        RateLimiter::for('auth-page', fn (Request $request) => [
+            Limit::perMinute(40)->by('auth-page-ip:'.$request->ip()),
+            Limit::perHour(400)->by('auth-page-ip-hour:'.$request->ip()),
+        ]);
+
         RateLimiter::for('api', fn (Request $request) => Limit::perMinute(120)->by($request->user()?->id ?: $request->ip()));
 
         RateLimiter::for('uploads', fn (Request $request) => Limit::perMinute(10)->by($request->user()?->id ?: $request->ip()));

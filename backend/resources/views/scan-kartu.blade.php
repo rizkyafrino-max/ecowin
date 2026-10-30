@@ -16,7 +16,7 @@
 
         .page{min-height:100dvh;display:flex;flex-direction:column;align-items:center}
         .top{width:100%;max-width:1040px;display:none;align-items:center;gap:12px;padding:22px 24px 4px}
-        .top img{width:40px;height:40px;border-radius:12px;background:#000;padding:5px}
+        .top img{width:40px;height:40px;border-radius:12px;background:#fff;border:1px solid #E2E8F0;padding:5px}
         .top b{font-size:1.2rem;font-weight:800;letter-spacing:-.01em}.top b i{font-style:normal;color:var(--em)}
         .top span{color:var(--mut);font-size:.9rem;margin-left:4px}
         .layout{width:100%;max-width:1040px;display:flex;justify-content:center;gap:24px;padding:0;flex:1}

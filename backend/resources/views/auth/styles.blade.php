@@ -83,7 +83,7 @@
         .ecl-bg{background:#ECFDF5;grid-row:1}
         .ecl-top{grid-area:top;color:#0F172A;justify-content:space-between;gap:1.5rem;padding:clamp(1.75rem,4vw,3rem) clamp(1.5rem,5vw,4.5rem)}
         .ecl-brand{display:flex;align-items:center;gap:.7rem}
-        .ecl-mark{width:44px;height:44px;border-radius:14px;background:#000;display:inline-flex;align-items:center;justify-content:center}
+        .ecl-mark{width:44px;height:44px;border-radius:14px;background:#fff;border:1px solid #E2E8F0;display:inline-flex;align-items:center;justify-content:center}
         .ecl-mark img{width:30px;height:auto}
         .ecl-word{font-size:1.45rem;font-weight:800;color:#0F172A;letter-spacing:-.01em}
         .ecl-word b{color:#059669}
@@ -170,4 +170,32 @@
         .ecl-btn.is-loading::before{content:"";width:20px;height:20px;border-radius:999px;border:3px solid #A7F3D0;border-top-color:#059669;animation:ecl-spin .8s linear infinite;flex:none}
         @keyframes ecl-spin{to{transform:rotate(360deg)}}
         @media (prefers-reduced-motion:reduce){.ecl-btn.is-loading::before{animation:none}}
+    
+        /* Dirapikan: ilustrasi lebih kecil, bayangan lebih lembut, jarak lebih lega */
+        .ecl-illus{width:min(100%,400px)}
+        .ecl-card{box-shadow:0 10px 30px rgba(15,23,42,.07)}
+        @media(max-width:960px){
+            .ecl-illus{width:min(52%,200px)}
+            .ecl-top{gap:.75rem}
+        }
+    
+        /* HP (halaman Masuk): hero ringkas di satu baris dengan ilustrasi kecil agar kartu dan tombol Google langsung terlihat */
+        @media(max-width:960px){
+            .ecl-root:not(.ecl-reg) .ecl-top{margin-top:auto;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:1rem;row-gap:.85rem;text-align:left;padding:1.1rem 1.25rem .35rem}
+            .ecl-root:not(.ecl-reg) .ecl-brand{grid-column:1/-1}
+            .ecl-root:not(.ecl-reg) .ecl-hero h1{font-size:1.4rem;line-height:1.15}
+            .ecl-root:not(.ecl-reg) .ecl-hero p{display:none}
+            .ecl-root:not(.ecl-reg) .ecl-illus{width:92px;margin:0}
+            .ecl-root:not(.ecl-reg) .ecl-form{margin-bottom:auto;padding:.25rem 1rem 1.25rem}
+            .ecl-root:not(.ecl-reg) .ecl-card{padding:1.25rem 1.15rem}
+            .ecl-root:not(.ecl-reg) .ecl-card h2{font-size:1.45rem;margin-top:.75rem}
+            .ecl-root:not(.ecl-reg) .ecl-sub{font-size:.9rem;margin-top:.4rem}
+            .ecl-root:not(.ecl-reg) .ecl-btn{margin-top:1.1rem}
+            .ecl-root:not(.ecl-reg) .ecl-note{margin-top:1rem}
+            .ecl-root:not(.ecl-reg) .ecl-or{margin-top:1rem}
+        }
+        @media(min-width:600px) and (max-width:960px){
+            .ecl-root:not(.ecl-reg) .ecl-illus{width:130px}
+            .ecl-root:not(.ecl-reg) .ecl-hero h1{font-size:1.9rem}
+        }
     </style>
