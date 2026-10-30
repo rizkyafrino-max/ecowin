@@ -3,18 +3,25 @@ package id.ecowin.app
 import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.graphics.Color
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.asRequestBody
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,7 +43,7 @@ import kotlinx.coroutines.launch
 
 /** Profil: kartu data akun + formulir (seperti halaman Profil di Web), lalu QR Card Nasabah dan tombol keluar. */
 @Composable
-fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: (UserDto) -> Unit, onLogout: () -> Unit) {
+fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: (UserDto) -> Unit, onLogout: () -> Unit, go: (Tab) -> Unit) {
     val qr = rememberLoadable(client, refreshKey) { client.api.qr() }
     val scope = rememberCoroutineScope()
     val nasabah = user.nasabah
@@ -47,12 +54,44 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
     var message by remember { mutableStateOf<String?>(null) }
     var ok by remember { mutableStateOf(false) }
     var saving by remember { mutableStateOf(false) }
+    var jenisKelamin by remember(user) { mutableStateOf(user.jenisKelamin) }
+    var fotoBusy by remember { mutableStateOf(false) }
+    var fotoPesan by remember { mutableStateOf<String?>(null) }
+    val konteks = androidx.compose.ui.platform.LocalContext.current
+    // Pilih foto dari galeri: diperkecil dan di-encode ulang di perangkat (tanpa metadata), lalu diunggah; server memeriksa dan menggambar ulang lagi.
+    val pilihFoto = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            fotoBusy = true
+            fotoPesan = null
+            scope.launch {
+                try {
+                    val berkas = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { PhotoUtils.compress(konteks, uri) }
+                    try {
+                        val bagian = okhttp3.MultipartBody.Part.createFormData("foto", "foto.jpg", berkas.asRequestBody("image/jpeg".toMediaType()))
+                        onUserChanged(client.api.gantiFoto(bagian).data)
+                    } finally {
+                        berkas.delete()
+                    }
+                } catch (e: Exception) {
+                    fotoPesan = if (e is IllegalArgumentException) "Berkas bukan gambar yang valid." else client.errorMessage(e)
+                } finally {
+                    fotoBusy = false
+                }
+            }
+        }
+    }
 
     TabList {
         item {
             EcoCard {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Avatar(user.nama, size = 64, url = user.avatar)
+                    Box {
+                        Avatar(user.nama, size = 80, url = user.avatar, onClick = { if (!fotoBusy) pilihFoto.launch("image/*") })
+                        Box(
+                            Modifier.align(Alignment.BottomEnd).size(28.dp).background(Emerald, CircleShape).border(2.dp, Color.White, CircleShape).clickable(enabled = !fotoBusy) { pilihFoto.launch("image/*") },
+                            contentAlignment = Alignment.Center,
+                        ) { Icon(Lucide.Camera, contentDescription = "Ganti foto profil", tint = Color.White, modifier = Modifier.size(14.dp)) }
+                    }
                     Column(Modifier.weight(1f)) {
                         Text(user.nama ?: "-", fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -63,15 +102,37 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
                     }
                 }
 
+                Row(Modifier.padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        if (fotoBusy) "Mengunggah…" else "Ganti foto", color = Emerald, fontWeight = FontWeight.SemiBold, fontSize = 12.sp,
+                        modifier = Modifier.background(EmeraldSoft, RoundedCornerShape(50)).clickable(enabled = !fotoBusy) { pilihFoto.launch("image/*") }.padding(horizontal = 14.dp, vertical = 7.dp),
+                    )
+                    if (user.punyaFoto) {
+                        Text(
+                            "Hapus foto", color = Red, fontWeight = FontWeight.SemiBold, fontSize = 12.sp,
+                            modifier = Modifier.clickable(enabled = !fotoBusy) {
+                                fotoBusy = true
+                                fotoPesan = null
+                                scope.launch {
+                                    try { onUserChanged(client.api.hapusFoto().data) } catch (e: Exception) { fotoPesan = client.errorMessage(e) } finally { fotoBusy = false }
+                                }
+                            }.padding(horizontal = 8.dp, vertical = 7.dp),
+                        )
+                    }
+                    Text(if (user.punyaFoto) "Foto sendiri" else "Avatar bawaan", color = Slate500, fontSize = 12.sp)
+                }
+                fotoPesan?.let { Text(it, color = Red, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 4.dp)) }
+
                 Column(Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    OutlinedTextField(nama, { nama = it.take(150); ok = false }, label = { Text("Nama lengkap") }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp))
-                    OutlinedTextField(
+                    EcoTextField(nama, { nama = it.take(150); ok = false }, label = { Text("Nama lengkap") }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp))
+                    PilihJenisKelamin(jenisKelamin, { jenisKelamin = it; ok = false })
+                    EcoTextField(
                         noHp, { noHp = it.filter { c -> c.isDigit() || c == '+' }.take(15); ok = false },
                         label = { Text("Nomor HP") }, placeholder = { Text("08xxxxxxxxxx") }, singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp),
                     )
-                    OutlinedTextField(alamat, { alamat = it.take(255); ok = false }, label = { Text("Alamat (RT/RW)") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp))
-                    OutlinedTextField(
+                    EcoTextField(alamat, { alamat = it.take(255); ok = false }, label = { Text("Alamat (RT/RW)") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp))
+                    EcoTextField(
                         user.email.orEmpty(), {}, label = { Text("Email Google") }, singleLine = true, enabled = false,
                         supportingText = { Text("Email tidak dapat diubah. Hubungi petugas Bank Sampah bila perlu.") },
                         modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp),
@@ -81,7 +142,7 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
                         saving = true
                         scope.launch {
                             try {
-                                val updated = client.api.updateProfile(ProfileUpdateRequest(nama.trim().ifBlank { null }, noHp.trim(), alamat.trim())).data
+                                val updated = client.api.updateProfile(ProfileUpdateRequest(nama.trim().ifBlank { null }, noHp.trim(), alamat.trim(), jenisKelamin)).data
                                 onUserChanged(updated)
                                 ok = true
                                 message = "Profil diperbarui."
@@ -126,9 +187,19 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
         }
 
         item {
-            OutlinedButton(onClick = onLogout, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
-                Icon(Lucide.LogOut, contentDescription = null, tint = Red, modifier = Modifier.size(18.dp).padding(end = 0.dp))
-                Text("  Keluar", color = Red, fontWeight = FontWeight.SemiBold)
+            OutlinedButton(onClick = { go(Tab.Pengaturan) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
+                Icon(Lucide.Settings, contentDescription = null, tint = Slate500, modifier = Modifier.size(18.dp))
+                Text("  Pengaturan", color = Slate900, fontWeight = FontWeight.SemiBold)
+            }
+        }
+
+        item {
+            androidx.compose.material3.Button(
+                onClick = onLogout, modifier = Modifier.fillMaxWidth().height(48.dp), shape = RoundedCornerShape(14.dp),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Red, contentColor = Color.White),
+            ) {
+                Icon(Lucide.LogOut, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                Text("  Keluar", color = Color.White, fontWeight = FontWeight.SemiBold)
             }
             Text(
                 "Setelah keluar, Anda perlu masuk kembali dengan Google.",

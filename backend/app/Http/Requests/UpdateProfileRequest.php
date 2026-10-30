@@ -25,6 +25,7 @@ class UpdateProfileRequest extends FormRequest
             'nama' => ['sometimes', 'string', 'max:150'],
             'no_hp' => ['sometimes', 'string', 'regex:/^(\+62|62|0)8[0-9]{7,12}$/', Rule::unique('nasabah', 'no_hp')->ignore($nasabahId)],
             'alamat_rt_rw' => ['sometimes', 'string', 'max:255'],
+            'jenis_kelamin' => ['sometimes', 'nullable', Rule::in(['L', 'P'])],
             'role' => ['prohibited'],
             'email' => ['prohibited'],
             'bank_sampah_id' => ['prohibited'],

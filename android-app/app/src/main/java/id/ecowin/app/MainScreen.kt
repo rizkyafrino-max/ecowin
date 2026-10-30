@@ -10,6 +10,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,8 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -63,6 +66,8 @@ enum class Tab(val label: String, val icon: ImageVector) {
     Organik("Organik", Lucide.Recycle),
     Saldo("Saldo", Lucide.Wallet),
     Profil("Profil", Lucide.UserRound),
+    Notifikasi("Notifikasi", Lucide.Bell),
+    Pengaturan("Pengaturan", Lucide.Settings),
 }
 
 private val FooterLeft = listOf(Tab.Beranda, Tab.Transaksi)
@@ -72,8 +77,29 @@ private val FooterRight = listOf(Tab.Organik, Tab.Saldo)
 fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Unit, onLogout: () -> Unit) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var refreshKey by rememberSaveable { mutableIntStateOf(0) }
+    var belumDibaca by remember { mutableIntStateOf(0) }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val segarkanNotif: () -> Unit = { scope.launch { runCatching { belumDibaca = client.api.jumlahNotif().belumDibaca } } }
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    // Jumlah notifikasi diperbarui tiap 60 detik hanya saat aplikasi terlihat di layar.
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+            while (true) {
+                segarkanNotif()
+                kotlinx.coroutines.delay(60_000)
+            }
+        }
+    }
+    LaunchedEffect(refreshKey, tab) { segarkanNotif() }
+    LaunchedEffect(NavAwal.permintaan) {
+        if (NavAwal.permintaan) { tab = Tab.Notifikasi.ordinal; NavAwal.permintaan = false }
+    }
     val current = Tab.entries[tab]
     val go: (Tab) -> Unit = { tab = it.ordinal }
+    // Tombol kembali: dari layar dalam (Notifikasi/Pengaturan/Profil) ke layar induknya, bukan langsung keluar aplikasi.
+    androidx.activity.compose.BackHandler(enabled = current != Tab.Beranda) {
+        tab = (if (current == Tab.Pengaturan) Tab.Profil else Tab.Beranda).ordinal
+    }
     var footerVisible by remember { mutableStateOf(true) }
     val scrollWatcher = remember {
         object : NestedScrollConnection {
@@ -88,15 +114,19 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
     Scaffold(containerColor = Canvas) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
             Column(Modifier.fillMaxSize().nestedScroll(scrollWatcher)) {
-                TopBar(user, current, onRefresh = { refreshKey++ }, onProfile = { go(Tab.Profil) })
+                TopBar(user, current, belumDibaca, onRefresh = { refreshKey++ }, onNotif = { go(Tab.Notifikasi) }, onProfile = { go(Tab.Profil) })
 
+                androidx.compose.runtime.CompositionLocalProvider(LocalJudulHalaman provides current.takeIf { it != Tab.Beranda }) {
                 when (current) {
                     Tab.Beranda -> BerandaTab(client, user, refreshKey, go)
                     Tab.Transaksi -> TransaksiTab(client, refreshKey)
                     Tab.Fitur -> FiturTab(go)
                     Tab.Organik -> OrganikTab(client, refreshKey)
                     Tab.Saldo -> SaldoTab(client, user, refreshKey)
-                    Tab.Profil -> ProfilTab(client, user, refreshKey, onUserChanged, onLogout)
+                    Tab.Profil -> ProfilTab(client, user, refreshKey, onUserChanged, onLogout, go)
+                    Tab.Pengaturan -> PengaturanTab()
+                    Tab.Notifikasi -> NotifikasiTab(client, refreshKey, onBerubah = segarkanNotif, go = go)
+                }
                 }
             }
 
@@ -115,26 +145,45 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
     }
 }
 
+/** Halaman yang judulnya ditampilkan di awal daftar (padanan PageHeader di Web). */
+val LocalJudulHalaman = androidx.compose.runtime.staticCompositionLocalOf<Tab?> { null }
+
+/** Judul halaman di bawah header (padanan PageHeader di Web). */
 @Composable
-private fun TopBar(user: UserDto, current: Tab, onRefresh: () -> Unit, onProfile: () -> Unit) {
+private fun JudulHalaman(current: Tab, aksi: (@Composable () -> Unit)? = null) {
+    Row(Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.weight(1f)) {
+            Text(current.label, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
+            subjudul(current)?.let { Text(it, fontSize = 14.sp, color = Slate500, modifier = Modifier.padding(top = 2.dp)) }
+        }
+        aksi?.invoke()
+    }
+}
+
+@Composable
+private fun TopBar(user: UserDto, current: Tab, belumDibaca: Int, onRefresh: () -> Unit, onNotif: () -> Unit, onProfile: () -> Unit) {
     Row(
-        Modifier.fillMaxWidth().padding(start = 20.dp, end = 8.dp, top = 12.dp, bottom = 4.dp),
+        Modifier.fillMaxWidth().background(Canvas).drawBehind { drawLine(Slate200, Offset(0f, size.height), Offset(size.width, size.height), 1.dp.toPx()) }.padding(start = 20.dp, end = 8.dp, top = 12.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        if (current == Tab.Beranda) {
-            Row {
-                Text("Eco", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
-                Text("Win", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Emerald)
-            }
-        } else {
-            Column {
-                Text(current.label, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
-                subjudul(current)?.let { Text(it, fontSize = 13.sp, color = Slate500, modifier = Modifier.padding(end = 8.dp)) }
-            }
+        // Header sama di semua halaman (seperti Web): logo di kiri, notifikasi dan profil di kanan. Ketuk logo = muat ulang.
+        Row(Modifier.clickable(onClickLabel = "Muat ulang", onClick = onRefresh)) {
+            Text("Eco", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Slate900)
+            Text("Win", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Emerald)
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onRefresh) { Icon(Lucide.RefreshCw, contentDescription = "Muat ulang", tint = Slate500, modifier = Modifier.size(22.dp)) }
+            Box {
+                IconButton(onClick = onNotif) {
+                    Icon(Lucide.Bell, contentDescription = if (belumDibaca > 0) "Notifikasi, $belumDibaca belum dibaca" else "Notifikasi", tint = if (current == Tab.Notifikasi) Emerald else Slate500, modifier = Modifier.size(22.dp))
+                }
+                if (belumDibaca > 0) {
+                    Text(
+                        if (belumDibaca > 99) "99+" else belumDibaca.toString(), color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold,
+                        modifier = Modifier.align(Alignment.TopEnd).padding(top = 4.dp, end = 2.dp).background(Red, RoundedCornerShape(50)).padding(horizontal = 5.dp, vertical = 1.dp),
+                    )
+                }
+            }
             Avatar(user.nama, Modifier.padding(end = 8.dp), size = 38, onClick = onProfile, url = user.avatar)
         }
     }
@@ -193,14 +242,14 @@ fun Avatar(nama: String?, modifier: Modifier = Modifier, size: Int = 44, onClick
 /** Footer melayang: dua menu, tombol tengah Semua Fitur, dua menu (sama dengan footer admin & Web). */
 @Composable
 private fun FloatingFooter(current: Tab, onSelect: (Tab) -> Unit, modifier: Modifier = Modifier) {
-    Box(modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 14.dp, vertical = 10.dp)) {
+    Box(modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 8.dp, vertical = 8.dp)) {
         Surface(
             modifier = Modifier.fillMaxWidth().shadow(10.dp, RoundedCornerShape(20.dp), ambientColor = Slate900.copy(alpha = 0.12f), spotColor = Slate900.copy(alpha = 0.12f)),
             shape = RoundedCornerShape(20.dp),
             color = Color.White.copy(alpha = 0.97f),
             border = BorderStroke(1.dp, Slate200),
         ) {
-            Row(Modifier.heightIn(min = 64.dp).padding(horizontal = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.heightIn(min = 64.dp).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 FooterLeft.forEach { FooterItem(it, current == it, onSelect, Modifier.weight(1f)) }
                 Box(Modifier.weight(1f))
                 FooterRight.forEach { FooterItem(it, current == it, onSelect, Modifier.weight(1f)) }
@@ -237,13 +286,16 @@ private fun FooterItem(tab: Tab, selected: Boolean, onSelect: (Tab) -> Unit, mod
 
 /** Daftar dengan padding seragam untuk setiap tab (ruang bawah untuk footer melayang). */
 @Composable
-fun TabList(content: LazyListScope.() -> Unit) {
+fun TabList(aksi: (@Composable () -> Unit)? = null, content: LazyListScope.() -> Unit) {
+    val judul = LocalJudulHalaman.current
     LazyColumn(
         Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 120.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        content = content,
-    )
+    ) {
+        if (judul != null) item { JudulHalaman(judul, aksi) }
+        content()
+    }
 }
 
 private fun subjudul(tab: Tab): String? = when (tab) {
@@ -252,5 +304,7 @@ private fun subjudul(tab: Tab): String? = when (tab) {
     Tab.Saldo -> "Riwayat perubahan saldo EcoWin Anda."
     Tab.Profil -> "Data akun dan QR Card Anda."
     Tab.Fitur -> "Semua yang bisa Anda lakukan di EcoWin."
+    Tab.Notifikasi -> "Kabar terbaru tentang setoran, penarikan, dan aktivitas Anda."
+    Tab.Pengaturan -> "Pemberitahuan HP dan nada notifikasi."
     else -> null
 }

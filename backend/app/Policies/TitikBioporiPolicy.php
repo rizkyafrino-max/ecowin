@@ -31,6 +31,12 @@ class TitikBioporiPolicy
         return $user->isStaff() && $user->canManageBankSampah($titik->bank_sampah_id);
     }
 
+    /** Menyetujui / menolak pengajuan titik: petugas Bank Sampah yang sama (atau admin). */
+    public function verify(User $user, TitikBiopori $titik): bool
+    {
+        return $user->isStaff() && $user->isActive() && $user->canManageBankSampah($titik->bank_sampah_id);
+    }
+
     public function delete(User $user, TitikBiopori $titik): bool
     {
         return false;

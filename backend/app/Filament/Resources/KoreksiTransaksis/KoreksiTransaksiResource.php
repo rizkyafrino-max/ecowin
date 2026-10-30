@@ -59,7 +59,7 @@ class KoreksiTransaksiResource extends Resource
             ->columns([
                 TextColumn::make('created_at')->label('Diajukan')->dateTime('d M Y H:i'),
                 TextColumn::make('tipe_transaksi')->label('Tipe')->badge(),
-                TextColumn::make('transaksi_id')->label('Transaksi #'),
+                TextColumn::make('transaksi_id')->label('Transaksi #')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('data_sebelum.berat_kg')->label('Berat lama')->suffix(' kg'),
                 TextColumn::make('data_koreksi.berat_kg')->label('Berat baru')->suffix(' kg'),
                 TextColumn::make('alasan')->limit(50)->wrap(),
@@ -69,8 +69,8 @@ class KoreksiTransaksiResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'approved' => 'success', 'rejected' => 'danger', default => 'warning',
                     }),
-                TextColumn::make('penyetuju.nama')->label('Diputuskan oleh')->placeholder('-'),
-                TextColumn::make('catatan_admin')->label('Catatan admin')->placeholder('-')->toggleable(),
+                TextColumn::make('penyetuju.nama')->label('Diputuskan oleh')->placeholder('-')->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('catatan_admin')->label('Catatan admin')->placeholder('-')->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([SelectFilter::make('status')->options(KoreksiTransaksi::STATUSES)])
             ->recordActions([

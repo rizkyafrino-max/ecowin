@@ -23,7 +23,7 @@ class PetaBiopori extends Page
     public function getViewData(): array
     {
         $query = TitikBioporiModel::query()->with(['nasabah:id,nama', 'bankSampah:id,nama_bank_sampah,rt,rw'])
-            ->whereNotNull('latitude')->whereNotNull('longitude');
+            ->disetujui()->whereNotNull('latitude')->whereNotNull('longitude');
         $query->visibleTo(auth()->user());
 
         $points = $query->latest()->get()->map(fn (TitikBioporiModel $point): array => [

@@ -67,6 +67,7 @@ class RegistrationController extends Controller
             'nama' => ['required', 'string', 'min:3', 'max:150'],
             'no_hp' => ['required', 'string', 'regex:/^08[0-9]{7,12}$/', Rule::unique('nasabah', 'no_hp')],
             'alamat_rt_rw' => ['required', 'string', 'min:5', 'max:255'],
+            'jenis_kelamin' => ['required', Rule::in(['L', 'P'])],
             'bank_sampah_id' => ['required', 'integer', Rule::exists('bank_sampah', 'id')->where('status', 'aktif')],
             'setuju' => ['accepted'],
         ], [

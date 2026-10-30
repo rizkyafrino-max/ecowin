@@ -33,6 +33,14 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Formulir panel: bagian (Section) tersusun ke bawah selebar penuh, dan isian di dalamnya dua kolom di layar sedang ke atas.
+        // Dua kartu bersisian membuat kolom isian hanya ±160px sehingga teks terpotong. Pengaturan eksplisit per formulir tetap menang.
+        \Filament\Schemas\Schema::configureUsing(fn (\Filament\Schemas\Schema $schema) => $schema->columns(1));
+        \Filament\Schemas\Components\Section::configureUsing(fn (\Filament\Schemas\Components\Section $section) => $section->columns(['default' => 1, 'md' => 2]));
+
+        // Placeholder singkat agar tidak terpotong pada kolom sempit di HP.
+        \Filament\Forms\Components\Select::configureUsing(fn (\Filament\Forms\Components\Select $select) => $select->placeholder('Pilih…'));
+
         // Saat test: gagal bila ada atribut yang diisi tapi tidak fillable.
         Model::preventSilentlyDiscardingAttributes($this->app->runningUnitTests());
 
@@ -58,6 +66,12 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('auth', fn (Request $request) => [
             Limit::perMinute(10)->by('auth-ip:'.$request->ip()),
             Limit::perHour(60)->by('auth-ip-hour:'.$request->ip()),
+        ]);
+
+        // Halaman masuk/daftar dan peralihan ke Google: lebih longgar dari 'auth' karena hanya menampilkan halaman atau mengalihkan.
+        RateLimiter::for('auth-page', fn (Request $request) => [
+            Limit::perMinute(40)->by('auth-page-ip:'.$request->ip()),
+            Limit::perHour(400)->by('auth-page-ip-hour:'.$request->ip()),
         ]);
 
         RateLimiter::for('api', fn (Request $request) => Limit::perMinute(120)->by($request->user()?->id ?: $request->ip()));

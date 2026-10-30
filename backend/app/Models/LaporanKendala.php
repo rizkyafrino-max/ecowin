@@ -42,16 +42,16 @@ class LaporanKendala extends Model
 
     public function pelaporNasabah(): BelongsTo
     {
-        return $this->belongsTo(Nasabah::class, 'dilaporkan_oleh_nasabah_id');
+        return $this->belongsTo(Nasabah::class, 'dilaporkan_oleh_nasabah_id')->withTrashed();
     }
 
     public function pelaporUser(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'dilaporkan_oleh_user_id');
+        return $this->belongsTo(User::class, 'dilaporkan_oleh_user_id')->withTrashed();
     }
 
     public function peninjau(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'ditinjau_oleh');
+        return $this->belongsTo(User::class, 'ditinjau_oleh')->withTrashed();
     }
 }

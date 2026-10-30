@@ -8,7 +8,7 @@ export function TransactionCard({ title, subtitle, amount, kind = 'kredit', date
   const Icon = credit ? ArrowDownLeft : ArrowUpRight;
   return (
     <div className="flex items-center gap-3.5 py-3">
-      <span className={`flex h-11 w-11 flex-none items-center justify-center rounded-2xl ${credit ? 'bg-tint text-primary' : 'bg-warn-tint text-warn'}`}>
+      <span className={`flex h-11 w-11 flex-none items-center justify-center rounded-2xl ${credit ? 'bg-tint text-primary-deep' : 'bg-warn-tint text-warn'}`}>
         <Icon className="h-5 w-5" aria-hidden />
       </span>
       <div className="min-w-0 flex-1">
@@ -16,7 +16,7 @@ export function TransactionCard({ title, subtitle, amount, kind = 'kredit', date
         <p className="truncate text-xs text-muted">{[subtitle, tanggal(date, true)].filter(Boolean).join(' · ')}</p>
       </div>
       <div className="flex flex-col items-end gap-1">
-        <p className={`font-bold tabular-nums ${credit ? 'text-primary' : 'text-ink'}`}>{credit ? '+' : '−'}{rupiah(amount)}</p>
+        <p className={`font-bold tabular-nums ${credit ? 'text-primary-deep' : 'text-ink'}`}>{credit ? '+' : '−'}{rupiah(amount)}</p>
         {status && <StatusBadge status={status} />}
       </div>
     </div>
@@ -28,7 +28,7 @@ export function ActivityCard({ icon: Icon = Leaf, title, subtitle, status, right
   const Tag = onClick ? 'button' : 'div';
   return (
     <Tag onClick={onClick} className="flex w-full items-center gap-3.5 py-3 text-left">
-      <span className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-tint text-primary"><Icon className="h-5 w-5" aria-hidden /></span>
+      <span className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-tint text-primary-deep"><Icon className="h-5 w-5" aria-hidden /></span>
       <div className="min-w-0 flex-1">
         <p className="truncate font-semibold">{title}</p>
         <p className="truncate text-xs text-muted">{subtitle}</p>

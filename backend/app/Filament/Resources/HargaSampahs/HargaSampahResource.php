@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\HargaSampahs;
 
+use App\Filament\Forms\DecimalInput;
 use App\Filament\Resources\HargaSampahs\Pages\CreateHargaSampah;
 use App\Filament\Resources\HargaSampahs\Pages\EditHargaSampah;
 use App\Filament\Resources\HargaSampahs\Pages\ListHargaSampahs;
@@ -46,8 +47,8 @@ class HargaSampahResource extends Resource
                     ->relationship('jenisSampah', 'nama_jenis', fn (Builder $query) => $query->whereHas('kategori', fn ($k) => $k->where('tipe', 'anorganik')))
                     ->searchable()->preload()->required(),
                 TextInput::make('kondisi')->default('Utuh')->required()->maxLength(50),
-                TextInput::make('minimal_berat')->label('Berat minimal')->suffix('kg')->numeric()->minValue(0)->default(0)->required(),
-                TextInput::make('maksimal_berat')->label('Berat maksimal')->suffix('kg')->numeric()->gt('minimal_berat')->helperText('Kosongkan bila tanpa batas atas.'),
+                DecimalInput::make('minimal_berat')->label('Berat minimal')->suffix('kg')->batasMin(0)->default(0)->required(),
+                DecimalInput::make('maksimal_berat')->label('Berat maksimal')->suffix('kg')->lebihBesarDari('minimal_berat', 'berat minimal')->helperText('Kosongkan bila tanpa batas atas.'),
             ])->columns(2),
             Section::make('Harga & masa berlaku')->schema([
                 TextInput::make('harga_per_kg')->label('Harga per kg')->prefix('Rp')->integer()->minValue(0)->maxValue(10000000)->required(),
@@ -66,7 +67,7 @@ class HargaSampahResource extends Resource
                 TextColumn::make('jenisSampah.nama_jenis')->label('Jenis')->searchable()->sortable(),
                 TextColumn::make('kondisi'),
                 TextColumn::make('rentang')->label('Rentang berat')->state(fn (HargaSampah $record): string => $record->labelRentang()),
-                TextColumn::make('harga_per_kg')->label('Harga/kg')->money('IDR', locale: 'id')->sortable(),
+                TextColumn::make('harga_per_kg')->label('Harga/kg')->money('IDR', locale: 'id', decimalPlaces: 0)->sortable(),
                 TextColumn::make('berlaku_mulai')->dateTime('d M Y')->sortable(),
                 TextColumn::make('berlaku_sampai')->dateTime('d M Y')->placeholder('—'),
                 TextColumn::make('status')->badge()->formatStateUsing(fn (string $state): string => ucfirst($state))->color(fn (string $state): string => $state === 'aktif' ? 'success' : 'gray'),

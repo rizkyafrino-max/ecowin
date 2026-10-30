@@ -1,6 +1,7 @@
 package id.ecowin.app
 
 import android.os.Bundle
+import androidx.compose.foundation.layout.offset
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.draw.clip
@@ -55,6 +56,22 @@ class MainActivity : ComponentActivity() {
     private lateinit var client: ApiClient
     private lateinit var googleAuth: GoogleAuth
 
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        bukaDariPemberitahuan(intent)
+    }
+
+    /** Ketukan pemberitahuan hanya meminta layar Notifikasi; bila belum login, layar masuk yang tampil seperti biasa. */
+    private fun bukaDariPemberitahuan(intent: android.content.Intent?) {
+        if (intent?.action == NotifikasiHp.AKSI_BUKA) NavAwal.permintaan = true
+        // Uji manual (build debug saja): jalankan pengecek sekali sekarang tanpa menunggu jadwal 15 menit.
+        if (BuildConfig.DEBUG && intent?.getBooleanExtra("debug_cek_notif", false) == true) {
+            androidx.work.WorkManager.getInstance(this).enqueue(
+                androidx.work.OneTimeWorkRequestBuilder<NotifikasiWorker>().setInputData(androidx.work.workDataOf(NotifikasiWorker.EXTRA_PAKSA to true)).build(),
+            )
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Splash Screen native: bertahan hanya selagi sesi tersimpan diperiksa, dengan batas waktu agar tidak menahan aplikasi.
         installSplashScreen().setKeepOnScreenCondition { SplashGate.keep }
@@ -64,6 +81,11 @@ class MainActivity : ComponentActivity() {
         session = SessionStore(this)
         client = ApiClient(session)
         googleAuth = GoogleAuth(this)
+        if (NotifikasiHp.aktif(this) && session.hasSession()) {
+            NotifikasiHp.jadwalkan(this, ulang = NotifikasiHp.perluJadwalUlang(this))
+            lifecycleScope.launch { Push.daftarkan(this@MainActivity) } // segarkan pendaftaran perangkat (token bisa berganti)
+        }
+        bukaDariPemberitahuan(intent)
 
         setContent {
             EcoWinTheme {
@@ -77,7 +99,7 @@ class MainActivity : ComponentActivity() {
 
 /** Penahan splash: false begitu status sesi diketahui (login/dashboard), sehingga tidak ada kilatan layar login. */
 object SplashGate {
-    const val MAX_MS = 2500L
+    const val MAX_MS = 4000L
     @Volatile var keep: Boolean = true
 }
 
@@ -93,11 +115,13 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
     var state by remember { mutableStateOf<AppState>(if (session.hasSession()) AppState.Checking else AppState.LoggedOut()) }
     var retry by remember { mutableStateOf(0) }
     val scope = rememberCoroutineScope()
+    val konteks = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(state) { if (state !is AppState.Checking) SplashGate.keep = false }
 
     LaunchedEffect(Unit) {
         client.sessionExpired.collect {
+            NotifikasiHp.berhenti(konteks)
             state = AppState.LoggedOut("Sesi Anda berakhir. Silakan masuk kembali dengan Google.")
         }
     }
@@ -113,6 +137,7 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
             } catch (e: HttpException) {
                 if (e.code() == 401 || e.code() == 403) {
                     session.clear()
+                    NotifikasiHp.berhenti(konteks)
                     AppState.LoggedOut("Sesi Anda berakhir. Silakan masuk kembali.")
                 } else AppState.Offline(client.errorMessage(e))
             } catch (e: Exception) {
@@ -158,8 +183,10 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
             onUserChanged = { state = AppState.LoggedIn(it) },
             onLogout = {
                 scope.launch {
+                    runCatching { Push.lepas(konteks) } // lepas token perangkat selagi sesi masih sah
                     runCatching { client.api.logout() }
                     session.clear()
+                    NotifikasiHp.berhenti(konteks)
                     googleAuth.signOut()
                     state = AppState.LoggedOut()
                 }
@@ -169,20 +196,16 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
 }
 
 /**
- * Layar peluncuran saat sesi diperiksa: logo EcoWin yang sama dengan splash native, di posisi yang sama
- * (tidak ada lompatan). Animasi ringan: masuk memudar-membesar, lalu "bernapas" pelan dengan garis kemajuan tipis.
- * Tidak memuat data sensitif.
+ * Layar peluncuran cadangan, hanya tampil bila pemeriksaan sesi lebih lama dari batas splash sistem.
+ * Logo diletakkan tepat di tengah dengan ukuran sama seperti splash sistem (116dp) dan langsung penuh
+ * (tanpa animasi masuk), sehingga peralihan dari splash sistem tidak terlihat melompat. Hanya "bernapas" pelan.
  */
 @Composable
 fun CenteredProgress() {
-    val masuk = remember { androidx.compose.animation.core.Animatable(0f) }
-    androidx.compose.runtime.LaunchedEffect(Unit) {
-        masuk.animateTo(1f, androidx.compose.animation.core.tween(450, easing = androidx.compose.animation.core.FastOutSlowInEasing))
-    }
     val napas = androidx.compose.animation.core.rememberInfiniteTransition(label = "napas")
     val skala by napas.animateFloat(
         initialValue = 1f,
-        targetValue = 1.045f,
+        targetValue = 1.04f,
         animationSpec = androidx.compose.animation.core.infiniteRepeatable(
             androidx.compose.animation.core.tween(1300, easing = androidx.compose.animation.core.FastOutSlowInEasing),
             androidx.compose.animation.core.RepeatMode.Reverse,
@@ -190,23 +213,17 @@ fun CenteredProgress() {
         label = "skala",
     )
 
-    Column(
-        Modifier.fillMaxSize().background(Canvas),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(Canvas)) {
         Image(
             painterResource(R.drawable.ecowin_logo),
             contentDescription = "EcoWin",
-            modifier = Modifier.width(116.dp).graphicsLayer {
-                val s0 = (0.9f + 0.1f * masuk.value) * skala
-                scaleX = s0
-                scaleY = s0
-                alpha = masuk.value
+            modifier = Modifier.align(Alignment.Center).width(99.dp).graphicsLayer {
+                scaleX = skala
+                scaleY = skala
             },
         )
         androidx.compose.material3.LinearProgressIndicator(
-            modifier = Modifier.padding(top = 36.dp).width(72.dp).clip(RoundedCornerShape(99.dp)),
+            modifier = Modifier.align(Alignment.Center).offset(y = 104.dp).width(72.dp).clip(RoundedCornerShape(99.dp)),
             color = Emerald,
             trackColor = EmeraldSoft,
         )

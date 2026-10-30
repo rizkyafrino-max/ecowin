@@ -3,13 +3,13 @@ const MAP = {
   pending: ['Menunggu', 'bg-warn-tint text-warn'],
   approved: ['Disetujui', 'bg-info-tint text-info'],
   rejected: ['Ditolak', 'bg-danger-tint text-danger'],
-  completed: ['Selesai', 'bg-tint text-primary'],
-  aktif: ['Aktif', 'bg-tint text-primary'],
+  completed: ['Selesai', 'bg-tint text-primary-deep'],
+  aktif: ['Aktif', 'bg-tint text-primary-deep'],
   diproses: ['Diproses', 'bg-info-tint text-info'],
-  selesai: ['Selesai', 'bg-tint text-primary'],
+  selesai: ['Selesai', 'bg-tint text-primary-deep'],
   belum_panen: ['Belum dipanen', 'bg-canvas text-muted'],
   siap_panen: ['Siap panen', 'bg-warn-tint text-warn'],
-  sudah_panen: ['Sudah dipanen', 'bg-tint text-primary'],
+  sudah_panen: ['Sudah dipanen', 'bg-tint text-primary-deep'],
 };
 
 export default function StatusBadge({ status, label }) {

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BioporiController;
+use App\Http\Controllers\Api\NotifikasiController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\HargaSampahController;
 use App\Http\Controllers\Api\KoreksiTransaksiController;
@@ -40,6 +41,8 @@ Route::middleware(['auth:sanctum', 'active', 'abilities:access'])->name('api.')-
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.put');
+    Route::post('/profile/foto', [\App\Http\Controllers\Api\FotoProfilController::class, 'store'])->middleware('throttle:uploads')->name('profile.foto.store');
+    Route::delete('/profile/foto', [\App\Http\Controllers\Api\FotoProfilController::class, 'destroy'])->middleware('throttle:uploads')->name('profile.foto.destroy');
 
     Route::get('/dashboard', [DashboardController::class, 'summary'])->name('dashboard.alias');
     Route::get('/dashboard/summary', [DashboardController::class, 'summary'])->name('dashboard.summary');
@@ -64,6 +67,16 @@ Route::middleware(['auth:sanctum', 'active', 'abilities:access'])->name('api.')-
         Route::get('/saldo/history', [NasabahController::class, 'mutasi'])->name('alias.saldo.history');
         Route::get('/qr', [NasabahController::class, 'qr'])->name('alias.qr');
         Route::get('/transaksi', [TransaksiAnorganikController::class, 'index'])->name('alias.transaksi');
+        // Notifikasi dalam aplikasi (hanya milik pengguna yang login)
+        // Token FCM perangkat (hanya untuk membangunkan aplikasi; isi notifikasi tetap diambil lewat API ini)
+        Route::post('/perangkat', [\App\Http\Controllers\Api\PerangkatController::class, 'store'])->middleware('throttle:30,1')->name('perangkat.store');
+        Route::delete('/perangkat', [\App\Http\Controllers\Api\PerangkatController::class, 'destroy'])->middleware('throttle:30,1')->name('perangkat.destroy');
+        Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
+        Route::get('/notifikasi/jumlah', [NotifikasiController::class, 'jumlah'])->name('notifikasi.jumlah');
+        Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'bacaSemua'])->name('notifikasi.baca-semua');
+        Route::delete('/notifikasi/{id}', [NotifikasiController::class, 'hapus'])->whereNumber('id')->name('notifikasi.hapus');
+        Route::delete('/notifikasi', [NotifikasiController::class, 'hapusSemua'])->name('notifikasi.hapus-semua');
+        Route::post('/notifikasi/{id}/baca', [NotifikasiController::class, 'baca'])->whereNumber('id')->name('notifikasi.baca');
         Route::get('/biopori', [BioporiController::class, 'index'])->name('alias.biopori.index');
         Route::post('/biopori', [BioporiController::class, 'store'])->middleware('throttle:uploads')->name('alias.biopori.store');
     });
@@ -88,6 +101,9 @@ Route::middleware(['auth:sanctum', 'active', 'abilities:access'])->name('api.')-
 
     // Organik (satu fitur): setoran + aktivitas dengan metode BioporiPrint
     Route::get('/organik/biopori/lokasi', [BioporiController::class, 'titik'])->name('biopori.titik');
+    Route::post('/organik/biopori/lokasi', [BioporiController::class, 'ajukanTitik'])->middleware(['role:nasabah', 'throttle:uploads'])->name('biopori.titik.store');
+    Route::post('/organik/biopori/lokasi/{titik}/approve', [BioporiController::class, 'approveTitik'])->middleware('role:admin,petugas')->whereNumber('titik')->name('biopori.titik.approve');
+    Route::post('/organik/biopori/lokasi/{titik}/reject', [BioporiController::class, 'rejectTitik'])->middleware('role:admin,petugas')->whereNumber('titik')->name('biopori.titik.reject');
     Route::get('/organik/biopori', [BioporiController::class, 'index'])->name('biopori.index');
     Route::post('/organik/biopori', [BioporiController::class, 'store'])->middleware(['role:nasabah', 'throttle:uploads'])->name('biopori.store');
     Route::get('/organik/biopori/{aktivitas}', [BioporiController::class, 'show'])->name('biopori.show');

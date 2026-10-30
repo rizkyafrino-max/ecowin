@@ -41,7 +41,7 @@ class PenarikanSaldo extends Model
 
     public function nasabah(): BelongsTo
     {
-        return $this->belongsTo(Nasabah::class, 'nasabah_id');
+        return $this->belongsTo(Nasabah::class, 'nasabah_id')->withTrashed();
     }
 
     public function bankSampah(): BelongsTo
@@ -51,7 +51,7 @@ class PenarikanSaldo extends Model
 
     public function pemroses(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'diproses_oleh');
+        return $this->belongsTo(User::class, 'diproses_oleh')->withTrashed();
     }
 
     public function isPending(): bool

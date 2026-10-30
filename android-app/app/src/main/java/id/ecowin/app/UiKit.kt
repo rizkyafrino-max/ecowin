@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -131,6 +133,79 @@ fun BalanceCard(saldo: Double, detail: String, actionLabel: String? = null, onAc
                     Text(actionLabel, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 }
             }
+        }
+    }
+}
+
+/**
+ * Kolom isian bergaya Web: label tebal di atas kolom, tepi 1,5dp (#8392A6), sudut 16dp, petunjuk/galat di bawah.
+ * Parameter sengaja sama dengan OutlinedTextField agar pemakai lama cukup berganti nama.
+ */
+@Composable
+fun EcoTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    label: (@Composable () -> Unit)? = null,
+    placeholder: (@Composable () -> Unit)? = null,
+    supportingText: (@Composable () -> Unit)? = null,
+    enabled: Boolean = true,
+    singleLine: Boolean = false,
+    minLines: Int = 1,
+    keyboardOptions: androidx.compose.foundation.text.KeyboardOptions = androidx.compose.foundation.text.KeyboardOptions.Default,
+    @Suppress("UNUSED_PARAMETER") shape: androidx.compose.ui.graphics.Shape? = null,
+) {
+    Column(modifier) {
+        if (label != null) {
+            androidx.compose.runtime.CompositionLocalProvider(
+                androidx.compose.material3.LocalTextStyle provides androidx.compose.ui.text.TextStyle(color = Slate900, fontSize = 14.sp, fontWeight = FontWeight.SemiBold),
+            ) { Box(Modifier.padding(bottom = 6.dp)) { label() } }
+        }
+        androidx.compose.material3.OutlinedTextField(
+            value, onValueChange, Modifier.fillMaxWidth(), enabled = enabled, singleLine = singleLine, minLines = minLines,
+            placeholder = placeholder, keyboardOptions = keyboardOptions, shape = RoundedCornerShape(16.dp),
+            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Slate900),
+            colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Emerald, unfocusedBorderColor = Color(0xFF8392A6), disabledBorderColor = Color(0xFF8392A6),
+                focusedContainerColor = Color.White, unfocusedContainerColor = Color.White, disabledContainerColor = Canvas,
+                disabledTextColor = Slate500,
+            ),
+        )
+        if (supportingText != null) {
+            androidx.compose.runtime.CompositionLocalProvider(
+                androidx.compose.material3.LocalTextStyle provides androidx.compose.ui.text.TextStyle(color = Slate500, fontSize = 12.sp),
+            ) { Box(Modifier.padding(top = 6.dp)) { supportingText() } }
+        }
+    }
+}
+
+/** Kotak bergaya kolom isian (label tebal di atas, tepi 1,5dp, sudut 16dp); isinya bebas. Dipakai untuk pilihan dan nilai baca-saja. */
+@Composable
+fun EcoFieldBox(label: String, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null, trailing: (@Composable () -> Unit)? = null, content: @Composable () -> Unit) {
+    Column(modifier) {
+        Text(label, color = Slate900, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 6.dp))
+        Row(
+            Modifier.fillMaxWidth().height(56.dp).background(Color.White, RoundedCornerShape(16.dp)).border(1.5.dp, Color(0xFF8392A6), RoundedCornerShape(16.dp))
+                .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier).padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(Modifier.weight(1f)) { content() }
+            trailing?.invoke()
+        }
+    }
+}
+
+/** Menu pilih seperti <select> di Web. */
+@Composable
+fun EcoSelect(label: String, terpilih: String?, placeholder: String, opsi: List<Pair<Long, String>>, onPilih: (Long) -> Unit, modifier: Modifier = Modifier) {
+    var buka by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    Box(modifier) {
+        EcoFieldBox(
+            label, onClick = { buka = true },
+            trailing = { Icon(Lucide.ChevronDown, contentDescription = null, tint = Slate900, modifier = Modifier.size(18.dp)) },
+        ) { Text(terpilih ?: placeholder, color = if (terpilih == null) Slate500 else Slate900, fontSize = 15.sp, fontWeight = FontWeight.Medium) }
+        androidx.compose.material3.DropdownMenu(expanded = buka, onDismissRequest = { buka = false }) {
+            opsi.forEach { (id, nama) -> androidx.compose.material3.DropdownMenuItem(text = { Text(nama) }, onClick = { onPilih(id); buka = false }) }
         }
     }
 }

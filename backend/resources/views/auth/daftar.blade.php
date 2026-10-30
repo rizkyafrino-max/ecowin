@@ -2,14 +2,13 @@
 
 @section('title', 'Daftar')
 
+@section('rootClass', 'ecl-reg')
+
 @section('card')
+    @include('auth.stepper', ['aktif' => 1])
     <span class="ecl-kicker">DAFTAR NASABAH</span>
     <h2>Buat akun EcoWin</h2>
-    <p class="ecl-sub">Daftar sebagai nasabah Bank Sampah RT/RW Anda dengan akun Google.</p>
-
-    <div class="ecl-steps" aria-label="Langkah pendaftaran">
-        <span class="on">1. Akun Google</span><span>2. Data diri</span><span>3. Petugas</span>
-    </div>
+    <p class="ecl-sub">Daftar sebagai nasabah Bank Sampah RT/RW Anda dengan akun Google. Akun diperiksa petugas sebelum aktif sepenuhnya.</p>
 
     @if (session('auth_error'))
         <div class="ecl-err" role="alert">{{ session('auth_error') }}</div>

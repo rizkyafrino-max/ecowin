@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { BottomNav, NAV_ITEMS, Sidebar } from '../components/Nav';
 import TopBar from '../components/TopBar';
+import { NotifProvider } from '../context/NotifContext';
 
-const TITLES = { '/penarikan': 'Tarik Saldo', '/fitur': 'Semua Fitur' };
+const TITLES = { '/penarikan': 'Tarik Saldo', '/fitur': 'Semua Fitur', '/notifikasi': 'Notifikasi' };
 
 export default function AppLayout() {
   const { pathname } = useLocation();
@@ -26,6 +27,7 @@ export default function AppLayout() {
   const title = TITLES[pathname] ?? NAV_ITEMS.find((i) => (i.end ? pathname === i.to : pathname.startsWith(i.to)))?.label ?? 'EcoWin';
 
   return (
+    <NotifProvider>
     <div className="min-h-dvh">
       <Sidebar pathname={pathname} />
       <div className="md:pl-20 lg:pl-64">
@@ -36,5 +38,6 @@ export default function AppLayout() {
       </div>
       <BottomNav pathname={pathname} hidden={footerHidden} />
     </div>
+    </NotifProvider>
   );
 }

@@ -105,6 +105,7 @@ class NasabahService
                 'google_id' => $identity->googleId,
                 'email_verified_at' => now(),
                 'avatar' => $identity->avatar,
+                'jenis_kelamin' => in_array($data['jenis_kelamin'] ?? null, ['L', 'P'], true) ? $data['jenis_kelamin'] : null,
                 'role' => Role::Nasabah->value,
                 'status' => User::STATUS_AKTIF,
                 'bank_sampah_id' => $bank->id,
@@ -150,6 +151,7 @@ class NasabahService
         $before = ['status_verifikasi' => $nasabah->status_verifikasi];
         $nasabah->forceFill(['status_verifikasi' => 'verified'])->save();
         app(AuditLogger::class)->log('verifikasi_nasabah', $nasabah, $before, ['status_verifikasi' => 'verified'], $actor);
+        app(\App\Services\NotifikasiService::class)->kirim($nasabah->user, 'akun_terverifikasi', 'Akun terverifikasi', 'Akun Anda sudah diverifikasi petugas. Sekarang Anda bisa menarik saldo dan mengajukan titik Biopori.', 'beranda');
 
         return $nasabah;
     }
@@ -174,6 +176,7 @@ class NasabahService
         });
 
         app(AuditLogger::class)->log('tolak_nasabah', $nasabah, $before, ['status' => 'nonaktif', 'alasan' => $alasan], $actor);
+        app(\App\Services\NotifikasiService::class)->kirim($nasabah->user, 'akun_ditolak', 'Pendaftaran ditolak', 'Pendaftaran Anda ditolak. Alasan: '.$alasan, 'beranda');
 
         return $nasabah;
     }

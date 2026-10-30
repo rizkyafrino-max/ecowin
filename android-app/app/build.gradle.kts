@@ -4,6 +4,12 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+// Firebase aktif hanya bila google-services.json dipasang di folder app/ (lihat FIREBASE.md); tanpa itu aplikasi tetap
+// berjalan dan memakai pengecekan berkala.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 // Konfigurasi dari gradle.properties (atau ~/.gradle/gradle.properties):
 //   ECOWIN_API_BASE_URL  = alamat API Laravel, diakhiri "/api/"
 //   ECOWIN_GOOGLE_WEB_CLIENT_ID = OAuth client ID tipe "Web application" (sama dengan GOOGLE_CLIENT_ID di .env Laravel)
@@ -98,6 +104,15 @@ dependencies {
 
     // Rotasi foto kamera sebelum kompresi
     implementation("androidx.exifinterface:exifinterface:1.3.7")
+
+    // Pemberitahuan di HP: pengecekan berkala (tanpa layanan pihak ketiga).
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("androidx.lifecycle:lifecycle-process:2.8.7")
+
+    // Peta OpenStreetMap di dalam aplikasi (tanpa kunci API).
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
 
     testImplementation("junit:junit:4.13.2")
 }

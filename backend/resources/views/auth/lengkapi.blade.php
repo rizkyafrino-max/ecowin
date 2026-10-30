@@ -2,14 +2,13 @@
 
 @section('title', 'Lengkapi data')
 
+@section('rootClass', 'ecl-reg')
+
 @section('card')
+    @include('auth.stepper', ['aktif' => 2])
     <span class="ecl-kicker">DAFTAR NASABAH</span>
     <h2>Lengkapi data Anda</h2>
     <p class="ecl-sub">Data ini diperiksa petugas Bank Sampah sebelum akun Anda aktif sepenuhnya.</p>
-
-    <div class="ecl-steps" aria-label="Langkah pendaftaran">
-        <span>1. Akun Google</span><span class="on">2. Data diri</span><span>3. Petugas</span>
-    </div>
 
     <div class="ecl-who">
         @if ($identity['avatar'])
@@ -40,16 +39,36 @@
             @error('alamat_rt_rw')<p class="ecl-field-err" role="alert">{{ $message }}</p>@enderror
         </div>
 
-        <div class="ecl-field">
-            <label for="bank_sampah_id">Bank Sampah</label>
-            <select class="ecl-input" id="bank_sampah_id" name="bank_sampah_id" required>
-                <option value="">Pilih Bank Sampah RT/RW Anda</option>
-                @foreach ($banks as $bank)
-                    <option value="{{ $bank->id }}" @selected((string) old('bank_sampah_id', $form['bank_sampah_id'] ?? '') === (string) $bank->id)>{{ $bank->nama_bank_sampah }} · RT {{ $bank->rt }}/RW {{ $bank->rw }}</option>
+        <fieldset class="ecl-field ecl-banks">
+            <legend>Jenis kelamin</legend>
+            @php($jk = (string) old('jenis_kelamin', $form['jenis_kelamin'] ?? ''))
+            <div class="ecl-jk">
+                @foreach (['L' => ['Laki-laki', 'avatar-laki.jpg'], 'P' => ['Perempuan', 'avatar-perempuan.jpg']] as $nilai => [$label, $gambar])
+                    <label class="ecl-bank">
+                        <input type="radio" name="jenis_kelamin" value="{{ $nilai }}" @checked($jk === $nilai) required>
+                        <img class="ecl-jk-img" src="{{ asset('images/'.$gambar) }}" alt="" width="42" height="42">
+                        <span class="ecl-bank-txt"><b>{{ $label }}</b></span>
+                        <span class="ecl-bank-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
+                    </label>
                 @endforeach
-            </select>
+            </div>
+            <p class="ecl-hint">Menentukan foto profil bawaan. Anda bisa menggantinya dengan foto sendiri nanti.</p>
+            @error('jenis_kelamin')<p class="ecl-field-err" role="alert">{{ $message }}</p>@enderror
+        </fieldset>
+
+        <fieldset class="ecl-field ecl-banks">
+            <legend>Pilih Bank Sampah RT/RW Anda</legend>
+            @php($terpilih = (string) old('bank_sampah_id', $form['bank_sampah_id'] ?? ''))
+            @foreach ($banks as $bank)
+                <label class="ecl-bank">
+                    <input type="radio" name="bank_sampah_id" value="{{ $bank->id }}" @checked($terpilih === (string) $bank->id) required>
+                    <span class="ecl-bank-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg></span>
+                    <span class="ecl-bank-txt"><b>{{ $bank->nama_bank_sampah }}</b><small>RT {{ $bank->rt }} / RW {{ $bank->rw }}</small></span>
+                    <span class="ecl-bank-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></span>
+                </label>
+            @endforeach
             @error('bank_sampah_id')<p class="ecl-field-err" role="alert">{{ $message }}</p>@enderror
-        </div>
+        </fieldset>
 
         <label class="ecl-check">
             <input type="checkbox" name="setuju" value="1" @checked(old('setuju')) required>
@@ -57,6 +76,8 @@
         </label>
         @error('setuju')<p class="ecl-field-err" role="alert">{{ $message }}</p>@enderror
 
-        <button type="submit" class="ecl-btn-primary">Daftar sekarang</button>
+        <div class="ecl-submitbar">
+            <button type="submit" class="ecl-btn-primary">Daftar sekarang</button>
+        </div>
     </form>
 @endsection

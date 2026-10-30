@@ -3,7 +3,7 @@
     // Identitas warna per role: Admin = Indigo, Petugas = Emerald.
     $eco = $ecoIsAdmin
         ? ['primary' => '#4F46E5', 'secondary' => '#6366F1', 'deep' => '#3730A3', 'soft' => '#EEF2FF', 'rgb' => '79,70,229']
-        : ['primary' => '#059669', 'secondary' => '#10B981', 'deep' => '#047857', 'soft' => '#ECFDF5', 'rgb' => '5,150,105'];
+        : ['primary' => '#047857', 'secondary' => '#059669', 'deep' => '#065F46', 'soft' => '#ECFDF5', 'rgb' => '4,120,87'];
 @endphp
 <style>
 :root{color-scheme:light!important;--eco-primary:{{ $eco['primary'] }};--eco-secondary:{{ $eco['secondary'] }};--eco-deep:{{ $eco['deep'] }};--eco-soft:{{ $eco['soft'] }};--eco-rgb:{{ $eco['rgb'] }};--eco-canvas:#F8FAFC;--eco-surface:#FFFFFF;--eco-ink:#0F172A;--eco-muted:#64748B;--eco-line:#E2E8F0}
@@ -181,13 +181,17 @@ html,html.dark{color-scheme:light!important;background:var(--eco-canvas)!importa
 .fi-ta-table,.fi-ta-table tbody{display:block!important;width:100%}
 .fi-ta-table thead{display:none!important}
 .fi-ta-table tbody.fi-ta-group-header,.fi-ta-table tbody>tr.fi-ta-group-header-row{display:block}
-.fi-ta-table .fi-ta-row{display:block!important;margin:.75rem;padding:.35rem .95rem;border:1px solid var(--eco-line);border-radius:16px;background:var(--eco-surface);box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.fi-ta-table .fi-ta-row{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem 1rem;margin:.75rem;padding:1rem;border:1px solid var(--eco-line);border-radius:20px;background:var(--eco-surface);box-shadow:0 1px 3px rgba(15,23,42,.06)}
 .fi-ta-table .fi-ta-row:hover{background:var(--eco-surface)!important}
-.fi-ta-table .fi-ta-cell{display:flex!important;align-items:center;justify-content:space-between;gap:1rem;padding:.55rem 0!important;border:0!important;text-align:right}
-.fi-ta-table .fi-ta-cell+.fi-ta-cell{border-top:1px dashed var(--eco-line)!important}
-.fi-ta-table .fi-ta-cell[data-label]:not([data-label=""])::before{content:attr(data-label);flex:none;max-width:42%;text-align:left;font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--eco-muted)}
-.fi-ta-table .fi-ta-cell>*{min-width:0;max-width:100%}
-.fi-ta-table .fi-ta-actions-cell,.fi-ta-table .fi-ta-cell:last-child:not([data-label]){justify-content:flex-end}
+.fi-ta-table .fi-ta-cell{display:flex!important;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:.22rem;padding:0!important;border:0!important;text-align:left;min-width:0}
+.fi-ta-table .fi-ta-cell+.fi-ta-cell{border-top:0!important}
+.fi-ta-table .fi-ta-cell[data-label]:not([data-label=""])::before{content:attr(data-label);order:-1;max-width:100%;font-size:.66rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--eco-muted)}
+.fi-ta-table .fi-ta-cell>*{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.fi-ta-table .fi-ta-col,.fi-ta-table .fi-ta-col-wrp,.fi-ta-table .fi-ta-text,.fi-ta-table .fi-ta-text-item{padding:0!important;margin:0!important}
+.fi-ta-table .fi-ta-cell:has(.fi-ta-actions){grid-column:1/-1;flex-direction:row!important;flex-wrap:wrap;align-items:center;padding-top:.75rem!important;border-top:1px solid var(--eco-line)!important}
+.fi-ta-table .fi-ta-cell:first-child{grid-column:1/-1;padding-bottom:.55rem!important;border-bottom:1px solid var(--eco-line)!important}
+.fi-ta-table .fi-ta-cell:first-child .fi-ta-text-item{font-size:1rem;font-weight:800;color:var(--eco-ink)}
+.fi-ta-table .fi-ta-actions-cell,.fi-ta-table .fi-ta-cell:last-child:not([data-label]){grid-column:1/-1;flex-direction:row!important;flex-wrap:wrap;align-items:center;gap:.5rem 1.1rem;padding-top:.75rem!important;border-top:1px solid var(--eco-line)!important}
 .fi-ta-table .fi-ta-cell:empty{display:none!important}
 }
 /* ===== Perapian dashboard ===== */
@@ -222,18 +226,10 @@ html,html.dark{color-scheme:light!important;background:var(--eco-canvas)!importa
 /* ===== Halaman Organik (cluster): tab, judul, tabel ===== */
 .fi-page-has-sub-navigation .fi-breadcrumbs{display:none!important}
 
-.fi-page-has-sub-navigation .fi-tabs.fi-page-sub-navigation-tabs{margin-bottom:1.25rem!important;background:transparent!important;box-shadow:none!important;border:0!important;border-bottom:1px solid var(--eco-line)!important;border-radius:0!important;padding:0!important;max-width:none!important;width:100%;justify-content:flex-start;gap:.25rem;margin:0!important}
-.fi-page-has-sub-navigation .fi-tabs-item{border-radius:0!important;background:transparent!important;padding:.8rem 1.05rem!important;font-weight:600;color:var(--eco-muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s ease,border-color .15s ease}
-.fi-page-has-sub-navigation .fi-tabs-item:hover{color:var(--eco-primary)}
-.fi-page-has-sub-navigation .fi-tabs-item.fi-active{color:var(--eco-primary)!important;border-bottom-color:var(--eco-primary)}
-.fi-page-has-sub-navigation .fi-tabs-item.fi-active .fi-tabs-item-label{color:var(--eco-primary)!important}
 .fi-page-has-sub-navigation .fi-header-heading{font-size:1.6rem!important}
 /* Organik di HP: tab bisa digeser, judul + tombol sebaris, kartu angka ringkas */
 @media(max-width:767px){
 .fi-page-sub-navigation-dropdown{display:none!important}
-.fi-tabs.fi-page-sub-navigation-tabs{display:flex!important;overflow-x:auto;white-space:nowrap;scrollbar-width:none;margin-inline:-1rem!important;padding-inline:1rem!important;width:auto!important;margin-bottom:1rem!important}
-.fi-tabs.fi-page-sub-navigation-tabs::-webkit-scrollbar{display:none}
-.fi-page-has-sub-navigation .fi-tabs-item{padding:.7rem .85rem!important;font-size:.85rem;flex:none}
 .fi-page-has-sub-navigation .fi-header{flex-direction:row!important;align-items:center!important;justify-content:space-between;gap:.75rem;margin-bottom:.75rem}
 .fi-page-has-sub-navigation .fi-header-actions-ctn .fi-btn{padding:.5rem .85rem!important;font-size:.8rem!important;box-shadow:none!important}
 .fi-page-has-sub-navigation .fi-wi-stats-overview-stat{padding:.75rem .85rem!important}
@@ -264,4 +260,166 @@ html,html.dark{color-scheme:light!important;background:var(--eco-canvas)!importa
 .eco-popup-items a:hover{background:#fff!important}
 .eco-popup-items small{margin:0;white-space:nowrap}
 .eco-popup-items a.eco-popup-more{color:var(--eco-primary);font-weight:600;justify-content:center}
+/* ===== Gaya "aplikasi Nasabah" untuk Dashboard Admin & Petugas =====
+   Bentuk, jarak, dan hierarki sama dengan Beranda Nasabah (Web & Android); warna mengikuti role
+   (Admin = Indigo, Petugas = Emerald). Semua fitur dan data tetap sama. */
+.eco-home{gap:1.25rem}
+.eco-avatar{width:52px;height:52px}
+.eco-home-hello{font-size:.9rem;color:var(--eco-muted);line-height:1.2}
+.eco-home-name{font-size:1.45rem;font-weight:800;letter-spacing:-.015em;line-height:1.2}
+.eco-home-loc{margin-top:.3rem}
+.eco-search,.eco-icon-btn{border-radius:999px}
+.eco-search{height:46px;padding:0 1.1rem}
+.eco-icon-btn{width:46px;height:46px}
+
+/* Kartu utama: gradien lembut dengan lingkaran dekoratif, tombol kaca (bukan kuning) */
+.eco-slide{min-height:210px;padding:1.6rem 1.75rem;border-radius:28px;background:linear-gradient(135deg,var(--eco-primary),var(--eco-secondary));box-shadow:0 14px 32px rgba(var(--eco-rgb),.22)}
+.eco-slide:nth-child(even){background:linear-gradient(135deg,var(--eco-deep),var(--eco-primary))}
+.eco-slide::before{content:"";position:absolute;right:-48px;top:-56px;width:210px;height:210px;border-radius:999px;background:rgba(255,255,255,.14);pointer-events:none}
+.eco-slide-badge{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.35);font-weight:700}
+.eco-slide-label{color:rgba(255,255,255,.88)}
+.eco-slide-value{font-size:2.2rem;letter-spacing:-.02em}
+.eco-slide-cta{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.55);padding:.55rem 1.3rem}
+.eco-slide-cta:hover{background:rgba(255,255,255,.3)}
+.eco-art-core{background:#fff}
+.eco-slides{padding-bottom:20px;margin-bottom:-14px}
+
+/* Akses cepat: satu kartu putih berisi kapsul yang bisa digeser (seperti "Aksi cepat" Nasabah) */
+section[aria-label="Akses cepat"]{background:#fff;border:1px solid var(--eco-line);border-radius:24px;padding:1.1rem 1.25rem 1.25rem;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+section[aria-label="Akses cepat"] .eco-sec-head{margin-bottom:.9rem}
+section[aria-label="Akses cepat"] .eco-sec-head h2{font-size:1.05rem;font-weight:800}
+.eco-cats{display:flex!important;gap:.75rem;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px 2px 4px;scroll-snap-type:x proximity}
+.eco-cats::-webkit-scrollbar{display:none}
+.eco-cat{flex:none;scroll-snap-align:start;gap:.7rem;padding:.4rem 1.15rem .4rem .4rem;border-radius:999px;background:#F1F5F9;border:1px solid var(--eco-line);font-size:.92rem;font-weight:700;white-space:nowrap}
+.eco-cat:first-child{background:linear-gradient(90deg,var(--eco-soft),rgba(var(--eco-rgb),.32));border-color:rgba(var(--eco-rgb),.25)}
+.eco-cat-ico{width:46px;height:46px;border-radius:999px;background:#fff;border:1px solid var(--eco-line);box-shadow:0 1px 2px rgba(15,23,42,.06)}
+.eco-cat-ico .eco-ico{width:22px;height:22px}
+
+/* Judul bagian dan kartu isi: radius dan bayangan seragam */
+.eco-sec-head h2{font-size:1.05rem;font-weight:800}
+.eco-panel,.eco-item{border-radius:22px;padding-inline:1.25rem}
+.eco-item{padding-block:1.1rem}
+.eco-item-badge{border-radius:999px}
+.eco-plus{box-shadow:0 4px 10px rgba(var(--eco-rgb),.28)}
+.eco-rank-no{border-radius:999px}
+
+/* Kartu statistik Filament: ikon dalam kotak lembut di atas, label, angka tebal, keterangan (seperti StatTile) */
+.fi-wi-stats-overview-stat{border-radius:22px!important;padding:1.1rem 1.15rem!important;box-shadow:0 1px 3px rgba(15,23,42,.05)!important}
+.fi-wi-stats-overview-stat-label-ctn{flex-direction:column!important;align-items:flex-start!important;gap:.7rem!important}
+.fi-wi-stats-overview-stat-label-ctn .fi-icon{box-sizing:border-box;width:42px!important;height:42px!important;padding:10px;border-radius:14px;background:var(--eco-soft);color:var(--eco-primary)!important}
+.fi-wi-stats-overview-stat-label{font-size:.86rem!important;font-weight:500!important}
+.fi-wi-stats-overview-stat-value{font-size:1.65rem!important;font-weight:800!important;letter-spacing:-.015em}
+.fi-wi-stats-overview-stat-description{color:var(--eco-muted)!important}
+
+/* Tabel dan grafik di dashboard: kartu membulat seperti daftar Nasabah */
+.fi-wi-widget .fi-ta-ctn,.fi-wi-chart,.fi-wi-widget .fi-section{border-radius:24px!important}
+.fi-wi-widget .fi-ta-header-heading,.fi-wi-chart .fi-section-header-heading{font-weight:800!important;font-size:1.05rem!important}
+.fi-ta-row{transition:background .12s ease}
+
+@media(max-width:640px){
+  .eco-home-name{font-size:1.25rem}
+  .eco-slide{border-radius:26px;padding:1.25rem}
+  .eco-slide::before{right:-70px;top:-70px;width:170px;height:170px}
+  section[aria-label="Akses cepat"]{border-radius:22px;padding:1rem}
+  .eco-cat{padding-right:1rem;font-size:.88rem}
+  .eco-cat-ico{width:42px;height:42px}
+}
+/* ===== Formulir: kolom isian harus jelas terlihat (WCAG 1.4.11: garis tepi >= 3:1) =====
+   Sebelumnya bayangan/ring Filament dimatikan sehingga kolom tampak kosong tanpa garis. */
+.fi-input-wrp{background:#fff!important;border:1.5px solid #8392A6!important;border-radius:12px!important;box-shadow:0 1px 2px rgba(15,23,42,.05)!important;--tw-ring-shadow:0 0 #0000!important;--tw-ring-color:transparent!important;min-height:46px;transition:border-color .12s ease,box-shadow .12s ease}
+.fi-input-wrp:hover{border-color:#64748B!important}
+.fi-input-wrp:focus-within{border-color:var(--eco-primary)!important;box-shadow:0 0 0 4px rgba(var(--eco-rgb),.20)!important}
+.fi-input-wrp:has([aria-invalid="true"]),.fi-input-wrp:has(.fi-invalid){border-color:#DC2626!important}
+.fi-input-wrp:has(:disabled){background:#F1F5F9!important;border-style:dashed!important;border-color:#A8B3C4!important}
+.fi-input,.fi-select-input{color:var(--eco-ink)!important;font-size:.95rem!important;font-weight:500;background:transparent!important}
+.fi-input::placeholder,.fi-select-input::placeholder{color:#64748B!important;opacity:1!important;font-weight:400}
+.fi-input:disabled{color:#475569!important;-webkit-text-fill-color:#475569}
+textarea.fi-input{min-height:96px;padding-block:.65rem}
+.fi-fo-field-label,.fi-fo-field-label-content{color:var(--eco-ink)!important;font-weight:600!important;font-size:.88rem!important}
+.fi-fo-field-label-required-mark{color:#DC2626!important}
+.fi-fo-field-wrp-hint,.fi-fo-field-wrp-helper-text{color:#475569!important}
+/* Awalan/akhiran (Rp, kg): kotak tersendiri yang terbaca */
+.fi-fo-field .fi-input-wrp-prefix,.fi-fo-field .fi-input-wrp-suffix,.fi-fo-field .fi-input-wrp [class*="fi-input-wrp-prefix"],.fi-fo-field .fi-input-wrp [class*="fi-input-wrp-suffix"]{color:#334155!important;font-weight:600;background:#F1F5F9;border-color:#CBD5E1!important}
+/* Kotak centang, radio, sakelar */
+input[type="checkbox"].fi-checkbox-input,input[type="radio"].fi-radio-input{border:1.5px solid #8392A6!important;background-color:#fff;box-shadow:none!important;width:1.15rem;height:1.15rem}
+input[type="checkbox"].fi-checkbox-input:checked,input[type="radio"].fi-radio-input:checked{background-color:var(--eco-primary)!important;border-color:var(--eco-primary)!important}
+input[type="checkbox"].fi-checkbox-input:focus-visible,input[type="radio"].fi-radio-input:focus-visible{outline:3px solid rgba(var(--eco-rgb),.35);outline-offset:2px}
+.fi-toggle{--tw-ring-color:#8392A6}
+.fi-toggle.fi-toggle-off{background-color:#94A3B8!important}
+/* Unggah berkas */
+.filepond--root .filepond--panel-root{background:#F8FAFC!important;border:2px dashed #8392A6;border-radius:14px}
+.filepond--drop-label{color:#334155!important;font-weight:500}
+.filepond--label-action{color:var(--eco-primary)!important;text-decoration-color:var(--eco-primary)}
+/* Pilihan (dropdown) dan pemilih tanggal */
+.fi-fo-select .choices__inner,.fi-dropdown-panel{border-color:#8392A6}
+.fi-fo-date-time-picker input,.fi-fo-date-time-picker button{color:var(--eco-ink)}
+/* Tombol di form: aksi sekunder tetap terbaca */
+.fi-btn.fi-color-gray,.fi-btn:not(.fi-color-primary):not(.fi-color-danger):not(.fi-color-success):not(.fi-color-warning){border:1.5px solid #8392A6}
+/* ===== Perapian tabel & halaman info ===== */
+/* Indikator memuat Livewire tidak boleh tampil sebelum Livewire aktif (Livewire sendiri yang menampilkannya lewat gaya inline). */
+.fi-loading-indicator[wire\:loading\.delay\.default],.fi-loading-indicator[wire\:loading]{display:none}
+.fi-ta-search-field .fi-input-wrp{border-radius:999px!important;min-height:42px}
+.fi-ta-search-field .fi-input-wrp-prefix,.fi-ta-search-field [class*="fi-input-wrp-prefix"]{background:transparent!important;border:0!important}
+.fi-pagination-records-per-page-select .fi-input-wrp,.fi-ta-pagination .fi-input-wrp{min-height:40px;border-radius:10px!important}
+.fi-pagination-records-per-page-select .fi-input-wrp-prefix{background:transparent!important}
+.fi-ta-table .fi-badge{font-weight:700}
+.eco-report-row b,.eco-report-row span{overflow-wrap:anywhere;min-width:0}
+.eco-report-row{align-items:baseline}
+
+/* ===== Perbaikan UI admin (audit tampilan nyata, 23 Okt 2026) ===== */
+/* Tabel: lebih padat dan ada bayangan di tepi bila masih bisa digeser ke samping (sebelumnya kolom terakhir terpotong tanpa petunjuk) */
+.fi-ta-table{font-size:.8125rem}
+.fi-ta-header-cell{padding:.65rem .5rem .65rem .75rem!important;white-space:nowrap}
+.fi-ta-header-cell:first-child{padding-left:1rem!important}
+.fi-ta-cell{padding-inline:.5rem .25rem!important}
+.fi-ta-cell:first-child{padding-left:1rem!important}
+.fi-ta-content-ctn{background:linear-gradient(to right,#fff 30%,rgba(255,255,255,0)) left center,linear-gradient(to left,#fff 30%,rgba(255,255,255,0)) right center,radial-gradient(farthest-side at 0 50%,rgba(15,23,42,.16),rgba(15,23,42,0)) left center,radial-gradient(farthest-side at 100% 50%,rgba(15,23,42,.16),rgba(15,23,42,0)) right center;background-repeat:no-repeat;background-size:44px 100%,44px 100%,16px 100%,16px 100%;background-attachment:local,local,scroll,scroll}
+.fi-ta-content-ctn::-webkit-scrollbar{height:10px}
+.fi-ta-content-ctn::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:99px;border:2px solid #fff}
+.fi-ta-content-ctn::-webkit-scrollbar-track{background:transparent}
+/* Bilah alat tabel: tombol aksi (mis. Scan QR) di kiri, pencarian dan filter di kanan, dalam satu baris */
+.fi-ta-header-ctn{display:flex!important;flex-wrap:wrap;align-items:center;gap:.5rem .75rem;padding:.75rem 1rem!important}
+.fi-ta-header,.fi-ta-header-toolbar{display:contents!important}
+.fi-ta-header-ctn>.fi-ta-header-toolbar>div:last-child{margin-inline-start:auto;flex:0 1 auto;display:flex;align-items:center;justify-content:flex-end;gap:.5rem;min-width:0}
+.fi-ta-search-field{flex:0 1 240px;width:240px;max-width:100%;min-width:0}
+.fi-ta-grouping-settings{flex:none}
+@media(max-width:640px){.fi-ta-header-ctn>.fi-ta-header-toolbar>div:last-child{flex:1 1 0}.fi-ta-search-field{max-width:none}}
+/* Kolom aksi tetap terlihat di kanan saat tabel digeser ke samping */
+.fi-ta-table th.fi-ta-actions-header-cell,.fi-ta-table td:has(>.fi-ta-actions){position:sticky;right:0;z-index:2;background:#fff}
+.fi-ta-table td:has(>.fi-ta-actions){box-shadow:-10px 0 10px -10px rgba(15,23,42,.22)}
+.fi-ta-table .fi-ta-row:hover td:has(>.fi-ta-actions){background:#F8FAFC}
+.fi-ta-filters-dropdown .fi-icon-btn svg{width:1.15rem;height:1.15rem}
+.fi-ta-filters-dropdown .fi-icon-btn svg path{fill:none;stroke:currentColor;stroke-width:1.5}
+.fi-ta-filters-dropdown .fi-icon-btn{border:1px solid var(--eco-line);border-radius:12px;background:#fff}
+.fi-ta-record-actions .fi-link,.fi-ta-actions .fi-link{white-space:nowrap}
+/* Formulir: bagian selebar penuh, bantalan dalam lebih ramping, kolom isian tidak mengecil */
+.fi-sc-form .fi-section-content{padding:1.1rem 1.25rem!important}
+.fi-sc-form .fi-section-header{padding:.9rem 1.25rem!important}
+.fi-fo-field-label-content{font-size:.8125rem;font-weight:700}
+.fi-fo-checkbox-list .fi-fo-checkbox-list-option-label{white-space:nowrap}
+.fi-form-actions,.fi-sc-actions{margin-top:.5rem}
+
+/* Tab sub-navigasi (mis. Organik): tombol segmented yang jelas bisa diklik, tab aktif terisi warna peran (menggantikan gaya garis bawah lama) */
+.fi-page-sub-navigation-tabs{display:flex!important;margin-inline:0!important;flex-wrap:wrap;gap:.35rem;width:fit-content;max-width:100%;padding:.35rem!important;margin-bottom:1.25rem!important;background:#EEF2F7;border:1px solid var(--eco-line)!important;border-radius:18px}
+.fi-page-sub-navigation-tabs .fi-tabs-item{display:inline-flex!important;align-items:center;gap:.5rem;padding:.6rem 1.05rem!important;border-radius:13px!important;border:1px solid transparent;background:transparent;font-size:.875rem;font-weight:700;color:var(--eco-muted)!important;transition:background .15s ease,color .15s ease,box-shadow .15s ease}
+.fi-page-sub-navigation-tabs .fi-tabs-item:hover{background:#fff;color:#0F172A!important}
+.fi-page-sub-navigation-tabs .fi-tabs-item.fi-active{background:var(--eco-primary)!important;color:#fff!important;box-shadow:0 4px 12px rgba(var(--eco-rgb),.28)}
+.fi-page-sub-navigation-tabs .fi-tabs-item.fi-active *{color:#fff!important}
+.fi-page-sub-navigation-tabs .fi-tabs-item .fi-badge{margin-inline-start:.15rem}
+.fi-page-sub-navigation-tabs .fi-tabs-item.fi-active .fi-badge{background:rgba(255,255,255,.22)!important;--tw-ring-color:rgba(255,255,255,.4)}
+@media(max-width:640px){.fi-page-sub-navigation-tabs{width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.fi-page-sub-navigation-tabs .fi-tabs-item{white-space:nowrap;flex:none}}
+/* Kontrol pengelompokan tabel: dua kotak pilihan sejajar, bukan gelembung bulat */
+.fi-ta-grouping-settings-fields{flex-wrap:wrap;align-items:center;gap:.5rem}
+.fi-ta-grouping-settings-fields label{margin:0}
+.fi-ta-grouping-settings-fields .fi-input-wrp{border-radius:12px!important;min-height:2.5rem;background:#fff;align-items:center}
+.fi-ta-grouping-settings-fields .fi-input-wrp-prefix{padding-inline:.75rem .5rem}
+.fi-ta-grouping-settings-fields .fi-input-wrp-label{font-size:.78rem;font-weight:600;color:var(--eco-muted)}
+.fi-ta-grouping-settings-fields .fi-select-input{height:2.4rem;padding-block:0!important;line-height:2.4rem;font-size:.85rem;font-weight:600}
+/* Header kolom aksi menyatu dengan baris header lain; tombol aksi header (mis. Scan QR) tetap di kiri */
+.fi-ta-table th.fi-ta-actions-header-cell{background:#F8FAFC!important}
+.fi-ta-header-ctn>.fi-ta-header>.fi-ta-actions{margin-inline:0 auto!important}
+.fi-ta-header-ctn>.fi-ta-header-toolbar>.fi-ta-actions{margin-inline:0!important}
+.fi-ta-filters-dropdown .fi-badge.eco-nol{display:none!important}
+/* Di HP (kartu, bukan tabel geser) kolom aksi tidak menempel dan tanpa bayangan */
+@media(max-width:640px){.fi-ta-table td:has(>.fi-ta-actions){position:static!important;box-shadow:none!important;background:transparent!important}.fi-ta-table .fi-ta-row:hover td:has(>.fi-ta-actions){background:transparent!important}}
 </style>

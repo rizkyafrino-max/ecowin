@@ -15,6 +15,7 @@ data class RegisterRequest(
     val nama: String,
     val noHp: String,
     val alamatRtRw: String,
+    val jenisKelamin: String? = null,
     val bankSampahId: Long,
     val setuju: Boolean,
 )
@@ -49,6 +50,8 @@ data class UserDto(
     val nama: String?,
     val email: String?,
     val avatar: String?,
+    val jenisKelamin: String? = null,
+    val punyaFoto: Boolean = false,
     val role: String,
     val bankSampahId: Long?,
     val nasabah: NasabahDto?,
@@ -119,6 +122,17 @@ data class TitikBioporiDto(
     val terakhirDiisiAt: String?,
     val estimasiPanenAt: String?,
     val statusPanen: String?,
+    val verifikasi: String? = null,
+    val catatanVerifikasi: String? = null,
+    val diajukanSaya: Boolean = false,
+)
+
+/** Pengajuan titik Biopori baru oleh nasabah (menunggu verifikasi petugas). */
+data class AjukanTitikRequest(
+    val namaLokasi: String,
+    val deskripsiLokasi: String?,
+    val latitude: Double,
+    val longitude: Double,
 )
 
 data class AktivitasBioporiDto(
@@ -145,7 +159,7 @@ data class PenarikanDto(
 
 data class PenarikanRequest(val jumlah: Long, val catatan: String?)
 
-data class ProfileUpdateRequest(val nama: String?, val noHp: String?, val alamatRtRw: String?)
+data class ProfileUpdateRequest(val nama: String?, val noHp: String?, val alamatRtRw: String?, val jenisKelamin: String? = null)
 
 data class AnorganikSummary(val totalBeratKg: Double = 0.0, val jumlahTransaksi: Int = 0, val totalNilai: Long = 0)
 
@@ -174,3 +188,21 @@ data class JenisHargaDto(val id: Long, val namaJenis: String, val satuan: String
 data class KategoriHargaDto(val id: Long, val namaKategori: String, val jenisSampah: List<JenisHargaDto>)
 
 data class ApiError(val message: String?, val errors: Map<String, List<String>>?)
+
+/** Notifikasi dalam aplikasi untuk nasabah. */
+data class NotifikasiDto(
+    val id: Long,
+    val tipe: String,
+    val judul: String,
+    val isi: String,
+    val aksi: String? = null,
+    val dibaca: Boolean = false,
+    val createdAt: String? = null,
+)
+
+data class NotifikasiResponse(val data: List<NotifikasiDto> = emptyList(), val belumDibaca: Int = 0)
+
+data class JumlahNotifDto(val belumDibaca: Int = 0)
+
+/** Token FCM perangkat untuk membangunkan aplikasi saat ada notifikasi (tanpa isi pesan). */
+data class PerangkatRequest(val token: String)

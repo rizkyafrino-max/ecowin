@@ -8,6 +8,7 @@ use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -24,11 +25,17 @@ use Laravel\Sanctum\HasApiTokens;
  */
 class User extends Authenticatable implements FilamentUser, HasAvatar, HasName
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     public const STATUS_AKTIF = 'aktif';
 
     public const STATUS_NONAKTIF = 'nonaktif';
+
+    public const JK_LAKI = 'L';
+
+    public const JK_PEREMPUAN = 'P';
+
+    public const JENIS_KELAMIN = [self::JK_LAKI => 'Laki-laki', self::JK_PEREMPUAN => 'Perempuan'];
 
     protected $fillable = [
         'nama',
@@ -40,6 +47,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasName
         'password',
         'remember_token',
         'google_id',
+        'foto_profil',
     ];
 
     protected $attributes = [
@@ -71,6 +79,24 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasName
 
     public function getFilamentAvatarUrl(): ?string
     {
+        return $this->avatarUrl();
+    }
+
+    /**
+     * Avatar yang ditampilkan: foto unggahan pengguna > avatar bawaan sesuai jenis kelamin > foto akun Google > null (inisial).
+     */
+    public function avatarUrl(): ?string
+    {
+        if ($this->foto_profil) {
+            return url('/foto/'.$this->foto_profil);
+        }
+        if ($this->jenis_kelamin === self::JK_LAKI) {
+            return asset('images/avatar-laki.jpg');
+        }
+        if ($this->jenis_kelamin === self::JK_PEREMPUAN) {
+            return asset('images/avatar-perempuan.jpg');
+        }
+
         return $this->avatar;
     }
 

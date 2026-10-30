@@ -49,19 +49,45 @@
                 this.setPoint(position.lat, position.lng, 'Penanda digeser. Koordinat berhasil diperbarui.');
             });
         },
+        watchId: null,
+        circle: null,
+        berhenti() {
+            if (this.watchId !== null) { navigator.geolocation.clearWatch(this.watchId); this.watchId = null; }
+        },
         ambil() {
             if (!navigator.geolocation) {
                 this.status = 'Perangkat tidak mendukung akses lokasi. Pilih titik di peta atau isi manual.';
                 return;
             }
+            this.berhenti();
             this.status = 'Meminta izin lokasi…';
-            navigator.geolocation.getCurrentPosition(
-                posisi => this.setPoint(posisi.coords.latitude, posisi.coords.longitude, `Lokasi terisi (akurasi ±${Math.round(posisi.coords.accuracy)} meter). Anda masih bisa menggeser penanda atau mengedit koordinat.`),
+            let terbaik = null;
+            const selesai = () => {
+                this.berhenti();
+                if (!terbaik) return;
+                const a = Math.round(terbaik.accuracy);
+                this.status = a > 100
+                    ? `Akurasi rendah (±${a} m): perangkat ini kemungkinan memakai perkiraan WiFi/IP, bukan GPS. Geser penanda ke posisi yang benar atau coba dari HP.`
+                    : `Lokasi terisi (akurasi ±${a} m). Anda masih bisa menggeser penanda atau mengedit koordinat.`;
+            };
+            // Pembacaan pertama sering kasar; ikuti beberapa detik dan simpan yang paling akurat.
+            this.watchId = navigator.geolocation.watchPosition(
+                posisi => {
+                    const c = posisi.coords;
+                    if (terbaik && c.accuracy >= terbaik.accuracy) return;
+                    terbaik = { accuracy: c.accuracy };
+                    this.setPoint(c.latitude, c.longitude, `Mencari sinyal terbaik… (akurasi ±${Math.round(c.accuracy)} m)`);
+                    if (this.circle) this.map.removeLayer(this.circle);
+                    this.circle = L.circle([c.latitude, c.longitude], { radius: c.accuracy, weight: 1, color: 'var(--eco-primary)', fillOpacity: 0.12 }).addTo(this.map);
+                    if (c.accuracy <= 20) selesai();
+                },
                 error => {
+                    this.berhenti();
                     this.status = error.code === 1 ? 'Izin lokasi ditolak. Anda tetap dapat memilih titik di peta atau mengisi manual.' : 'Lokasi belum tersedia. Pilih titik di peta atau isi manual.';
                 },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
             );
+            setTimeout(selesai, 15000);
         }
     }"
     class="biopori-location-picker"
@@ -78,10 +104,10 @@
     .biopori-location-picker{overflow:hidden;border:1px solid #d8e9df;border-radius:16px;background:#f8fcf9}
     .biopori-location-picker__header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px}
     .biopori-location-picker__header strong,.biopori-location-picker__header span{display:block}
-    .biopori-location-picker__header strong{color:#174c37;font-size:13px;font-weight:800}
+    .biopori-location-picker__header strong{color:var(--eco-deep);font-size:13px;font-weight:800}
     .biopori-location-picker__header span{margin-top:3px;color:#718279;font-size:11px}
-    .biopori-location-picker__header button{flex:none;border:0;border-radius:10px;background:#176b4d;padding:9px 13px;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
-    .biopori-location-picker__header button:hover{background:#104b37}
+    .biopori-location-picker__header button{flex:none;border:0;border-radius:10px;background:var(--eco-primary);padding:9px 13px;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
+    .biopori-location-picker__header button:hover{background:var(--eco-deep)}
     .biopori-location-picker__map{height:320px;width:100%;background:#e9f5ee}
     .biopori-location-picker__status{margin:0;padding:10px 16px;color:#527363;font-size:11px}
     @media(max-width:640px){.biopori-location-picker__header{align-items:flex-start;flex-direction:column}.biopori-location-picker__map{height:280px}}

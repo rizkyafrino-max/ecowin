@@ -8,7 +8,9 @@ use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Models\User;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -79,7 +81,28 @@ class UserResource extends Resource
         ])->filters([
             SelectFilter::make('role')->label('Peran')->options(['admin' => 'Admin', 'petugas' => 'Petugas']),
             SelectFilter::make('status')->options(['aktif' => 'Aktif', 'nonaktif' => 'Nonaktif']),
-        ])->recordActions([EditAction::make()]);
+        ])->recordActions([
+            EditAction::make(),
+            Action::make('hapus_data')
+                ->label('Hapus data')
+                ->icon('heroicon-o-trash')
+                ->color('danger')
+                ->visible(fn (User $record): bool => auth()->user()?->can('delete', $record) ?? false)
+                ->requiresConfirmation()
+                ->modalHeading('Hapus data petugas ini?')
+                ->modalDescription('Nama, email, dan akun Google petugas dihapus permanen dan tidak bisa dikembalikan. Riwayat pekerjaan (transaksi, audit log) tetap tersimpan dan tampil sebagai "Petugas dihapus".')
+                ->modalSubmitActionLabel('Ya, hapus data')
+                ->action(function (User $record): void {
+                    try {
+                        app(\App\Services\PenghapusanAkunService::class)->hapusPetugas(auth()->user(), $record);
+                    } catch (\Illuminate\Validation\ValidationException $e) {
+                        Notification::make()->danger()->title('Tidak bisa dihapus')->body(collect($e->errors())->flatten()->first())->send();
+
+                        return;
+                    }
+                    Notification::make()->success()->title('Data petugas dihapus')->send();
+                }),
+        ]);
     }
 
     public static function getPages(): array

@@ -76,6 +76,7 @@ class PenarikanService
             ])->save();
 
             $this->audit->log('approve_penarikan', $locked, $before, $locked->attributesToArray(), $actor);
+            app(\App\Services\NotifikasiService::class)->kirim($locked->nasabah?->user, 'penarikan_disetujui', 'Penarikan disetujui', 'Penarikan '.\App\Services\NotifikasiService::rupiah($locked->jumlah).' disetujui. Ambil uangnya di petugas Bank Sampah.', 'saldo');
 
             return $locked;
         });
@@ -98,6 +99,7 @@ class PenarikanService
             ])->save();
 
             $this->audit->log('reject_penarikan', $locked, $before, $locked->attributesToArray(), $actor);
+            app(\App\Services\NotifikasiService::class)->kirim($locked->nasabah?->user, 'penarikan_ditolak', 'Penarikan ditolak', 'Penarikan '.\App\Services\NotifikasiService::rupiah($locked->jumlah).' ditolak. Alasan: '.$catatan, 'saldo');
 
             return $locked;
         });
@@ -118,6 +120,7 @@ class PenarikanService
             $locked->forceFill(['status' => PenarikanSaldo::STATUS_COMPLETED, 'diselesaikan_at' => now()])->save();
 
             $this->audit->log('selesaikan_penarikan', $locked, $before, $locked->attributesToArray(), $actor);
+            app(\App\Services\NotifikasiService::class)->kirim($locked->nasabah?->user, 'penarikan_selesai', 'Penarikan selesai', 'Uang '.\App\Services\NotifikasiService::rupiah($locked->jumlah).' sudah diserahkan kepada Anda.', 'saldo');
 
             return $locked;
         });

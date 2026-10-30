@@ -8,6 +8,7 @@ use App\Filament\Resources\BankSampahs\BankSampahResource;
 use App\Filament\Resources\HargaSampahs\HargaSampahResource;
 use App\Filament\Resources\Nasabahs\NasabahResource;
 use App\Filament\Resources\PenarikanSaldos\PenarikanSaldoResource;
+use App\Filament\Resources\TitikBioporis\TitikBioporiResource;
 use App\Filament\Resources\TransaksiAnorganiks\TransaksiAnorganikResource;
 use App\Filament\Resources\TransaksiOrganiks\TransaksiOrganikResource;
 use App\Models\AktivitasBiopori;
@@ -17,6 +18,7 @@ use App\Models\JenisSampah;
 use App\Models\KoreksiTransaksi;
 use App\Models\Nasabah;
 use App\Models\PenarikanSaldo;
+use App\Models\TitikBiopori;
 use App\Models\TransaksiAnorganik;
 use App\Models\TransaksiOrganik;
 use App\Models\User;
@@ -53,6 +55,7 @@ class BerandaHero extends Widget
             'penarikan' => PenarikanSaldo::query()->visibleTo($user)->where('status', PenarikanSaldo::STATUS_PENDING)->count(),
             'koreksi' => KoreksiTransaksi::query()->visibleTo($user)->where('status', KoreksiTransaksi::STATUS_PENDING)->count(),
             'nasabah' => Nasabah::query()->visibleTo($user)->where('status_verifikasi', 'pending')->where('status', 'aktif')->count(),
+            'titik' => TitikBiopori::query()->visibleTo($user)->where('verifikasi', TitikBiopori::VERIFIKASI_PENDING)->count(),
         ];
 
         // Pop-up pengingat: kategori yang punya tugas menunggu, lengkap dengan beberapa item terbaru yang langsung menuju halamannya.
@@ -63,6 +66,9 @@ class BerandaHero extends Widget
             ->map(fn (PenarikanSaldo $p) => ['title' => ($p->nasabah?->nama ?? 'Nasabah').' · Rp '.number_format((float) $p->jumlah, 0, ',', '.'), 'meta' => 'Diajukan '.$p->created_at?->format('d M Y'), 'url' => PenarikanSaldoResource::getUrl('index')]);
         $organik = AktivitasBiopori::query()->visibleTo($user)->with('nasabah')->where('status', AktivitasBiopori::STATUS_PENDING)->latest('id')->limit(3)->get()
             ->map(fn (AktivitasBiopori $a) => ['title' => ($a->nasabah?->nama ?? 'Nasabah').' · '.($a->jenis_sampah ?: 'Aktivitas'), 'meta' => number_format((float) $a->berat_kg, 1, ',', '.').' kg', 'url' => AktivitasBioporiResource::getUrl('view', ['record' => $a])]);
+        $filterTitik = ['tableFilters' => ['verifikasi' => ['value' => 'pending']]];
+        $titikBaru = TitikBiopori::query()->visibleTo($user)->where('verifikasi', TitikBiopori::VERIFIKASI_PENDING)->latest('id')->limit(3)->get()
+            ->map(fn (TitikBiopori $t) => ['title' => $t->nama_lokasi ?: 'Titik baru', 'meta' => 'Diajukan '.$t->created_at?->format('d M Y'), 'url' => TitikBioporiResource::getUrl('index', $filterTitik)]);
         $koreksi = KoreksiTransaksi::query()->visibleTo($user)->where('status', KoreksiTransaksi::STATUS_PENDING)->latest('id')->limit(3)->get()
             ->map(fn (KoreksiTransaksi $k) => ['title' => ucfirst($k->tipe_transaksi).' #'.$k->transaksi_id, 'meta' => 'Menunggu keputusan', 'url' => \App\Filament\Resources\KoreksiTransaksis\KoreksiTransaksiResource::getUrl('index')]);
 
@@ -70,6 +76,7 @@ class BerandaHero extends Widget
             ['label' => 'Pendaftaran nasabah baru', 'hint' => 'Perlu diverifikasi sebelum bisa menarik saldo', 'count' => $pending['nasabah'], 'url' => NasabahResource::getUrl('index', $filterNasabah), 'items' => $nasabahBaru->all()],
             ['label' => 'Penarikan saldo', 'hint' => 'Menunggu persetujuan', 'count' => $pending['penarikan'], 'url' => PenarikanSaldoResource::getUrl('index'), 'items' => $penarikan->all()],
             ['label' => 'Aktivitas organik', 'hint' => 'Menunggu verifikasi foto bukti', 'count' => $pending['biopori'], 'url' => AktivitasBioporiResource::getUrl('index'), 'items' => $organik->all()],
+            ['label' => 'Pengajuan titik Biopori', 'hint' => 'Lokasi baru dari nasabah menunggu persetujuan', 'count' => $pending['titik'], 'url' => TitikBioporiResource::getUrl('index', $filterTitik), 'items' => $titikBaru->all()],
             ['label' => 'Koreksi transaksi', 'hint' => 'Menunggu keputusan', 'count' => $pending['koreksi'], 'url' => \App\Filament\Resources\KoreksiTransaksis\KoreksiTransaksiResource::getUrl('index'), 'items' => $koreksi->all()],
         ], fn (array $p): bool => $p['count'] > 0));
         $jam = (int) now()->format('G');

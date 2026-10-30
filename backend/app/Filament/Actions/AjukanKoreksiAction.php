@@ -2,6 +2,7 @@
 
 namespace App\Filament\Actions;
 
+use App\Filament\Forms\DecimalInput;
 use App\Models\TransaksiAnorganik;
 use App\Models\TransaksiOrganik;
 use App\Services\KoreksiService;
@@ -24,7 +25,7 @@ class AjukanKoreksiAction
             ->color('warning')
             ->visible(fn (): bool => auth()->user()?->isStaff() ?? false)
             ->schema([
-                TextInput::make('berat_kg')->label('Berat yang benar')->suffix('kg')->numeric()->minValue(0.01)->maxValue(10000)->required()
+                DecimalInput::make('berat_kg')->label('Berat yang benar')->suffix('kg')->batasMin(0.01)->batasMax(10000)->required()
                     ->default(fn (TransaksiAnorganik|TransaksiOrganik $record) => $record->berat_kg),
                 Textarea::make('alasan')->label('Alasan koreksi')->required()->minLength(10)->maxLength(1000),
             ])

@@ -39,6 +39,11 @@ return [
     | Google Sign-In (semua role). Backend SELALU memverifikasi ID token Google
     | (signature, issuer, audience/client ID, expiry, email_verified).
     */
+    // Firebase Cloud Messaging: jalur ke berkas JSON akun layanan (di luar repository). Kosong = push dimatikan.
+    'firebase' => [
+        'credentials' => env('FIREBASE_CREDENTIALS'),
+    ],
+
     'google' => [
         // OAuth client "Web application" (dipakai dashboard Filament).
         'client_id' => env('GOOGLE_CLIENT_ID'),

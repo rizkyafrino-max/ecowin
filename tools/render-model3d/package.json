@@ -1,0 +1,10 @@
+{
+  "name": "ecowin-render-model3d",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Alat sekali pakai: render STL menjadi sprite putar",
+  "devDependencies": {
+    "puppeteer-core": "^25.14.0",
+    "three": "^0.186.1"
+  }
+}

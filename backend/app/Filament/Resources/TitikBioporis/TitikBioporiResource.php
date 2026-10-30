@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TitikBioporis;
 
+use App\Filament\Forms\DecimalInput;
 use App\Filament\Concerns\ScopesToCurrentUser;
 use App\Filament\Resources\TitikBioporis\Pages\CreateTitikBiopori;
 use App\Filament\Resources\TitikBioporis\Pages\EditTitikBiopori;
@@ -49,6 +50,19 @@ class TitikBioporiResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
+    /** Jumlah lokasi yang menunggu verifikasi (sesuai hak akses pengguna), supaya petugas tahu ada yang perlu diperiksa. */
+    public static function getNavigationBadge(): ?string
+    {
+        $n = static::getEloquentQuery()->where('verifikasi', TitikBiopori::VERIFIKASI_PENDING)->count();
+
+        return $n > 0 ? (string) $n : null;
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'warning';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
@@ -85,7 +99,7 @@ class TitikBioporiResource extends Resource
                 TextColumn::make('nama_lokasi')->label('Lokasi')->searchable()->placeholder(fn (TitikBiopori $r) => $r->alamat_rt_rw),
                 TextColumn::make('nasabah.nama')->label('Penanggung jawab')->placeholder('-')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('tanggal_tanam')->label('Dibuat')->date('d M Y')->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('terakhir_diisi_at')->label('Terakhir diisi')->dateTime('d M Y')->placeholder('Belum'),
+                TextColumn::make('terakhir_diisi_at')->label('Terakhir diisi')->dateTime('d M Y')->placeholder('Belum')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('estimasi_panen_at')->label('Estimasi panen')->date('d M Y')->placeholder('-')->sortable(),
                 TextColumn::make('status_panen')->label('Status panen')->badge()
                     ->state(fn (TitikBiopori $r): string => $r->statusPanenEfektif())
@@ -93,19 +107,39 @@ class TitikBioporiResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'siap_panen' => 'warning', 'sudah_panen' => 'success', default => 'gray',
                     }),
-                TextColumn::make('hasil_kompos_kg')->label('Hasil kompos')->suffix(' kg')->placeholder('-'),
+                TextColumn::make('hasil_kompos_kg')->label('Hasil kompos')->suffix(' kg')->placeholder('-')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('status')->badge()->color(fn (string $state): string => match ($state) {
                     'aktif' => 'success', 'penuh' => 'warning', default => 'gray',
                 }),
+                TextColumn::make('verifikasi')->label('Verifikasi')->badge()
+                    ->formatStateUsing(fn (string $state): string => ['pending' => 'Menunggu', 'approved' => 'Disetujui', 'rejected' => 'Ditolak'][$state] ?? $state)
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning', 'rejected' => 'danger', default => 'success',
+                    }),
                 TextColumn::make('bankSampah.nama_bank_sampah')->label('Bank Sampah')->visible(fn (): bool => auth()->user()?->isAdmin() ?? false),
             ])
             ->filters([
                 SelectFilter::make('status')->options(['aktif' => 'Aktif', 'penuh' => 'Penuh', 'dikosongkan' => 'Dikosongkan']),
+                SelectFilter::make('verifikasi')->label('Verifikasi')->options(['pending' => 'Menunggu', 'approved' => 'Disetujui', 'rejected' => 'Ditolak']),
             ])
             ->recordActions([
+                Action::make('setujui')->label('Setujui titik')->icon('heroicon-o-check-circle')->color('success')
+                    ->visible(fn (TitikBiopori $r): bool => $r->isPendingVerifikasi() && (auth()->user()?->can('verify', $r) ?? false))
+                    ->requiresConfirmation()->modalDescription('Titik akan tampil di peta dan bisa dipakai nasabah untuk melapor aktivitas.')
+                    ->action(function (TitikBiopori $record): void {
+                        app(BioporiService::class)->setujuiTitik(auth()->user(), $record);
+                        Notification::make()->success()->title('Titik disetujui.')->send();
+                    }),
+                Action::make('tolak')->label('Tolak')->icon('heroicon-o-x-circle')->color('danger')
+                    ->visible(fn (TitikBiopori $r): bool => $r->isPendingVerifikasi() && (auth()->user()?->can('verify', $r) ?? false))
+                    ->schema([TextInput::make('catatan')->label('Alasan penolakan')->required()->maxLength(500)])
+                    ->action(function (TitikBiopori $record, array $data): void {
+                        app(BioporiService::class)->tolakTitik(auth()->user(), $record, $data['catatan']);
+                        Notification::make()->success()->title('Titik ditolak.')->send();
+                    }),
                 Action::make('panen')->label('Catat panen')->icon('heroicon-o-check-badge')->color('success')
-                    ->visible(fn (TitikBiopori $r): bool => $r->statusPanenEfektif() !== TitikBiopori::PANEN_SUDAH && (auth()->user()?->can('update', $r) ?? false))
-                    ->schema([TextInput::make('hasil_kompos_kg')->label('Hasil kompos')->suffix('kg')->numeric()->minValue(0)->maxValue(10000)->required()])
+                    ->visible(fn (TitikBiopori $r): bool => $r->verifikasi === TitikBiopori::VERIFIKASI_APPROVED && $r->statusPanenEfektif() !== TitikBiopori::PANEN_SUDAH && (auth()->user()?->can('update', $r) ?? false))
+                    ->schema([DecimalInput::make('hasil_kompos_kg')->label('Hasil kompos')->suffix('kg')->batasMin(0)->batasMax(10000)->required()])
                     ->action(function (TitikBiopori $record, array $data): void {
                         app(BioporiService::class)->tandaiPanen(auth()->user(), $record, (float) $data['hasil_kompos_kg']);
                         Notification::make()->success()->title('Panen dicatat.')->send();

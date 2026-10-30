@@ -26,6 +26,10 @@
 -dontwarn org.bouncycastle.**
 -dontwarn org.openjsse.**
 
+# osmdroid (peta OpenStreetMap)
+-dontwarn org.osmdroid.**
+-keep class org.osmdroid.** { *; }
+
 # Gson TypeToken
 -keep class com.google.gson.reflect.TypeToken { *; }
 -keep class * extends com.google.gson.reflect.TypeToken

@@ -8,7 +8,7 @@ export default function Card({ as: Tag = 'section', className = '', children, ..
 
 /** Kartu statistik kecil: ikon, label, angka. */
 export function StatCard({ icon: Icon, label, value, hint, tone = 'primary' }) {
-  const tones = { primary: 'bg-tint text-primary', info: 'bg-info-tint text-info', warn: 'bg-warn-tint text-warn' };
+  const tones = { primary: 'bg-tint text-primary-deep', info: 'bg-info-tint text-info', warn: 'bg-warn-tint text-warn' };
   return (
     <Card className="flex flex-col gap-3 !p-4 sm:flex-row sm:items-start sm:gap-4 sm:!p-5">
       <span className={`flex h-10 w-10 flex-none items-center justify-center rounded-2xl sm:h-11 sm:w-11 ${tones[tone]}`}>

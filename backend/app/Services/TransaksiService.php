@@ -52,6 +52,7 @@ class TransaksiService
             }
 
             $this->audit->log('buat_transaksi_anorganik', $transaksi, null, $transaksi->attributesToArray(), $actor);
+            app(\App\Services\NotifikasiService::class)->kirim($nasabah->user, 'setoran_anorganik', 'Setoran tercatat', number_format($beratKg, 2, ',', '.').' kg '.($harga->jenisSampah?->nama_jenis ?? 'sampah').' bernilai '.\App\Services\NotifikasiService::rupiah($nilai).' masuk ke saldo Anda.', 'transaksi');
 
             return $transaksi;
         });
@@ -87,6 +88,7 @@ class TransaksiService
             ])->save();
 
             $this->audit->log('buat_transaksi_organik', $transaksi, null, $transaksi->attributesToArray(), $actor);
+            app(\App\Services\NotifikasiService::class)->kirim($nasabah->user, 'setoran_organik', 'Setoran organik tercatat', number_format($berat, 2, ',', '.').' kg '.$data['jenis_organik'].' tercatat (estimasi kompos '.number_format((float) $transaksi->estimasi_kompos_kg, 2, ',', '.').' kg). Organik tidak menambah saldo.', 'organik');
 
             return $transaksi;
         });

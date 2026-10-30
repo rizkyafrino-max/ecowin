@@ -30,11 +30,24 @@ interface EcoWinApi {
     @GET("auth/me")
     suspend fun me(): DataWrapper<UserDto>
 
+    @POST("perangkat")
+    suspend fun daftarPerangkat(@Body body: PerangkatRequest)
+
+    @retrofit2.http.HTTP(method = "DELETE", path = "perangkat", hasBody = true)
+    suspend fun lepasPerangkat(@Body body: PerangkatRequest)
+
     @POST("auth/logout")
     suspend fun logout()
 
     @PATCH("profile")
     suspend fun updateProfile(@Body body: ProfileUpdateRequest): DataWrapper<UserDto>
+
+    @retrofit2.http.Multipart
+    @POST("profile/foto")
+    suspend fun gantiFoto(@retrofit2.http.Part foto: okhttp3.MultipartBody.Part): DataWrapper<UserDto>
+
+    @retrofit2.http.DELETE("profile/foto")
+    suspend fun hapusFoto(): DataWrapper<UserDto>
 
     @GET("dashboard/summary")
     suspend fun dashboard(): DashboardDto
@@ -62,6 +75,28 @@ interface EcoWinApi {
 
     @GET("organik/biopori/lokasi")
     suspend fun lokasiBiopori(): DataWrapper<List<TitikBioporiDto>>
+
+    @GET("notifikasi")
+    suspend fun notifikasi(): NotifikasiResponse
+
+    @GET("notifikasi/jumlah")
+    suspend fun jumlahNotif(): JumlahNotifDto
+
+    @retrofit2.http.DELETE("notifikasi/{id}")
+    suspend fun hapusNotif(@retrofit2.http.Path("id") id: Long): JumlahNotifDto
+
+    /** hanyaDibaca = 1 menghapus hanya yang sudah dibaca; null menghapus semua. */
+    @retrofit2.http.DELETE("notifikasi")
+    suspend fun hapusSemuaNotif(@retrofit2.http.Query("hanya_dibaca") hanyaDibaca: Int?): JumlahNotifDto
+
+    @POST("notifikasi/{id}/baca")
+    suspend fun bacaNotif(@retrofit2.http.Path("id") id: Long): JumlahNotifDto
+
+    @POST("notifikasi/baca-semua")
+    suspend fun bacaSemuaNotif(): JumlahNotifDto
+
+    @POST("organik/biopori/lokasi")
+    suspend fun ajukanTitik(@Body body: AjukanTitikRequest): DataWrapper<TitikBioporiDto>
 
     @GET("organik/biopori")
     suspend fun aktivitasBiopori(): Paged<AktivitasBioporiDto>

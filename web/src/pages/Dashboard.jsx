@@ -45,7 +45,7 @@ export default function Dashboard() {
       <div className="flex items-center gap-3.5">
         {user?.avatar
           ? <img src={user.avatar} alt="" referrerPolicy="no-referrer" className="h-12 w-12 rounded-full object-cover md:hidden" />
-          : <span className="flex h-12 w-12 items-center justify-center rounded-full bg-tint font-bold text-primary md:hidden">{inisial(user?.nama)}</span>}
+          : <span className="flex h-12 w-12 items-center justify-center rounded-full bg-tint font-bold text-primary-deep md:hidden">{inisial(user?.nama)}</span>}
         <div>
           <p className="text-sm text-muted">{sapaan()},</p>
           <h2 className="text-2xl font-extrabold leading-tight">{user?.nama}</h2>
@@ -65,7 +65,7 @@ export default function Dashboard() {
             <Card className="flex min-w-0 flex-col justify-center">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-bold">Aksi cepat</p>
-                <Link to="/fitur" className="text-xs font-semibold text-muted hover:text-primary">Lihat semua</Link>
+                <Link to="/fitur" className="text-xs font-semibold text-muted hover:text-primary-deep">Lihat semua</Link>
               </div>
               <div className="-mx-5 mt-3 flex gap-2.5 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {[
@@ -76,7 +76,7 @@ export default function Dashboard() {
                 ].map((a, i) => (
                   <Link key={a.label} to={a.to}
                     className={`flex flex-none items-center gap-2 rounded-full py-1 pl-1 pr-4 text-sm font-semibold transition ${i === 0 ? 'bg-gradient-to-r from-tint via-accent/40 to-accent/70 text-ink' : 'bg-line/50 text-ink hover:bg-tint'}`}>
-                    <span className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface text-primary"><a.icon className="h-5 w-5" aria-hidden /></span>
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface text-primary-deep"><a.icon className="h-5 w-5" aria-hidden /></span>
                     {a.label}
                   </Link>
                 ))}
@@ -97,7 +97,7 @@ export default function Dashboard() {
 
           <div className="grid gap-4 lg:grid-cols-2">
             <Card>
-              <div className="mb-1 flex items-center justify-between"><h3 className="font-bold">Transaksi terbaru</h3><Link to="/transaksi" className="text-sm font-semibold text-primary">Lihat semua</Link></div>
+              <div className="mb-1 flex items-center justify-between"><h3 className="font-bold">Transaksi terbaru</h3><Link to="/transaksi" className="text-sm font-semibold text-primary-deep">Lihat semua</Link></div>
               {dash.loading ? <LoadingState rows={3} /> : d.transaksi_terakhir.length === 0
                 ? <EmptyState title="Belum ada transaksi" message="Setoran sampah anorganik Anda akan tampil di sini." />
                 : <ul className="divide-y divide-line">{d.transaksi_terakhir.map((t) => (
@@ -106,7 +106,7 @@ export default function Dashboard() {
             </Card>
 
             <Card>
-              <div className="mb-1 flex items-center justify-between"><h3 className="font-bold">Aktivitas Organik</h3><Link to="/organik" className="text-sm font-semibold text-primary">Lihat semua</Link></div>
+              <div className="mb-1 flex items-center justify-between"><h3 className="font-bold">Aktivitas Organik</h3><Link to="/organik" className="text-sm font-semibold text-primary-deep">Lihat semua</Link></div>
               {dash.loading ? <LoadingState rows={3} /> : d.biopori_terakhir.length === 0
                 ? <EmptyState icon={Leaf} title="Belum ada aktivitas" message="Tambahkan aktivitas saat Anda mengolah sampah organik."
                   action={<Link to="/organik"><Button size="sm">Tambah Aktivitas</Button></Link>} />

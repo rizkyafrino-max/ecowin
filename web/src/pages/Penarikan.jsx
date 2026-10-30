@@ -1,3 +1,4 @@
+import { soloAngka } from '../utils/angka';
 import { ArrowUpFromLine, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 import { EcoApi } from '../api/endpoints';
@@ -63,17 +64,17 @@ export default function Penarikan() {
       <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr]">
         <Card>
           <p className="text-sm text-muted">Saldo tersedia</p>
-          <p className="mt-1 text-3xl font-extrabold tabular-nums text-primary">{saldo.loading ? '…' : rupiah(tersedia)}</p>
+          <p className="mt-1 text-3xl font-extrabold tabular-nums text-primary-deep">{saldo.loading ? '…' : rupiah(tersedia)}</p>
           <form onSubmit={ask} className="mt-5 space-y-4" noValidate>
-            <Input label="Nominal penarikan (Rp)" type="number" inputMode="numeric" min="1" step="1" value={jumlah} onChange={(e) => setJumlah(e.target.value)} error={errors.jumlah} placeholder="mis. 20000" />
+            <Input label="Nominal penarikan (Rp)" type="text" inputMode="numeric" autoComplete="off" value={jumlah} onChange={(e) => setJumlah(soloAngka(e.target.value))} error={errors.jumlah} placeholder="mis. 20000" />
             <div className="flex flex-wrap gap-2">
-              {[10000, 20000, 50000].map((v) => <button key={v} type="button" onClick={() => setJumlah(String(v))} className="rounded-full bg-tint px-3.5 py-1.5 text-xs font-semibold text-primary hover:bg-emerald-100">{rupiah(v)}</button>)}
+              {[10000, 20000, 50000].map((v) => <button key={v} type="button" onClick={() => setJumlah(String(v))} className="rounded-full bg-tint px-3.5 py-1.5 text-xs font-semibold text-primary-deep hover:bg-emerald-100">{rupiah(v)}</button>)}
               {tersedia > 0 && <button type="button" onClick={() => setJumlah(String(Math.floor(tersedia)))} className="rounded-full border border-line px-3.5 py-1.5 text-xs font-semibold text-muted hover:bg-canvas">Semua saldo</button>}
             </div>
             <Textarea label="Catatan (opsional)" value={catatan} onChange={(e) => setCatatan(e.target.value)} maxLength={500} />
             <Button type="submit" size="lg" className="w-full" icon={ArrowUpFromLine} disabled={belumVerifikasi}>Ajukan penarikan</Button>
           </form>
-          {ok && <p className="mt-4 flex items-center gap-2 rounded-2xl bg-tint p-3.5 text-sm font-semibold text-primary" role="status"><CheckCircle2 className="h-5 w-5" aria-hidden />Pengajuan terkirim, menunggu petugas.</p>}
+          {ok && <p className="mt-4 flex items-center gap-2 rounded-2xl bg-tint p-3.5 text-sm font-semibold text-primary-deep" role="status"><CheckCircle2 className="h-5 w-5" aria-hidden />Pengajuan terkirim, menunggu petugas.</p>}
         </Card>
 
         <div>

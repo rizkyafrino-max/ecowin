@@ -106,6 +106,67 @@ object Lucide {
         "M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"
     ) }
 
+    val Printer: ImageVector by lazy { icon("Printer",
+        "M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2",
+        "M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6",
+        "M7 14h10a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1Z"
+    ) }
+
+    val Camera: ImageVector by lazy { icon("Camera",
+        "M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z",
+        "M9 13a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+    ) }
+    val X: ImageVector by lazy { icon("X", "M18 6 6 18", "m6 6 12 12") }
+    val ChevronLeft: ImageVector by lazy { icon("ChevronLeft", "m15 18-6-6 6-6") }
+    val ChevronDown: ImageVector by lazy { icon("ChevronDown", "m6 9 6 6 6-6") }
+    val Trash2: ImageVector by lazy { icon("Trash2",
+        "M3 6h18",
+        "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6",
+        "M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2",
+        "M10 11v6",
+        "M14 11v6"
+    ) }
+    val Settings: ImageVector by lazy { icon("Settings",
+        "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z",
+        "M9 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+    ) }
+    val Megaphone: ImageVector by lazy { icon("Megaphone",
+        "m3 11 18-5v12L3 14v-3z",
+        "M11.6 16.8a3 3 0 1 1-5.8-1.6"
+    ) }
+    val Bell: ImageVector by lazy { icon("Bell",
+        "M10.268 21a2 2 0 0 0 3.464 0",
+        "M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"
+    ) }
+
+    val CheckCheck: ImageVector by lazy { icon("CheckCheck",
+        "M18 6 7 17l-5-5",
+        "m22 10-7.5 7.5L13 16"
+    ) }
+
+    val ArrowLeft: ImageVector by lazy { icon("ArrowLeft",
+        "m12 19-7-7 7-7",
+        "M19 12H5"
+    ) }
+
+    val Check: ImageVector by lazy { icon("Check",
+        "M20 6 9 17l-5-5"
+    ) }
+
+    val Phone: ImageVector by lazy { icon("Phone",
+        "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+    ) }
+
+    val Building2: ImageVector by lazy { icon("Building2",
+        "M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z",
+        "M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2",
+        "M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2",
+        "M10 6h4",
+        "M10 10h4",
+        "M10 14h4",
+        "M10 18h4"
+    ) }
+
     val MapPin: ImageVector by lazy { icon("MapPin",
         "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
         "M9 10a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"

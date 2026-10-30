@@ -31,7 +31,7 @@ class BioporiService
 
         $titik = TitikBiopori::query()->findOrFail($data['titik_biopori_id']);
 
-        if ((int) $titik->bank_sampah_id !== (int) $nasabah->bank_sampah_id || $titik->status !== 'aktif') {
+        if ((int) $titik->bank_sampah_id !== (int) $nasabah->bank_sampah_id || $titik->status !== 'aktif' || $titik->verifikasi !== TitikBiopori::VERIFIKASI_APPROVED) {
             throw ValidationException::withMessages(['titik_biopori_id' => ['Lokasi Biopori tidak tersedia untuk Bank Sampah Anda.']]);
         }
 
@@ -74,6 +74,128 @@ class BioporiService
 
             return $aktivitas;
         });
+    }
+
+    /** Jumlah maksimum pengajuan titik yang boleh menunggu sekaligus per nasabah. */
+    public const MAKS_PENGAJUAN_PENDING = 3;
+
+    /** Titik yang lebih dekat dari ini (meter) dengan titik lain di Bank Sampah yang sama dianggap duplikat. */
+    public const JARAK_DUPLIKAT_METER = 15;
+
+    /**
+     * Nasabah mengajukan titik Biopori baru. Titik berstatus "pending" dan belum tampil di peta resmi
+     * sampai petugas Bank Sampah yang sama menyetujuinya.
+     *
+     * @param  array{nama_lokasi: string, latitude: float|string, longitude: float|string, deskripsi_lokasi?: string|null, alamat_rt_rw?: string|null}  $data
+     */
+    public function ajukanTitik(User $actor, array $data): TitikBiopori
+    {
+        $nasabah = $actor->nasabah;
+
+        if (! $actor->isNasabah() || ! $nasabah || ! $actor->isActive()) {
+            throw new AuthorizationException('Hanya nasabah aktif yang dapat mengajukan titik Biopori.');
+        }
+
+        if ($nasabah->status_verifikasi !== 'verified') {
+            throw ValidationException::withMessages(['nama_lokasi' => ['Akun Anda belum diverifikasi petugas, sehingga belum bisa mengajukan titik baru.']]);
+        }
+
+        $lat = (float) $data['latitude'];
+        $lng = (float) $data['longitude'];
+
+        return DB::transaction(function () use ($actor, $nasabah, $data, $lat, $lng): TitikBiopori {
+            // Kunci baris nasabah agar batas pengajuan tidak bisa dilewati dengan permintaan serentak.
+            $nasabah->newQuery()->whereKey($nasabah->id)->lockForUpdate()->first();
+
+            $menunggu = TitikBiopori::query()->where('diajukan_oleh', $actor->id)->where('verifikasi', TitikBiopori::VERIFIKASI_PENDING)->count();
+            if ($menunggu >= self::MAKS_PENGAJUAN_PENDING) {
+                throw ValidationException::withMessages(['nama_lokasi' => ['Anda sudah memiliki '.self::MAKS_PENGAJUAN_PENDING.' pengajuan yang menunggu verifikasi. Tunggu keputusan petugas dulu.']]);
+            }
+
+            $dekat = TitikBiopori::query()
+                ->where('bank_sampah_id', $nasabah->bank_sampah_id)
+                ->whereIn('verifikasi', [TitikBiopori::VERIFIKASI_APPROVED, TitikBiopori::VERIFIKASI_PENDING])
+                ->whereNotNull('latitude')->whereNotNull('longitude')
+                ->get(['id', 'nama_lokasi', 'latitude', 'longitude'])
+                ->first(fn (TitikBiopori $t): bool => $this->jarakMeter($lat, $lng, (float) $t->latitude, (float) $t->longitude) < self::JARAK_DUPLIKAT_METER);
+            if ($dekat) {
+                throw ValidationException::withMessages(['latitude' => ['Sudah ada titik "'.$dekat->nama_lokasi.'" di lokasi ini. Pilih lokasi yang berbeda.']]);
+            }
+
+            $titik = new TitikBiopori([
+                'nasabah_id' => $nasabah->id,
+                'nama_lokasi' => trim($data['nama_lokasi']),
+                'alamat_rt_rw' => trim((string) ($data['alamat_rt_rw'] ?? '')) ?: ($nasabah->alamat_rt_rw ?: '-'),
+                'deskripsi_lokasi' => ($data['deskripsi_lokasi'] ?? null) ?: null,
+                'latitude' => round($lat, 7),
+                'longitude' => round($lng, 7),
+                'tanggal_tanam' => now()->toDateString(),
+                'jumlah_pipa' => 1,
+                'bioporiprint' => true,
+                'status' => 'aktif',
+            ]);
+            $titik->forceFill([
+                'bank_sampah_id' => $nasabah->bank_sampah_id,
+                'dicatat_oleh' => $actor->id,
+                'diajukan_oleh' => $actor->id,
+                'verifikasi' => TitikBiopori::VERIFIKASI_PENDING,
+            ])->save();
+
+            $this->audit->log('ajukan_titik_biopori', $titik, null, $titik->attributesToArray(), $actor);
+
+            return $titik;
+        });
+    }
+
+    public function setujuiTitik(User $actor, TitikBiopori $titik, ?string $catatan = null): TitikBiopori
+    {
+        return $this->putuskanTitik($actor, $titik, TitikBiopori::VERIFIKASI_APPROVED, $catatan);
+    }
+
+    public function tolakTitik(User $actor, TitikBiopori $titik, string $catatan): TitikBiopori
+    {
+        return $this->putuskanTitik($actor, $titik, TitikBiopori::VERIFIKASI_REJECTED, $catatan);
+    }
+
+    private function putuskanTitik(User $actor, TitikBiopori $titik, string $status, ?string $catatan): TitikBiopori
+    {
+        if (! $actor->isStaff() || ! $actor->isActive() || ! $actor->canManageBankSampah($titik->bank_sampah_id)) {
+            throw new AuthorizationException('Anda tidak berhak memverifikasi titik ini.');
+        }
+
+        return DB::transaction(function () use ($actor, $titik, $status, $catatan): TitikBiopori {
+            $locked = TitikBiopori::query()->whereKey($titik->id)->lockForUpdate()->firstOrFail();
+
+            if (! $locked->isPendingVerifikasi()) {
+                throw ValidationException::withMessages(['verifikasi' => ['Titik ini sudah diverifikasi.']]);
+            }
+
+            $before = $locked->attributesToArray();
+            $locked->forceFill([
+                'verifikasi' => $status,
+                'catatan_verifikasi' => $catatan,
+                'diverifikasi_oleh' => $actor->id,
+                'diverifikasi_at' => now(),
+            ])->save();
+
+            $aksi = $status === TitikBiopori::VERIFIKASI_APPROVED ? 'setujui_titik_biopori' : 'tolak_titik_biopori';
+            $this->audit->log($aksi, $locked, $before, $locked->attributesToArray(), $actor);
+            $disetujui = $status === TitikBiopori::VERIFIKASI_APPROVED;
+            app(\App\Services\NotifikasiService::class)->kirim($locked->pengaju, $disetujui ? 'titik_disetujui' : 'titik_ditolak', $disetujui ? 'Titik Biopori disetujui' : 'Titik Biopori ditolak', $disetujui ? 'Titik "'.$locked->nama_lokasi.'" sudah disetujui dan tampil di peta. Anda bisa melapor aktivitas di sana.' : 'Titik "'.$locked->nama_lokasi.'" ditolak. Alasan: '.($catatan ?: '-'), 'organik');
+
+            return $locked;
+        });
+    }
+
+    /** Jarak antar dua koordinat (haversine), dalam meter. */
+    private function jarakMeter(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $r = 6371000;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        $a = sin($dLat / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
+
+        return 2 * $r * asin(min(1, sqrt($a)));
     }
 
     public function setujui(User $actor, AktivitasBiopori $aktivitas, ?string $catatan = null): AktivitasBiopori
@@ -145,6 +267,8 @@ class BioporiService
 
             $aksi = $status === AktivitasBiopori::STATUS_APPROVED ? 'approve_biopori' : 'reject_biopori';
             $this->audit->log($aksi, $locked, $before, $locked->attributesToArray(), $actor);
+            $disetujui = $status === AktivitasBiopori::STATUS_APPROVED;
+            app(\App\Services\NotifikasiService::class)->kirim($locked->nasabah?->user, $disetujui ? 'biopori_disetujui' : 'biopori_ditolak', $disetujui ? 'Aktivitas organik disetujui' : 'Aktivitas organik ditolak', $disetujui ? 'Aktivitas Biopori Anda ('.number_format((float) $locked->berat_kg, 2, ',', '.').' kg) sudah disetujui petugas.' : 'Aktivitas Biopori Anda ditolak. Alasan: '.($catatan ?: '-'), 'organik');
 
             return $locked;
         });

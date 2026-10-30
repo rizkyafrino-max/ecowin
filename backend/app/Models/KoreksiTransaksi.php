@@ -54,12 +54,12 @@ class KoreksiTransaksi extends Model
 
     public function pengaju(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'diajukan_oleh');
+        return $this->belongsTo(User::class, 'diajukan_oleh')->withTrashed();
     }
 
     public function penyetuju(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'disetujui_oleh');
+        return $this->belongsTo(User::class, 'disetujui_oleh')->withTrashed();
     }
 
     public function bankSampah(): BelongsTo

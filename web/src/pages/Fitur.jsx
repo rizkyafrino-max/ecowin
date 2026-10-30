@@ -38,7 +38,7 @@ export default function Fitur() {
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {g.items.map((f) => (
               <Link key={f.label} to={f.to} className="flex items-start gap-3.5 rounded-[20px] border border-line bg-surface p-4 transition hover:border-primary/40 hover:shadow-md">
-                <span className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-tint text-primary"><f.icon className="h-6 w-6" aria-hidden /></span>
+                <span className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-tint text-primary-deep"><f.icon className="h-6 w-6" aria-hidden /></span>
                 <span className="min-w-0">
                   <span className="block font-bold">{f.label}</span>
                   <span className="mt-0.5 block text-xs leading-relaxed text-muted">{f.text}</span>

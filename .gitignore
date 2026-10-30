@@ -1,2 +1,15 @@
 *.log
 *.err
+
+# Arsip/berkas sementara di akar proyek tidak boleh ikut di-commit
+/*.zip
+
+# Model 3D pihak ketiga (lisensi belum dipastikan): jangan di-commit
+/model3d.stl
+/*.stl
+/tools/**/node_modules/
+
+# Firebase: kunci akun layanan dan konfigurasi aplikasi bersifat rahasia (lihat FIREBASE.md)
+/backend/storage/firebase/
+/android-app/app/google-services.json
+*-firebase-adminsdk-*.json

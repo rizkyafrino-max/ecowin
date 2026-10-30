@@ -46,13 +46,14 @@
         {{-- Sapaan, pencarian, notifikasi --}}
         <header class="eco-home-top">
             <div class="eco-home-user">
-                @if ($user->avatar)
-                    <img class="eco-avatar" src="{{ $user->avatar }}" alt="" referrerpolicy="no-referrer">
+                @if ($user->avatarUrl())
+                    <img class="eco-avatar" src="{{ $user->avatarUrl() }}" alt="" referrerpolicy="no-referrer">
                 @else
                     <span class="eco-avatar eco-avatar-text" aria-hidden="true">{{ mb_strtoupper(mb_substr((string) $user->nama, 0, 1)) }}</span>
                 @endif
                 <div>
-                    <p class="eco-home-name">{{ $sapaan }}, {{ $user->nama }}</p>
+                    <p class="eco-home-hello">{{ $sapaan }},</p>
+                    <p class="eco-home-name">{{ $user->nama }}</p>
                     <p class="eco-home-loc"><span class="eco-role">{{ strtoupper($user->roleEnum()?->label() ?? $user->role) }}</span>{{ $lokasi }}</p>
                 </div>
             </div>

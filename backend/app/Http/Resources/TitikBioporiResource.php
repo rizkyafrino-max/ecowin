@@ -25,6 +25,9 @@ class TitikBioporiResource extends JsonResource
             'terakhir_diisi_at' => $this->terakhir_diisi_at?->toIso8601String(),
             'estimasi_panen_at' => $this->estimasi_panen_at?->toIso8601String(),
             'status_panen' => $this->statusPanenEfektif(),
+            'verifikasi' => $this->verifikasi,
+            'catatan_verifikasi' => $this->catatan_verifikasi,
+            'diajukan_saya' => $request->user() !== null && (int) $this->diajukan_oleh === (int) $request->user()->id,
         ];
     }
 }
