@@ -16,7 +16,7 @@ class NasabahSeeder extends Seeder
         $banks = BankSampah::query()->orderBy('id')->get();
 
         $data = [
-            [env('ECOWIN_SEED_NASABAH_EMAIL', 'nasabah.budi.ecowin@gmail.com'), 'Budi Santoso', '081234567001', 0],
+            [env('ECOWIN_SEED_NASABAH_EMAIL') ?: 'nasabah.budi.ecowin@gmail.com', 'Budi Santoso', '081234567001', 0],
             ['nasabah.siti.ecowin@gmail.com', 'Siti Aminah', '081234567002', 0],
             ['nasabah.agus.ecowin@gmail.com', 'Agus Wibowo', '081234567003', 1],
             ['nasabah.rina.ecowin@gmail.com', 'Rina Lestari', '081234567004', 2],
