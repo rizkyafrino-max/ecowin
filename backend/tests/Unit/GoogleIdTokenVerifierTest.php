@@ -19,9 +19,9 @@ class GoogleIdTokenVerifierTest extends TestCase
     {
         parent::setUp();
 
-        $this->privateKey = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA]);
-        $csr = openssl_csr_new(['commonName' => 'test'], $this->privateKey);
-        $cert = openssl_csr_sign($csr, null, $this->privateKey, 1);
+        $this->privateKey = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA] + opsi_openssl());
+        $csr = openssl_csr_new(['commonName' => 'test'], $this->privateKey, opsi_openssl());
+        $cert = openssl_csr_sign($csr, null, $this->privateKey, 1, opsi_openssl());
         openssl_x509_export($cert, $pem);
 
         Cache::flush();
@@ -85,7 +85,7 @@ class GoogleIdTokenVerifierTest extends TestCase
 
     public function test_token_signed_by_other_key_is_rejected(): void
     {
-        $this->privateKey = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA]);
+        $this->privateKey = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA] + opsi_openssl());
 
         $this->expectException(InvalidGoogleTokenException::class);
 

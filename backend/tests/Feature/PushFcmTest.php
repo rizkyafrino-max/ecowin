@@ -53,8 +53,8 @@ class PushFcmTest extends TestCase
     /** Membuat kredensial akun layanan palsu dengan kunci RSA sungguhan agar tanda tangan JWT bisa diverifikasi. */
     private function siapkanFirebase(string $tokenUri = 'https://oauth2.googleapis.com/token'): void
     {
-        $kunci = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA]);
-        openssl_pkey_export($kunci, $privat);
+        $kunci = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA] + opsi_openssl());
+        openssl_pkey_export($kunci, $privat, null, opsi_openssl());
         $this->kunciPublik = openssl_pkey_get_details($kunci)['key'];
         $this->berkasKunci = sys_get_temp_dir().'/ecowin-fcm-'.uniqid().'.json';
         file_put_contents($this->berkasKunci, json_encode([
