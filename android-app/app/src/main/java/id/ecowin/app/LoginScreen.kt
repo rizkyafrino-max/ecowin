@@ -76,8 +76,10 @@ fun LoginScreen(
                 .clip(RoundedCornerShape(bottomStart = 36.dp, bottomEnd = 36.dp))
                 .background(Brush.linearGradient(listOf(Color(0xFF065F46), Emerald, Color(0xFF10B981)))),
         ) {
-            Box(Modifier.align(Alignment.TopEnd).offset(x = 70.dp, y = (-80).dp).size(260.dp).background(Color.White.copy(alpha = 0.10f), CircleShape))
-            Box(Modifier.align(Alignment.BottomStart).offset(x = (-70).dp, y = 70.dp).size(200.dp).background(Color.White.copy(alpha = 0.07f), CircleShape))
+            Box(Modifier.matchParentSize()) {
+                Box(Modifier.align(Alignment.TopEnd).offset(x = 70.dp, y = (-80).dp).size(260.dp).background(Color.White.copy(alpha = 0.10f), CircleShape))
+                Box(Modifier.align(Alignment.BottomStart).offset(x = (-70).dp, y = 70.dp).size(200.dp).background(Color.White.copy(alpha = 0.07f), CircleShape))
+            }
             Column(
                 Modifier.fillMaxWidth().statusBarsPadding().padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 84.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),

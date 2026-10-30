@@ -96,3 +96,19 @@ fun soloAngka(raw: String, maksDigit: Int = 9): String {
     val d = raw.filter { it.isDigit() }.take(maksDigit)
     return if (d.length > 1) d.trimStart('0').ifEmpty { "0" } else d
 }
+
+/**
+ * Nama tampilan dari ID token Google, hanya untuk mengisi otomatis kolom nama di formulir daftar.
+ * Token TIDAK diverifikasi di sini (server yang memverifikasi tanda tangan, audience, dan email); hasilnya hanya saran
+ * isian yang bisa diubah pengguna, bukan dasar keputusan apa pun. Mengembalikan null bila bentuk token tidak sesuai.
+ */
+fun namaDariTokenGoogle(idToken: String?): String? {
+    if (idToken.isNullOrBlank() || idToken.length > 4096) return null
+    val bagian = idToken.split('.')
+    if (bagian.size != 3) return null
+    return runCatching {
+        val json = String(java.util.Base64.getUrlDecoder().decode(bagian[1]), Charsets.UTF_8)
+        val nama = com.google.gson.JsonParser.parseString(json).asJsonObject.get("name")?.asString
+        nama?.replace(Regex("[\\p{Cntrl}]"), " ")?.trim()?.take(150)?.takeIf { it.length >= 2 }
+    }.getOrNull()
+}

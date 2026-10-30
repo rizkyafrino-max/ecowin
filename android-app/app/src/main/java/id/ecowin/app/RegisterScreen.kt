@@ -60,6 +60,7 @@ fun RegisterScreen(
     val scope = rememberCoroutineScope()
     var idToken by remember { mutableStateOf<String?>(null) }
     var nama by rememberSaveable { mutableStateOf("") }
+    var namaDariGoogle by rememberSaveable { mutableStateOf<String?>(null) }
     var noHp by rememberSaveable { mutableStateOf("") }
     var alamat by rememberSaveable { mutableStateOf("") }
     var bankId by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -113,7 +114,10 @@ fun RegisterScreen(
                 .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
                 .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFF065F46), Emerald, Color(0xFF10B981)))),
         ) {
-            Box(Modifier.align(Alignment.TopEnd).offset(x = 60.dp, y = (-70).dp).size(200.dp).background(Color.White.copy(alpha = 0.10f), CircleShape))
+            // matchParentSize: lingkaran dekoratif tidak ikut menentukan tinggi kepala
+            Box(Modifier.matchParentSize()) {
+                Box(Modifier.align(Alignment.TopEnd).offset(x = 60.dp, y = (-70).dp).size(200.dp).background(Color.White.copy(alpha = 0.10f), CircleShape))
+            }
             Row(
                 Modifier.fillMaxWidth().statusBarsPadding().padding(start = 12.dp, end = 16.dp, top = 10.dp, bottom = 20.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -145,7 +149,11 @@ fun RegisterScreen(
                     error = null
                     scope.launch {
                         when (val r = googleAuth.signIn()) {
-                            is GoogleAuth.Result.Success -> idToken = r.idToken
+                            is GoogleAuth.Result.Success -> {
+                                idToken = r.idToken
+                                // Isi otomatis dari nama akun Google; tetap bisa diubah.
+                                namaDariTokenGoogle(r.idToken)?.let { if (nama.isBlank()) { nama = it; namaDariGoogle = it } }
+                            }
                             is GoogleAuth.Result.Failure -> error = r.message
                             GoogleAuth.Result.Cancelled -> error = "Pemilihan akun Google ditutup. Jika Anda tidak membatalkannya, Google belum mengenali aplikasi ini: buat OAuth client tipe Android (package id.ecowin.app + SHA-1 kunci debug) di Google Cloud, dan pastikan email Anda terdaftar sebagai Test user."
                         }
@@ -169,7 +177,10 @@ fun RegisterScreen(
                     Modifier.fillMaxWidth().background(Color.White, RoundedCornerShape(20.dp)).border(1.dp, Slate200, RoundedCornerShape(20.dp)).padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    EcoTextField(nama, { nama = it.take(150) }, label = { Text("Nama lengkap") }, singleLine = true, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth())
+                    EcoTextField(
+                        nama, { nama = it.take(150) }, label = { Text("Nama lengkap") }, singleLine = true, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth(),
+                        supportingText = if (namaDariGoogle != null && nama == namaDariGoogle) ({ Text("Diisi dari akun Google Anda. Ubah bila tidak sesuai.") }) else null,
+                    )
                     EcoTextField(
                         noHp, { noHp = it.filter { c -> c.isDigit() || c == '+' }.take(16) },
                         label = { Text("Nomor HP") }, placeholder = { Text("081234567890") }, singleLine = true,
