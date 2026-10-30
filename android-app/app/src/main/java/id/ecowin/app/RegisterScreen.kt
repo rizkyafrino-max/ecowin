@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -105,16 +106,34 @@ fun RegisterScreen(
         }
     }
 
-    Column(Modifier.fillMaxSize().background(Color(0xFFECFDF5)).statusBarsPadding().imePadding()) {
-        // Bilah atas: kembali + judul + langkah
-        Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                Modifier.size(44.dp).clip(CircleShape).clickable(onClick = onBack),
-                contentAlignment = Alignment.Center,
-            ) { Icon(Lucide.ArrowLeft, contentDescription = "Kembali", tint = Slate900, modifier = Modifier.size(22.dp)) }
-            Text("Daftar nasabah", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = Slate900, modifier = Modifier.padding(start = 4.dp))
+    Column(Modifier.fillMaxSize().background(Canvas).imePadding()) {
+        // Kepala hijau EcoWin: kembali + merek + judul
+        Box(
+            Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
+                .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFF065F46), Emerald, Color(0xFF10B981)))),
+        ) {
+            Box(Modifier.align(Alignment.TopEnd).offset(x = 60.dp, y = (-70).dp).size(200.dp).background(Color.White.copy(alpha = 0.10f), CircleShape))
+            Row(
+                Modifier.fillMaxWidth().statusBarsPadding().padding(start = 12.dp, end = 16.dp, top = 10.dp, bottom = 20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Box(
+                    Modifier.size(44.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.22f)).clickable(onClick = onBack),
+                    contentAlignment = Alignment.Center,
+                ) { Icon(Lucide.ArrowLeft, contentDescription = "Kembali", tint = Color.White, modifier = Modifier.size(22.dp)) }
+                Image(
+                    painterResource(R.drawable.ecowin_emblem), contentDescription = null,
+                    modifier = Modifier.size(38.dp).background(Color.White, RoundedCornerShape(12.dp)).padding(6.dp),
+                )
+                Column {
+                    Text("Daftar nasabah", fontWeight = FontWeight.ExtraBold, fontSize = 19.sp, color = Color.White)
+                    Text("Bank sampah digital EcoWin", fontSize = 12.sp, color = Color(0xFFD1FAE5))
+                }
+            }
         }
-        Stepper(aktif = if (idToken == null) 1 else 2, modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp))
+        Stepper(aktif = if (idToken == null) 1 else 2, modifier = Modifier.padding(horizontal = 24.dp, vertical = 14.dp))
 
         Column(
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 12.dp),
