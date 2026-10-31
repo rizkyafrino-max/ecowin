@@ -39,7 +39,8 @@ class BankSampahResource extends Resource
         return $schema->components([
             Section::make('Identitas Bank Sampah')->schema([
                 TextInput::make('nama_bank_sampah')->label('Nama')->required()->maxLength(150),
-                TextInput::make('kode')->label('Kode')->required()->maxLength(30)->alphaDash()->unique(BankSampah::class, 'kode', ignoreRecord: true),
+                TextInput::make('kode')->label('Kode')->disabled()->dehydrated(false)->placeholder('Dibuat otomatis')
+                    ->helperText(fn (string $operation): string => $operation === 'create' ? 'Dibuat otomatis saat disimpan (BS-0001, BS-0002, ...).' : 'Kode dibuat otomatis dan tidak bisa diubah.'),
                 Select::make('status')->options(['aktif' => 'Aktif', 'nonaktif' => 'Nonaktif'])->default('aktif')->required(),
             ])->columns(3),
             Section::make('Wilayah')->schema([
