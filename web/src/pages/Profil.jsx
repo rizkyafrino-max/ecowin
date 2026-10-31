@@ -1,5 +1,6 @@
-import { Bug, Camera, CheckCircle2, LogOut, ShieldCheck, Trash2, UserRound } from 'lucide-react';
+import { Bug, Camera, CheckCircle2, LogOut, Maximize, ShieldCheck, Trash2, UserRound } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { EcoApi } from '../api/endpoints';
 import Button from '../components/Button';
 import Card from '../components/Card';
@@ -120,6 +121,9 @@ export default function Profil() {
 
         <div className="lg:col-start-2 lg:row-start-1">
           <QRCard data={qr.data} loading={qr.loading} bank={bank} />
+          <Link to="/kartu" className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-tint px-5 text-sm font-semibold text-primary-deep transition hover:bg-emerald-100">
+            <Maximize className="h-4 w-4" aria-hidden />Tampilkan layar penuh
+          </Link>
         </div>
 
         <section className="lg:col-start-1 lg:row-span-2 lg:row-start-2">

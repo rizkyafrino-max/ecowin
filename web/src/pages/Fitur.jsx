@@ -21,7 +21,7 @@ const GROUPS = [
   {
     title: 'Akun',
     items: [
-      { to: '/profil', icon: QrCode, label: 'QR Saya', text: 'Tunjukkan QR ke petugas saat setor sampah.' },
+      { to: '/kartu', icon: QrCode, label: 'Kartu Nasabah', text: 'Tampilkan kartu layar penuh berisi QR untuk setor sampah.' },
       { to: '/organik', icon: MapPin, label: 'Peta Biopori', text: 'Lihat titik Biopori dan BioporiPrint di sekitar Anda.' },
       { to: '/profil', icon: UserRound, label: 'Profil', text: 'Data diri, Bank Sampah, dan keluar dari akun.' },
       { to: '/lapor-bug', icon: Bug, label: 'Lapor Bug', text: 'Laporkan masalah aplikasi beserta foto bukti.' },

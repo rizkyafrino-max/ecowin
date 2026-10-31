@@ -8,7 +8,7 @@ import { LoadingState } from './States';
  * kanan. Ukuran isi mengikuti lebar kartu lewat satuan container (cqw), jadi rapi dari HP sampai desktop.
  * Isi QR hanya token acak (tanpa data pribadi); bukan pengganti login.
  */
-export default function QRCard({ data, loading, bank }) {
+export default function QRCard({ data, loading, bank, tanpaCatatan = false }) {
   if (loading) return <Card><LoadingState rows={2} /></Card>;
   if (!data) return null;
   return (
@@ -28,18 +28,18 @@ export default function QRCard({ data, loading, bank }) {
                 <img src={emblem} alt="" className="h-full w-auto" />
               </span>
               <span className="leading-tight">
-                <span className="block text-[clamp(13px,4.2cqw,19px)] font-extrabold">Eco<span className="text-emerald-200">Win</span></span>
-                <span className="block text-[clamp(7px,2.1cqw,9.5px)] font-bold tracking-[0.1em] text-emerald-200">BANK SAMPAH DIGITAL</span>
+                <span className="block text-[clamp(13px,4.2cqw,26px)] font-extrabold">Eco<span className="text-emerald-200">Win</span></span>
+                <span className="block text-[clamp(7px,2.1cqw,12px)] font-bold tracking-[0.1em] text-emerald-200">BANK SAMPAH DIGITAL</span>
               </span>
             </div>
 
             <div>
-              <p className="text-[clamp(7px,2.3cqw,10px)] font-bold tracking-[0.15em] text-emerald-200">KARTU NASABAH</p>
-              <p className="mt-[0.8cqw] line-clamp-2 break-words text-[clamp(14px,5.6cqw,26px)] font-extrabold leading-[1.15]">{data.nama}</p>
-              <p className="mt-[1cqw] font-mono text-[clamp(10px,3.6cqw,15px)] font-semibold tracking-[0.12em] text-emerald-100">{data.nomor_nasabah}</p>
+              <p className="text-[clamp(7px,2.3cqw,13px)] font-bold tracking-[0.15em] text-emerald-200">KARTU NASABAH</p>
+              <p className="mt-[0.8cqw] line-clamp-2 break-words text-[clamp(14px,5.6cqw,40px)] font-extrabold leading-[1.15]">{data.nama}</p>
+              <p className="mt-[1cqw] font-mono text-[clamp(10px,3.6cqw,22px)] font-semibold tracking-[0.12em] text-emerald-100">{data.nomor_nasabah}</p>
             </div>
 
-            <p className="flex items-center gap-[1.6cqw] text-[clamp(9px,2.9cqw,12px)] font-medium text-white/90">
+            <p className="flex items-center gap-[1.6cqw] text-[clamp(9px,2.9cqw,16px)] font-medium text-white/90">
               <MapPin aria-hidden className="h-[3.4cqw] w-[3.4cqw] min-h-3 min-w-3 flex-none text-emerald-200" />
               <span className="truncate">{bank || 'EcoWin'}</span>
             </p>
@@ -49,11 +49,11 @@ export default function QRCard({ data, loading, bank }) {
             <div className="rounded-[3.6cqw] bg-white p-[1.6cqw]" style={{ width: '37cqw', height: '37cqw' }}>
               <img className="h-full w-full [image-rendering:pixelated]" alt={`QR nasabah ${data.nomor_nasabah}`} src={`data:image/png;base64,${data.qr_png_base64}`} />
             </div>
-            <p className="mt-[1.6cqw] text-[clamp(6.5px,2cqw,9px)] font-bold tracking-[0.1em] text-emerald-100">PINDAI OLEH PETUGAS</p>
+            <p className="mt-[1.6cqw] text-[clamp(6.5px,2cqw,12px)] font-bold tracking-[0.1em] text-emerald-100">PINDAI OLEH PETUGAS</p>
           </div>
         </div>
       </section>
-      <p className="mx-auto mt-3 max-w-sm text-center text-xs text-muted">Tunjukkan kartu ini kepada petugas Bank Sampah. QR hanya berisi kode acak, bukan data pribadi.</p>
+      {!tanpaCatatan && <p className="mx-auto mt-3 max-w-sm text-center text-xs text-muted">Tunjukkan kartu ini kepada petugas Bank Sampah. QR hanya berisi kode acak, bukan data pribadi.</p>}
     </div>
   );
 }

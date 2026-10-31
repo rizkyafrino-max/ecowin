@@ -1,9 +1,10 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import LaunchScreen from './components/LaunchScreen';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import AppLayout from './layouts/AppLayout';
 import Dashboard from './pages/Dashboard';
 import Fitur from './pages/Fitur';
+import KartuLayarPenuh from './pages/KartuLayarPenuh';
 import AuthCallback from './pages/AuthCallback';
 import LaporBug from './pages/LaporBug';
 import Masuk from './pages/Masuk';
@@ -15,11 +16,12 @@ import Saldo from './pages/Saldo';
 import Transaksi from './pages/Transaksi';
 
 /** Halaman di balik login: sesi valid langsung masuk, selain itu kembali ke Login Google. */
-function Protected() {
+function Protected({ polos = false }) {
   const { status } = useAuth();
   if (status === 'loading') return <LaunchScreen />;
   if (status !== 'authed') return <Navigate to="/masuk" replace />;
-  return <AppLayout />;
+  // "polos": layar penuh tanpa menu dan bilah atas (mis. Kartu Nasabah).
+  return polos ? <Outlet /> : <AppLayout />;
 }
 
 export default function App() {
@@ -41,6 +43,9 @@ export default function App() {
             <Route path="profil" element={<Profil />} />
             <Route path="notifikasi" element={<Notifikasi />} />
             <Route path="lapor-bug" element={<LaporBug />} />
+          </Route>
+          <Route element={<Protected polos />}>
+            <Route path="kartu" element={<KartuLayarPenuh />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
