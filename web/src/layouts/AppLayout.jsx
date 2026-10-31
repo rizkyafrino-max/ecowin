@@ -4,7 +4,7 @@ import { BottomNav, NAV_ITEMS, Sidebar } from '../components/Nav';
 import TopBar from '../components/TopBar';
 import { NotifProvider } from '../context/NotifContext';
 
-const TITLES = { '/penarikan': 'Tarik Saldo', '/fitur': 'Semua Fitur', '/notifikasi': 'Notifikasi' };
+const TITLES = { '/penarikan': 'Tarik Saldo', '/fitur': 'Semua Fitur', '/notifikasi': 'Notifikasi', '/lapor-bug': 'Lapor Bug' };
 
 export default function AppLayout() {
   const { pathname } = useLocation();

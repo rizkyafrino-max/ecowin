@@ -1,4 +1,4 @@
-import { ArrowDownToLine, ArrowLeftRight, Home, MapPin, QrCode, Recycle, UserRound, Wallet } from 'lucide-react';
+import { ArrowDownToLine, ArrowLeftRight, Bug, Home, MapPin, QrCode, Recycle, UserRound, Wallet } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageHeader from '../components/PageHeader';
 
@@ -24,6 +24,7 @@ const GROUPS = [
       { to: '/profil', icon: QrCode, label: 'QR Saya', text: 'Tunjukkan QR ke petugas saat setor sampah.' },
       { to: '/organik', icon: MapPin, label: 'Peta Biopori', text: 'Lihat titik Biopori dan BioporiPrint di sekitar Anda.' },
       { to: '/profil', icon: UserRound, label: 'Profil', text: 'Data diri, Bank Sampah, dan keluar dari akun.' },
+      { to: '/lapor-bug', icon: Bug, label: 'Lapor Bug', text: 'Laporkan masalah aplikasi beserta foto bukti.' },
     ],
   },
 ];

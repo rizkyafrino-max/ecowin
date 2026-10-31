@@ -5,6 +5,7 @@ import AppLayout from './layouts/AppLayout';
 import Dashboard from './pages/Dashboard';
 import Fitur from './pages/Fitur';
 import AuthCallback from './pages/AuthCallback';
+import LaporBug from './pages/LaporBug';
 import Masuk from './pages/Masuk';
 import Notifikasi from './pages/Notifikasi';
 import Organik from './pages/Organik';
@@ -39,6 +40,7 @@ export default function App() {
             <Route path="penarikan" element={<Penarikan />} />
             <Route path="profil" element={<Profil />} />
             <Route path="notifikasi" element={<Notifikasi />} />
+            <Route path="lapor-bug" element={<LaporBug />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
