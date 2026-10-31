@@ -19,7 +19,7 @@ use Illuminate\Validation\ValidationException;
 class NasabahService
 {
     /**
-     * @param  array{nama: string, email: string, no_hp: string, alamat_rt_rw: string, nisn_atau_nik?: string|null, bank_sampah_id?: int|null}  $data
+     * @param  array{nama: string, email: string, no_hp: string, alamat_rt_rw: string, nisn_atau_nik?: string|null, jenis_kelamin?: string|null, bank_sampah_id?: int|null}  $data
      */
     public function daftarkan(User $actor, array $data, ?string $fotoKtpPath = null): Nasabah
     {
@@ -45,6 +45,7 @@ class NasabahService
             $user->forceFill([
                 'nama' => $data['nama'],
                 'email' => $email,
+                'jenis_kelamin' => in_array($data['jenis_kelamin'] ?? null, [User::JK_LAKI, User::JK_PEREMPUAN], true) ? $data['jenis_kelamin'] : null,
                 'role' => Role::Nasabah->value,
                 'status' => User::STATUS_AKTIF,
                 'bank_sampah_id' => $bankId,
