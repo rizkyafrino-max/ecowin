@@ -93,7 +93,7 @@ class NasabahController extends Controller
     public function qr(Request $request): JsonResponse
     {
         $nasabah = $this->nasabahSaya($request);
-        $qr = (new Builder(data: $nasabah->kartu_qr_token, size: 300, margin: 12))->build();
+        $qr = (new Builder(data: $nasabah->kartu_qr_token, size: 600, margin: 24))->build();
 
         return response()->json([
             'nomor_nasabah' => $nasabah->nomor_nasabah,

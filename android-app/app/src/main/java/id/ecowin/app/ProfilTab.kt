@@ -53,7 +53,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: (UserDto) -> Unit, onLogout: () -> Unit, go: (Tab) -> Unit) {
-    val qr = rememberLoadable(client, refreshKey) { client.api.qr() }
     val scope = rememberCoroutineScope()
     val nasabah = user.nasabah
 
@@ -151,32 +150,21 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
         }
 
         item {
-            EcoCard {
-                LoadableContent(qr) { q ->
-                    val bitmap = remember(q.qrPngBase64) {
-                        runCatching {
-                            val bytes = Base64.decode(q.qrPngBase64, Base64.DEFAULT)
-                            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
-                        }.getOrNull()
-                    }
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        bitmap?.let {
-                            Image(it, contentDescription = "QR Card nasabah", modifier = Modifier.size(132.dp).border(1.dp, Slate200, RoundedCornerShape(16.dp)).padding(8.dp))
-                        }
-                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Icon(Lucide.QrCode, contentDescription = null, tint = Emerald, modifier = Modifier.size(16.dp))
-                                Text("QR CARD NASABAH", color = Emerald, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.sp)
-                            }
-                            Text(q.nama ?: user.nama ?: "", fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Slate900, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                            Text(q.nomorNasabah ?: "", color = Slate500, fontFamily = FontFamily.Monospace, letterSpacing = 1.sp, fontSize = 13.sp)
-                            Text(
-                                "Tunjukkan QR ini kepada petugas. QR hanya berisi kode acak, bukan data pribadi.",
-                                color = Slate500, fontSize = 12.sp, lineHeight = 17.sp, modifier = Modifier.padding(top = 2.dp),
-                            )
-                        }
-                    }
+            Row(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
+                    .background(Brush.linearGradient(listOf(EmeraldDeep, Emerald)))
+                    .clickable(role = androidx.compose.ui.semantics.Role.Button, onClickLabel = "Tampilkan kartu nasabah") { go(Tab.Kartu) }
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                Box(Modifier.size(52.dp).background(Color.White.copy(alpha = 0.22f), RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
+                    Icon(Lucide.QrCode, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp))
                 }
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text("Kartu Nasabah", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold)
+                    Text("Tampilkan QR layar penuh untuk setor sampah", color = Color(0xFFD1FAE5), fontSize = 12.5.sp, lineHeight = 17.sp)
+                }
+                Icon(Lucide.ChevronRight, contentDescription = null, tint = Color.White, modifier = Modifier.size(22.dp))
             }
         }
 

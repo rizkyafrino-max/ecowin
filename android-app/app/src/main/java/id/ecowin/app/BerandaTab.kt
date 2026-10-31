@@ -122,7 +122,7 @@ private data class Aksi(val tab: Tab, val icon: ImageVector, val label: String)
 @Composable
 private fun AksiCepat(onNavigate: (Tab) -> Unit) {
     val aksi = listOf(
-        Aksi(Tab.Profil, Lucide.QrCode, "Setor sampah"),
+        Aksi(Tab.Kartu, Lucide.QrCode, "Setor sampah"),
         Aksi(Tab.Organik, Lucide.Recycle, "Organik"),
         Aksi(Tab.Saldo, Lucide.ArrowDownToLine, "Tarik saldo"),
         Aksi(Tab.Transaksi, Lucide.Scale, "Riwayat"),
