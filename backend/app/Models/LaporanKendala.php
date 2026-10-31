@@ -18,6 +18,16 @@ class LaporanKendala extends Model
         'deskripsi',
     ];
 
+    /** Jalur berkas di disk privat tidak pernah ikut keluar lewat JSON; klien cukup tahu ada foto atau tidak. */
+    protected $hidden = ['foto_bukti_path'];
+
+    protected $appends = ['punya_foto'];
+
+    public function getPunyaFotoAttribute(): bool
+    {
+        return $this->foto_bukti_path !== null;
+    }
+
     public function scopeVisibleTo(Builder $query, ?User $user): Builder
     {
         if (! $user || ! $user->isActive()) {

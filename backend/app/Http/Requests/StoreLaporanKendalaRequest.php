@@ -19,6 +19,7 @@ class StoreLaporanKendalaRequest extends FormRequest
         return [
             'kategori' => ['required', 'in:pencatatan,bug'],
             'deskripsi' => ['required', 'string', 'max:2000'],
+            'foto' => ['nullable', 'file', 'max:'.(\App\Services\FotoLaporanService::MAKS_BYTE / 1024), 'mimetypes:image/jpeg,image/png,image/webp'],
         ];
     }
 }

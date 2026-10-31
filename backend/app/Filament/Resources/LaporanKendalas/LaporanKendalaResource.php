@@ -11,6 +11,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -49,7 +50,13 @@ class LaporanKendalaResource extends Resource
             ->columns([
                 TextColumn::make('created_at')->label('Waktu')->dateTime('d M Y H:i'),
                 TextColumn::make('kategori')->badge(),
-                TextColumn::make('deskripsi')->limit(60)->wrap(),
+                TextColumn::make('deskripsi')->limit(60)->wrap()
+                    // Teks utuh (termasuk info perangkat pada laporan bug) tampil saat kursor diarahkan.
+                    ->tooltip(fn (TextColumn $column): ?string => mb_strlen((string) $column->getState()) > 60 ? (string) $column->getState() : null),
+                ImageColumn::make('foto')->label('Foto')
+                    ->state(fn (LaporanKendala $r): ?string => $r->foto_bukti_path ? route('admin.berkas.laporan', $r) : null)
+                    ->url(fn (LaporanKendala $r): ?string => $r->foto_bukti_path ? route('admin.berkas.laporan', $r) : null, shouldOpenInNewTab: true)
+                    ->imageHeight(48)->extraImgAttributes(['loading' => 'lazy', 'class' => 'rounded-lg']),
                 TextColumn::make('pelaporUser.nama')->label('Pelapor'),
                 TextColumn::make('bankSampah.nama_bank_sampah')->label('Bank Sampah')->placeholder('-'),
                 TextColumn::make('status')->badge()->color(fn (string $state): string => match ($state) {
@@ -57,7 +64,10 @@ class LaporanKendalaResource extends Resource
                 }),
                 TextColumn::make('catatan_admin')->label('Catatan')->placeholder('-')->toggleable(),
             ])
-            ->filters([SelectFilter::make('status')->options(['menunggu' => 'Menunggu', 'disetujui' => 'Disetujui', 'ditolak' => 'Ditolak'])])
+            ->filters([
+                SelectFilter::make('status')->options(['menunggu' => 'Menunggu', 'disetujui' => 'Disetujui', 'ditolak' => 'Ditolak']),
+                SelectFilter::make('kategori')->options(['bug' => 'Bug aplikasi', 'pencatatan' => 'Pencatatan']),
+            ])
             ->recordActions([
                 Action::make('tinjau')->label('Tinjau')->icon('heroicon-o-check')
                     ->visible(fn (LaporanKendala $r): bool => auth()->user()?->can('update', $r) ?? false)

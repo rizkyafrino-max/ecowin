@@ -5,6 +5,8 @@ import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.Color
@@ -42,6 +44,9 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
 /** Profil: kartu data akun + formulir (seperti halaman Profil di Web), lalu QR Card Nasabah dan tombol keluar. */
+/** Situs pembuat aplikasi, dibuka di peramban. */
+private const val URL_PEMBUAT = "https://rizky.pplgku.my.id/"
+
 @Composable
 fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: (UserDto) -> Unit, onLogout: () -> Unit, go: (Tab) -> Unit) {
     val qr = rememberLoadable(client, refreshKey) { client.api.qr() }
@@ -194,6 +199,11 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
         }
 
         item {
+            val situs = androidx.compose.ui.platform.LocalUriHandler.current
+            KartuPembuat { runCatching { situs.openUri(URL_PEMBUAT) } }
+        }
+
+        item {
             androidx.compose.material3.Button(
                 onClick = onLogout, modifier = Modifier.fillMaxWidth().height(48.dp), shape = RoundedCornerShape(14.dp),
                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Red, contentColor = Color.White),
@@ -206,6 +216,32 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
                 color = Slate500, fontSize = 12.sp, textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             )
+        }
+    }
+}
+
+/** Kartu pembuat aplikasi: gradasi hijau EcoWin, seluruh kartu bisa diketuk untuk membuka situs pembuat. */
+@Composable
+private fun KartuPembuat(onBuka: () -> Unit) {
+    Box(
+        Modifier.fillMaxWidth()
+            .clip(RoundedCornerShape(22.dp))
+            .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(EmeraldDeep, Emerald, Color(0xFF10B981))))
+            .clickable(role = androidx.compose.ui.semantics.Role.Button, onClickLabel = "Buka situs pembuat aplikasi", onClick = onBuka),
+    ) {
+        Box(Modifier.align(Alignment.TopEnd).offset(x = 36.dp, y = (-36).dp).size(120.dp).background(Color.White.copy(alpha = 0.10f), CircleShape))
+        Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+            Box(Modifier.size(48.dp).background(Color.White.copy(alpha = 0.22f), CircleShape), contentAlignment = Alignment.Center) {
+                Text("R", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+            }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text("DIBUAT OLEH", color = Color(0xFFA7F3D0), fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                Text("Rizky", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
+                Text("rizky.pplgku.my.id", color = Color(0xFFD1FAE5), fontSize = 12.sp)
+            }
+            Box(Modifier.size(40.dp).background(Color.White, CircleShape), contentAlignment = Alignment.Center) {
+                Icon(Lucide.ExternalLink, contentDescription = null, tint = Emerald, modifier = Modifier.size(18.dp))
+            }
         }
     }
 }

@@ -36,6 +36,8 @@ class PushFcmTest extends TestCase
         $this->bank = BankSampah::factory()->create();
         $this->a = Nasabah::factory()->forBank($this->bank)->create();
         $this->b = Nasabah::factory()->forBank($this->bank)->create();
+        // Terisolasi dari .env pengembang: tes tidak boleh memakai kredensial Firebase sungguhan.
+        config(['services.firebase.credentials' => null]);
         PushService::lupakan();
         Cache::flush();
     }

@@ -68,6 +68,7 @@ enum class Tab(val label: String, val icon: ImageVector) {
     Profil("Profil", Lucide.UserRound),
     Notifikasi("Notifikasi", Lucide.Bell),
     Pengaturan("Pengaturan", Lucide.Settings),
+    LaporBug("Lapor bug", Lucide.Bug),
 }
 
 private val FooterLeft = listOf(Tab.Beranda, Tab.Transaksi)
@@ -95,10 +96,20 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
         if (NavAwal.permintaan) { tab = Tab.Notifikasi.ordinal; NavAwal.permintaan = false }
     }
     val current = Tab.entries[tab]
-    val go: (Tab) -> Unit = { tab = it.ordinal }
+    // Lapor bug bisa dibuka dari mana saja (menu atau goyang); layar asalnya diingat untuk tombol kembali dan ikut dilaporkan.
+    var sebelumLapor by rememberSaveable { mutableIntStateOf(Tab.Pengaturan.ordinal) }
+    val bukaLapor: () -> Unit = { if (tab != Tab.LaporBug.ordinal) { sebelumLapor = tab; tab = Tab.LaporBug.ordinal } }
+    val go: (Tab) -> Unit = { if (it == Tab.LaporBug) bukaLapor() else tab = it.ordinal }
+    val konteks = androidx.compose.ui.platform.LocalContext.current
+    remember { PengaturanApp.muat(konteks) }
+    GoyangUntukLaporBug(aktif = PengaturanApp.goyangAktif.value, onGoyang = bukaLapor)
     // Tombol kembali: dari layar dalam (Notifikasi/Pengaturan/Profil) ke layar induknya, bukan langsung keluar aplikasi.
     androidx.activity.compose.BackHandler(enabled = current != Tab.Beranda) {
-        tab = (if (current == Tab.Pengaturan) Tab.Profil else Tab.Beranda).ordinal
+        tab = when (current) {
+            Tab.Pengaturan -> Tab.Profil.ordinal
+            Tab.LaporBug -> sebelumLapor
+            else -> Tab.Beranda.ordinal
+        }
     }
     var footerVisible by remember { mutableStateOf(true) }
     val scrollWatcher = remember {
@@ -124,7 +135,8 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
                     Tab.Organik -> OrganikTab(client, refreshKey)
                     Tab.Saldo -> SaldoTab(client, user, refreshKey)
                     Tab.Profil -> ProfilTab(client, user, refreshKey, onUserChanged, onLogout, go)
-                    Tab.Pengaturan -> PengaturanTab()
+                    Tab.Pengaturan -> PengaturanTab(onLaporBug = bukaLapor)
+                    Tab.LaporBug -> LaporBugTab(client, layarAsal = Tab.entries[sebelumLapor].label, onKembali = { tab = sebelumLapor })
                     Tab.Notifikasi -> NotifikasiTab(client, refreshKey, onBerubah = segarkanNotif, go = go)
                 }
                 }
@@ -305,6 +317,7 @@ private fun subjudul(tab: Tab): String? = when (tab) {
     Tab.Profil -> "Data akun dan QR Card Anda."
     Tab.Fitur -> "Semua yang bisa Anda lakukan di EcoWin."
     Tab.Notifikasi -> "Kabar terbaru tentang setoran, penarikan, dan aktivitas Anda."
-    Tab.Pengaturan -> "Pemberitahuan HP dan nada notifikasi."
+    Tab.Pengaturan -> "Pemberitahuan HP, nada notifikasi, dan lapor bug."
+    Tab.LaporBug -> "Laporkan masalah yang Anda temui di aplikasi."
     else -> null
 }

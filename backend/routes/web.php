@@ -38,5 +38,6 @@ Route::middleware(['auth', 'role:admin,petugas'])->group(function (): void {
     Route::get('/admin/scan-kartu', [ScanKartuController::class, 'page'])->name('admin.scan-kartu');
     Route::get('/admin/scan-kartu/{token}', [ScanKartuController::class, 'lookup'])->name('admin.scan-kartu.lookup');
     Route::get('/admin/berkas/biopori/{aktivitas}', [SecureFileController::class, 'biopori'])->name('admin.berkas.biopori');
+    Route::get('/admin/berkas/laporan/{laporanKendala}', [SecureFileController::class, 'laporan'])->name('admin.berkas.laporan');
     Route::get('/admin/berkas/identitas/{nasabah}', [SecureFileController::class, 'identitas'])->name('admin.berkas.identitas');
 });
