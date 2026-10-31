@@ -39,6 +39,7 @@ private val Grup: List<Pair<String, List<Fitur>>> = listOf(
         Fitur(Tab.Organik, Lucide.MapPin, "Peta BioporiPrint", "Lihat titik BioporiPrint di sekitar Anda."),
         Fitur(Tab.Profil, Lucide.UserRound, "Profil", "Data diri, Bank Sampah, dan keluar dari akun."),
         Fitur(Tab.Pengaturan, Lucide.Settings, "Pengaturan", "Pemberitahuan HP dan nada notifikasi."),
+        Fitur(Tab.LaporBug, Tab.LaporBug.icon, "Lapor Bug", "Laporkan masalah aplikasi. Bisa juga dengan mengguncang HP."),
     ),
 )
 

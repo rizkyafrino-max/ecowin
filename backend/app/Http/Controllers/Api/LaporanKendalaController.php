@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLaporanKendalaRequest;
 use App\Models\LaporanKendala;
 use App\Services\AuditLogger;
+use App\Services\FotoLaporanService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -28,17 +29,26 @@ class LaporanKendalaController extends Controller
     /**
      * Pelapor selalu diambil dari akun login, bukan dari input.
      */
-    public function store(StoreLaporanKendalaRequest $request, AuditLogger $audit): JsonResponse
+    public function store(StoreLaporanKendalaRequest $request, AuditLogger $audit, FotoLaporanService $foto): JsonResponse
     {
         $user = $request->user();
 
-        $laporan = new LaporanKendala($request->validated());
-        $laporan->forceFill([
-            'bank_sampah_id' => $user->bank_sampah_id ?? $user->nasabah?->bank_sampah_id,
-            'dilaporkan_oleh_nasabah_id' => $user->nasabah?->id,
-            'dilaporkan_oleh_user_id' => $user->id,
-            'status' => 'menunggu',
-        ])->save();
+        // Foto diproses dulu: bila tidak sah, tidak ada laporan setengah jadi. Hanya jalur hasil olahan server yang disimpan.
+        $jalurFoto = $request->hasFile('foto') ? $foto->simpan((string) $request->file('foto')->get()) : null;
+
+        try {
+            $laporan = new LaporanKendala($request->safe()->only(['kategori', 'deskripsi']));
+            $laporan->forceFill([
+                'bank_sampah_id' => $user->bank_sampah_id ?? $user->nasabah?->bank_sampah_id,
+                'dilaporkan_oleh_nasabah_id' => $user->nasabah?->id,
+                'dilaporkan_oleh_user_id' => $user->id,
+                'foto_bukti_path' => $jalurFoto,
+                'status' => 'menunggu',
+            ])->save();
+        } catch (\Throwable $e) {
+            $foto->hapus($jalurFoto);
+            throw $e;
+        }
 
         $audit->log('buat_laporan_kendala', $laporan, null, $laporan->attributesToArray(), $user);
 

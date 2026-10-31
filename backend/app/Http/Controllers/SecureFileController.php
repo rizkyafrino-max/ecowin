@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\AktivitasBiopori;
+use App\Models\LaporanKendala;
 use App\Models\Nasabah;
+use App\Services\FotoLaporanService;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -24,6 +26,14 @@ class SecureFileController extends Controller
         $this->authorize('update', $nasabah);
 
         return $this->stream($nasabah->foto_ktp_kk_path);
+    }
+
+    public function laporan(LaporanKendala $laporanKendala, FotoLaporanService $foto): StreamedResponse
+    {
+        $this->authorize('view', $laporanKendala);
+        abort_unless($laporanKendala->foto_bukti_path !== null && $foto->jalurSah($laporanKendala->foto_bukti_path), 404);
+
+        return $this->stream($laporanKendala->foto_bukti_path);
     }
 
     private function stream(?string $path): StreamedResponse

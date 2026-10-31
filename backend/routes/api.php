@@ -134,6 +134,6 @@ Route::middleware(['auth:sanctum', 'active', 'abilities:access'])->name('api.')-
 
     // Laporan kendala
     Route::get('/laporan-kendala', [LaporanKendalaController::class, 'index'])->name('laporan-kendala.index');
-    Route::post('/laporan-kendala', [LaporanKendalaController::class, 'store'])->name('laporan-kendala.store');
+    Route::post('/laporan-kendala', [LaporanKendalaController::class, 'store'])->middleware('throttle:5,10')->name('laporan-kendala.store');
     Route::patch('/laporan-kendala/{laporanKendala}', [LaporanKendalaController::class, 'update'])->middleware('role:admin')->name('laporan-kendala.update');
 });

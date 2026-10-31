@@ -16,6 +16,7 @@ use App\Models\BankSampah;
 use App\Models\HargaSampah;
 use App\Models\JenisSampah;
 use App\Models\KoreksiTransaksi;
+use App\Models\LaporanKendala;
 use App\Models\Nasabah;
 use App\Models\PenarikanSaldo;
 use App\Models\TitikBiopori;
@@ -56,6 +57,8 @@ class BerandaHero extends Widget
             'koreksi' => KoreksiTransaksi::query()->visibleTo($user)->where('status', KoreksiTransaksi::STATUS_PENDING)->count(),
             'nasabah' => Nasabah::query()->visibleTo($user)->where('status_verifikasi', 'pending')->where('status', 'aktif')->count(),
             'titik' => TitikBiopori::query()->visibleTo($user)->where('verifikasi', TitikBiopori::VERIFIKASI_PENDING)->count(),
+            // Laporan bug dari aplikasi ditinjau Admin saja.
+            'bug' => $user->isAdmin() ? LaporanKendala::query()->where('kategori', 'bug')->where('status', 'menunggu')->count() : 0,
         ];
 
         // Pop-up pengingat: kategori yang punya tugas menunggu, lengkap dengan beberapa item terbaru yang langsung menuju halamannya.
@@ -72,11 +75,18 @@ class BerandaHero extends Widget
         $koreksi = KoreksiTransaksi::query()->visibleTo($user)->where('status', KoreksiTransaksi::STATUS_PENDING)->latest('id')->limit(3)->get()
             ->map(fn (KoreksiTransaksi $k) => ['title' => ucfirst($k->tipe_transaksi).' #'.$k->transaksi_id, 'meta' => 'Menunggu keputusan', 'url' => \App\Filament\Resources\KoreksiTransaksis\KoreksiTransaksiResource::getUrl('index')]);
 
+        $filterBug = ['tableFilters' => ['status' => ['value' => 'menunggu'], 'kategori' => ['value' => 'bug']]];
+        $bugBaru = $user->isAdmin()
+            ? LaporanKendala::query()->with('pelaporUser')->where('kategori', 'bug')->where('status', 'menunggu')->latest('id')->limit(3)->get()
+                ->map(fn (LaporanKendala $l) => ['title' => \Illuminate\Support\Str::limit(trim((string) strtok($l->deskripsi, "\n")), 48), 'meta' => ($l->pelaporUser?->nama ?? 'Pengguna').' · '.$l->created_at?->format('d M Y'), 'url' => \App\Filament\Resources\LaporanKendalas\LaporanKendalaResource::getUrl('index', $filterBug)])
+            : collect();
+
         $popup = array_values(array_filter([
             ['label' => 'Pendaftaran nasabah baru', 'hint' => 'Perlu diverifikasi sebelum bisa menarik saldo', 'count' => $pending['nasabah'], 'url' => NasabahResource::getUrl('index', $filterNasabah), 'items' => $nasabahBaru->all()],
             ['label' => 'Penarikan saldo', 'hint' => 'Menunggu persetujuan', 'count' => $pending['penarikan'], 'url' => PenarikanSaldoResource::getUrl('index'), 'items' => $penarikan->all()],
             ['label' => 'Aktivitas organik', 'hint' => 'Menunggu verifikasi foto bukti', 'count' => $pending['biopori'], 'url' => AktivitasBioporiResource::getUrl('index'), 'items' => $organik->all()],
             ['label' => 'Pengajuan titik Biopori', 'hint' => 'Lokasi baru dari nasabah menunggu persetujuan', 'count' => $pending['titik'], 'url' => TitikBioporiResource::getUrl('index', $filterTitik), 'items' => $titikBaru->all()],
+            ['label' => 'Laporan bug', 'hint' => 'Dikirim dari aplikasi, menunggu ditinjau', 'count' => $pending['bug'], 'url' => \App\Filament\Resources\LaporanKendalas\LaporanKendalaResource::getUrl('index', $filterBug), 'items' => $bugBaru->all()],
             ['label' => 'Koreksi transaksi', 'hint' => 'Menunggu keputusan', 'count' => $pending['koreksi'], 'url' => \App\Filament\Resources\KoreksiTransaksis\KoreksiTransaksiResource::getUrl('index'), 'items' => $koreksi->all()],
         ], fn (array $p): bool => $p['count'] > 0));
         $jam = (int) now()->format('G');

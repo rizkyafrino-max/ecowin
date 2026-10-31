@@ -206,3 +206,6 @@ data class JumlahNotifDto(val belumDibaca: Int = 0)
 
 /** Token FCM perangkat untuk membangunkan aplikasi saat ada notifikasi (tanpa isi pesan). */
 data class PerangkatRequest(val token: String)
+
+/** Hasil kirim laporan bug; pelapor, bank sampah, dan status ditentukan server dari akun yang login. */
+data class LaporanKendalaDto(val id: Long = 0, val punyaFoto: Boolean = false)

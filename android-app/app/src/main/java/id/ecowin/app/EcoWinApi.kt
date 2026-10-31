@@ -117,4 +117,12 @@ interface EcoWinApi {
 
     @POST("penarikan")
     suspend fun ajukanPenarikan(@Body body: PenarikanRequest): DataWrapper<PenarikanDto>
+
+    @retrofit2.http.Multipart
+    @POST("laporan-kendala")
+    suspend fun kirimLaporan(
+        @retrofit2.http.Part("kategori") kategori: okhttp3.RequestBody,
+        @retrofit2.http.Part("deskripsi") deskripsi: okhttp3.RequestBody,
+        @retrofit2.http.Part foto: okhttp3.MultipartBody.Part?,
+    ): LaporanKendalaDto
 }

@@ -220,6 +220,26 @@ internal suspend fun periksaNotifikasi(c: Context, paksa: Boolean = false) {
     }
 }
 
+/**
+ * Menetapkan titik acuan tepat saat pemberitahuan dinyalakan: kabar yang sudah ada tidak diberitahukan, tetapi kabar pertama
+ * sesudahnya langsung tampil. Acuan lama direset lebih dulu agar kabar yang masuk saat saklar mati tidak membanjiri HP.
+ * Bila jaringan gagal, acuan tetap -1 dan pengecekan pertama berikutnya yang menetapkannya (perilaku lama).
+ */
+internal suspend fun tetapkanAcuanNotifikasi(c: Context) {
+    val session = SessionStore(c)
+    session.setNotifTerakhir(-1)
+    if (!session.hasSession()) return
+    try {
+        val respons = ApiClient(session).api.notifikasi()
+        session.setNotifTerakhir(respons.data.maxOfOrNull { it.id } ?: 0)
+        catat("acuan ditetapkan saat dinyalakan: ${session.notifTerakhir()}")
+    } catch (e: HttpException) {
+        catat("acuan gagal: http ${e.code()}")
+    } catch (e: IOException) {
+        catat("acuan gagal: ${e.javaClass.simpleName}")
+    }
+}
+
 /** Pengecek berkala (cadangan bila FCM belum disiapkan atau tertunda oleh sistem). */
 class NotifikasiWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     companion object {
