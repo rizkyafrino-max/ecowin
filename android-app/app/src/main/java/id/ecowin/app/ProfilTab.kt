@@ -14,6 +14,9 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,10 +46,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
-/** Profil: kartu data akun + formulir (seperti halaman Profil di Web), lalu QR Card Nasabah dan tombol keluar. */
-/** Situs pembuat aplikasi, dibuka di peramban. */
-private const val URL_PEMBUAT = "https://rizky.pplgku.my.id/"
-
+/**
+ * Profil: kepala hijau (foto, nama, lencana), kartu QR Nasabah, data diri yang bisa diubah, lalu daftar Akun (Pengaturan,
+ * pembuat aplikasi) dan tombol keluar. Gaya daftarnya sama dengan Pengaturan.
+ */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: (UserDto) -> Unit, onLogout: () -> Unit, go: (Tab) -> Unit) {
     val qr = rememberLoadable(client, refreshKey) { client.api.qr() }
@@ -88,47 +92,97 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
 
     TabList {
         item {
-            EcoCard {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Box(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp))
+                    .background(Brush.linearGradient(listOf(Color(0xFF065F46), Emerald, Color(0xFF10B981)))),
+            ) {
+                Box(Modifier.align(Alignment.TopEnd).offset(x = 50.dp, y = (-50).dp).size(170.dp).background(Color.White.copy(alpha = 0.10f), CircleShape))
+                Box(Modifier.align(Alignment.BottomStart).offset(x = (-40).dp, y = 50.dp).size(130.dp).background(Color.White.copy(alpha = 0.07f), CircleShape))
+                Column(
+                    Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
                     Box {
-                        Avatar(user.nama, size = 80, url = user.avatar, onClick = { if (!fotoBusy) pilihFoto.launch("image/*") })
-                        Box(
-                            Modifier.align(Alignment.BottomEnd).size(28.dp).background(Emerald, CircleShape).border(2.dp, Color.White, CircleShape).clickable(enabled = !fotoBusy) { pilihFoto.launch("image/*") },
-                            contentAlignment = Alignment.Center,
-                        ) { Icon(Lucide.Camera, contentDescription = "Ganti foto profil", tint = Color.White, modifier = Modifier.size(14.dp)) }
-                    }
-                    Column(Modifier.weight(1f)) {
-                        Text(user.nama ?: "-", fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Icon(Lucide.Mail, contentDescription = null, tint = Slate500, modifier = Modifier.size(14.dp))
-                            Text(user.email ?: "", color = Slate500, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Box(Modifier.size(98.dp).background(Color.White, CircleShape).padding(4.dp)) {
+                            Avatar(user.nama, size = 90, url = user.avatar, onClick = { if (!fotoBusy) pilihFoto.launch("image/*") })
                         }
-                        Text(listOfNotNull(nasabah?.nomorNasabah, nasabah?.bankSampah?.nama).joinToString(" · "), color = Slate500, fontSize = 12.sp)
+                        Box(
+                            Modifier.align(Alignment.BottomEnd).size(32.dp).background(EmeraldDeep, CircleShape).border(2.dp, Color.White, CircleShape)
+                                .clickable(enabled = !fotoBusy, role = androidx.compose.ui.semantics.Role.Button, onClickLabel = "Ganti foto profil") { pilihFoto.launch("image/*") },
+                            contentAlignment = Alignment.Center,
+                        ) { Icon(Lucide.Camera, contentDescription = "Ganti foto profil", tint = Color.White, modifier = Modifier.size(16.dp)) }
                     }
-                }
-
-                Row(Modifier.padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        if (fotoBusy) "Mengunggah…" else "Ganti foto", color = Emerald, fontWeight = FontWeight.SemiBold, fontSize = 12.sp,
-                        modifier = Modifier.background(EmeraldSoft, RoundedCornerShape(50)).clickable(enabled = !fotoBusy) { pilihFoto.launch("image/*") }.padding(horizontal = 14.dp, vertical = 7.dp),
+                        user.nama ?: "-", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center,
+                        maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 6.dp),
                     )
-                    if (user.punyaFoto) {
-                        Text(
-                            "Hapus foto", color = Red, fontWeight = FontWeight.SemiBold, fontSize = 12.sp,
-                            modifier = Modifier.clickable(enabled = !fotoBusy) {
-                                fotoBusy = true
-                                fotoPesan = null
-                                scope.launch {
-                                    try { onUserChanged(client.api.hapusFoto().data) } catch (e: Exception) { fotoPesan = client.errorMessage(e) } finally { fotoBusy = false }
-                                }
-                            }.padding(horizontal = 8.dp, vertical = 7.dp),
-                        )
-                    }
-                    Text(if (user.punyaFoto) "Foto sendiri" else "Avatar bawaan", color = Slate500, fontSize = 12.sp)
-                }
-                fotoPesan?.let { Text(it, color = Red, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 4.dp)) }
+                    Text(user.email ?: "", color = Color(0xFFD1FAE5), fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
 
-                Column(Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    FlowRow(
+                        Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        nasabah?.nomorNasabah?.let { LencanaProfil(it, mono = true) }
+                        nasabah?.bankSampah?.nama?.let { LencanaProfil(it) }
+                        if (nasabah?.statusVerifikasi == "verified") LencanaProfil("Terverifikasi", ikon = Lucide.ShieldCheck)
+                    }
+
+                    Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            if (fotoBusy) "Mengunggah…" else "Ganti foto", color = EmeraldDeep, fontWeight = FontWeight.Bold, fontSize = 13.sp,
+                            modifier = Modifier.background(Color.White, RoundedCornerShape(50)).clickable(enabled = !fotoBusy) { pilihFoto.launch("image/*") }.padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
+                        if (user.punyaFoto) {
+                            Text(
+                                "Hapus foto", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 13.sp,
+                                modifier = Modifier.background(Color.White.copy(alpha = 0.20f), RoundedCornerShape(50)).clickable(enabled = !fotoBusy) {
+                                    fotoBusy = true
+                                    fotoPesan = null
+                                    scope.launch {
+                                        try { onUserChanged(client.api.hapusFoto().data) } catch (e: Exception) { fotoPesan = client.errorMessage(e) } finally { fotoBusy = false }
+                                    }
+                                }.padding(horizontal = 16.dp, vertical = 8.dp),
+                            )
+                        }
+                    }
+                    fotoPesan?.let { Text(it, color = Color(0xFFFECACA), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center) }
+                }
+            }
+        }
+
+        item {
+            EcoCard {
+                LoadableContent(qr) { q ->
+                    val bitmap = remember(q.qrPngBase64) {
+                        runCatching {
+                            val bytes = Base64.decode(q.qrPngBase64, Base64.DEFAULT)
+                            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
+                        }.getOrNull()
+                    }
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        bitmap?.let {
+                            Image(it, contentDescription = "QR Card nasabah", modifier = Modifier.size(132.dp).border(1.dp, Slate200, RoundedCornerShape(16.dp)).padding(8.dp))
+                        }
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Icon(Lucide.QrCode, contentDescription = null, tint = Emerald, modifier = Modifier.size(16.dp))
+                                Text("QR CARD NASABAH", color = Emerald, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.sp)
+                            }
+                            Text(q.nama ?: user.nama ?: "", fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Slate900, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            Text(q.nomorNasabah ?: "", color = Slate500, fontFamily = FontFamily.Monospace, letterSpacing = 1.sp, fontSize = 13.sp)
+                            Text(
+                                "Tunjukkan QR ini kepada petugas. QR hanya berisi kode acak, bukan data pribadi.",
+                                color = Slate500, fontSize = 12.sp, lineHeight = 17.sp, modifier = Modifier.padding(top = 2.dp),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Kelompok("Data diri") {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     EcoTextField(nama, { nama = it.take(150); ok = false }, label = { Text("Nama lengkap") }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp))
                     PilihJenisKelamin(jenisKelamin, { jenisKelamin = it; ok = false })
                     EcoTextField(
@@ -164,48 +218,17 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
         }
 
         item {
-            EcoCard {
-                LoadableContent(qr) { q ->
-                    val bitmap = remember(q.qrPngBase64) {
-                        runCatching {
-                            val bytes = Base64.decode(q.qrPngBase64, Base64.DEFAULT)
-                            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
-                        }.getOrNull()
-                    }
-                    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Icon(Lucide.QrCode, contentDescription = null, tint = Emerald, modifier = Modifier.size(16.dp))
-                            Text("QR Card Nasabah", color = Emerald, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                        }
-                        bitmap?.let {
-                            Image(it, contentDescription = "QR Card nasabah", modifier = Modifier.padding(top = 8.dp).size(208.dp).border(1.dp, Slate200, RoundedCornerShape(16.dp)).padding(8.dp))
-                        }
-                        Text(q.nama ?: user.nama ?: "", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
-                        Text(q.nomorNasabah ?: "", color = Slate500, fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-                        Text(
-                            "Tunjukkan QR ini kepada petugas Bank Sampah. QR hanya berisi kode acak, bukan data pribadi.",
-                            color = Slate500, fontSize = 12.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 4.dp),
-                        )
-                    }
-                }
-            }
-        }
-
-        item {
-            OutlinedButton(onClick = { go(Tab.Pengaturan) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
-                Icon(Lucide.Settings, contentDescription = null, tint = Slate500, modifier = Modifier.size(18.dp))
-                Text("  Pengaturan", color = Slate900, fontWeight = FontWeight.SemiBold)
-            }
-        }
-
-        item {
             val situs = androidx.compose.ui.platform.LocalUriHandler.current
-            KartuPembuat { runCatching { situs.openUri(URL_PEMBUAT) } }
+            Kelompok("Akun") {
+                Baris(Lucide.Settings, "Pengaturan", "Pemberitahuan, nada, dan lapor bug", warnaIkon = Slate500, latarIkon = LatarNetral, onClick = { go(Tab.Pengaturan) }) { PanahBaris() }
+                Pemisah()
+                Baris(Lucide.UserRound, "Dibuat oleh Rizky", "rizky.pplgku.my.id", onClick = { runCatching { situs.openUri(URL_PEMBUAT) } }) { TautanLuar() }
+            }
         }
 
         item {
             androidx.compose.material3.Button(
-                onClick = onLogout, modifier = Modifier.fillMaxWidth().height(48.dp), shape = RoundedCornerShape(14.dp),
+                onClick = onLogout, modifier = Modifier.fillMaxWidth().height(52.dp), shape = RoundedCornerShape(50),
                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = Red, contentColor = Color.White),
             ) {
                 Icon(Lucide.LogOut, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
@@ -220,28 +243,14 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
     }
 }
 
-/** Kartu pembuat aplikasi: gradasi hijau EcoWin, seluruh kartu bisa diketuk untuk membuka situs pembuat. */
+/** Lencana kecil bening di atas kepala hijau profil. */
 @Composable
-private fun KartuPembuat(onBuka: () -> Unit) {
-    Box(
-        Modifier.fillMaxWidth()
-            .clip(RoundedCornerShape(22.dp))
-            .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(EmeraldDeep, Emerald, Color(0xFF10B981))))
-            .clickable(role = androidx.compose.ui.semantics.Role.Button, onClickLabel = "Buka situs pembuat aplikasi", onClick = onBuka),
+private fun LencanaProfil(teks: String, mono: Boolean = false, ikon: androidx.compose.ui.graphics.vector.ImageVector? = null) {
+    Row(
+        Modifier.background(Color.White.copy(alpha = 0.20f), RoundedCornerShape(50)).padding(horizontal = 12.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Box(Modifier.align(Alignment.TopEnd).offset(x = 36.dp, y = (-36).dp).size(120.dp).background(Color.White.copy(alpha = 0.10f), CircleShape))
-        Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-            Box(Modifier.size(48.dp).background(Color.White.copy(alpha = 0.22f), CircleShape), contentAlignment = Alignment.Center) {
-                Text("R", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
-            }
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text("DIBUAT OLEH", color = Color(0xFFA7F3D0), fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-                Text("Rizky", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
-                Text("rizky.pplgku.my.id", color = Color(0xFFD1FAE5), fontSize = 12.sp)
-            }
-            Box(Modifier.size(40.dp).background(Color.White, CircleShape), contentAlignment = Alignment.Center) {
-                Icon(Lucide.ExternalLink, contentDescription = null, tint = Emerald, modifier = Modifier.size(18.dp))
-            }
-        }
+        if (ikon != null) Icon(ikon, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
+        Text(teks, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, fontFamily = if (mono) FontFamily.Monospace else FontFamily.Default, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }

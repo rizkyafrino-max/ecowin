@@ -41,9 +41,6 @@ private fun deskripsi(n: NotifikasiHp.Nada) = when (n) {
     NotifikasiHp.Nada.Sistem -> "Nada notifikasi bawaan HP Anda"
 }
 
-private val LatarNetral = Color(0xFFF1F5F9)
-private val Slate400 = Color(0xFF94A3B8)
-
 /**
  * Halaman Pengaturan: daftar berkelompok ala aplikasi modern. Tiap kelompok adalah satu kartu putih berisi baris-baris
  * dengan ikon berlatar lembut, judul, keterangan, dan kontrol di kanan; catatan kecil ada di bawah kartu.
@@ -75,6 +72,7 @@ fun PengaturanTab(onLaporBug: () -> Unit) {
         else minta.launch(android.Manifest.permission.POST_NOTIFICATIONS)
     }
     val goyang = PengaturanApp.goyangAktif.value
+    val situs = androidx.compose.ui.platform.LocalUriHandler.current
 
     TabList {
         item {
@@ -130,7 +128,7 @@ fun PengaturanTab(onLaporBug: () -> Unit) {
                 Baris(
                     Lucide.Bug, "Lapor bug", "Kirim masalah beserta foto bukti",
                     warnaIkon = Color(0xFFD97706), latarIkon = Color(0xFFFFFBEB), onClick = onLaporBug,
-                ) { Icon(Lucide.ChevronRight, contentDescription = null, tint = Slate400, modifier = Modifier.size(20.dp)) }
+                ) { PanahBaris() }
             }
         }
 
@@ -139,66 +137,12 @@ fun PengaturanTab(onLaporBug: () -> Unit) {
                 Baris(Lucide.Info, "Versi aplikasi", "EcoWin Bank Sampah Digital", warnaIkon = Slate500, latarIkon = LatarNetral) {
                     Text(BuildConfig.VERSION_NAME, color = Slate500, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 }
+                Pemisah()
+                Baris(
+                    Lucide.UserRound, "Dibuat oleh Rizky", "rizky.pplgku.my.id", warnaIkon = Emerald, latarIkon = EmeraldSoft,
+                    onClick = { runCatching { situs.openUri(URL_PEMBUAT) } },
+                ) { TautanLuar() }
             }
         }
     }
-}
-
-/** Satu kelompok pengaturan: judul kecil, kartu putih berisi baris-baris, lalu catatan opsional di bawahnya. */
-@Composable
-private fun Kelompok(judul: String, catatan: String? = null, isi: @Composable ColumnScope.() -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(judul.uppercase(), color = Slate500, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, modifier = Modifier.padding(start = 6.dp))
-        Column(
-            Modifier.fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
-                .background(Color.White)
-                .border(1.dp, Slate200, RoundedCornerShape(20.dp)),
-            content = isi,
-        )
-        catatan?.let { Text(it, color = Slate500, fontSize = 12.sp, lineHeight = 17.sp, modifier = Modifier.padding(horizontal = 6.dp)) }
-    }
-}
-
-/** Baris pengaturan: ikon berlatar lembut, judul dan keterangan, lalu kontrol di kanan. Bisa diketuk seluruh barisnya. */
-@Composable
-private fun Baris(
-    ikon: ImageVector,
-    judul: String,
-    keterangan: String? = null,
-    warnaIkon: Color = Emerald,
-    latarIkon: Color = EmeraldSoft,
-    dipilih: Boolean = false,
-    peran: Role = Role.Button,
-    onClick: (() -> Unit)? = null,
-    kanan: @Composable () -> Unit = {},
-) {
-    Row(
-        Modifier.fillMaxWidth()
-            .background(if (dipilih) EmeraldSoft else Color.Transparent)
-            .then(if (onClick != null) Modifier.clickable(role = peran, onClick = onClick) else Modifier)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        Box(Modifier.size(40.dp).background(latarIkon, RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
-            Icon(ikon, contentDescription = null, tint = warnaIkon, modifier = Modifier.size(20.dp))
-        }
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(judul, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = Slate900)
-            keterangan?.let { Text(it, color = Slate500, fontSize = 12.5.sp, lineHeight = 17.sp) }
-        }
-        kanan()
-    }
-}
-
-/** Saklar tanpa penanganan sendiri: seluruh baris yang menanganinya, supaya area ketuk besar dan terbaca layanan aksesibilitas. */
-@Composable
-private fun Saklar(nyala: Boolean) {
-    Switch(checked = nyala, onCheckedChange = null, colors = SwitchDefaults.colors(checkedTrackColor = Emerald))
-}
-
-@Composable
-private fun Pemisah() {
-    Box(Modifier.fillMaxWidth().padding(start = 70.dp).height(1.dp).background(LatarNetral))
 }
