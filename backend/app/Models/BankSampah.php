@@ -23,6 +23,29 @@ class BankSampah extends Model
         'status',
     ];
 
+    protected static function booted(): void
+    {
+        // Kode dibuat otomatis bila tidak diisi (form panel tidak lagi meminta kode).
+        static::creating(function (BankSampah $bank): void {
+            if (blank($bank->kode)) {
+                $bank->kode = self::kodeBerikutnya();
+            }
+        });
+    }
+
+    /**
+     * Kode berikutnya: BS-0001, BS-0002, ... mengikuti angka terbesar yang sudah ada, jadi kode yang pernah dipakai tidak
+     * dipakai ulang. Kode lama berformat lain (mis. BS-RT01) tidak mengganggu. Keunikan tetap dijaga indeks unik database.
+     */
+    public static function kodeBerikutnya(): string
+    {
+        $terbesar = static::query()->pluck('kode')
+            ->map(fn (?string $kode): int => preg_match('/^BS-(\d+)$/', (string) $kode, $cocok) === 1 ? (int) $cocok[1] : 0)
+            ->max() ?? 0;
+
+        return 'BS-'.str_pad((string) ($terbesar + 1), 4, '0', STR_PAD_LEFT);
+    }
+
     // Satu bank sampah dapat memiliki beberapa petugas
     public function petugas()
     {
