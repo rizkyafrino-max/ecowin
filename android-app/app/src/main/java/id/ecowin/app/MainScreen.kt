@@ -69,6 +69,7 @@ enum class Tab(val label: String, val icon: ImageVector) {
     Notifikasi("Notifikasi", Lucide.Bell),
     Pengaturan("Pengaturan", Lucide.Settings),
     LaporBug("Lapor bug", Lucide.Bug),
+    Kartu("Kartu Nasabah", Lucide.QrCode),
 }
 
 private val FooterLeft = listOf(Tab.Beranda, Tab.Transaksi)
@@ -99,7 +100,16 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
     // Lapor bug bisa dibuka dari mana saja (menu atau goyang); layar asalnya diingat untuk tombol kembali dan ikut dilaporkan.
     var sebelumLapor by rememberSaveable { mutableIntStateOf(Tab.Pengaturan.ordinal) }
     val bukaLapor: () -> Unit = { if (tab != Tab.LaporBug.ordinal) { sebelumLapor = tab; tab = Tab.LaporBug.ordinal } }
-    val go: (Tab) -> Unit = { if (it == Tab.LaporBug) bukaLapor() else tab = it.ordinal }
+    // Kartu Nasabah layar penuh (melintang): layar asal diingat agar tombol kembali dan tombol tutup kembali ke sana.
+    var sebelumKartu by rememberSaveable { mutableIntStateOf(Tab.Profil.ordinal) }
+    val bukaKartu: () -> Unit = { if (tab != Tab.Kartu.ordinal) { sebelumKartu = tab; tab = Tab.Kartu.ordinal } }
+    val go: (Tab) -> Unit = {
+        when (it) {
+            Tab.LaporBug -> bukaLapor()
+            Tab.Kartu -> bukaKartu()
+            else -> tab = it.ordinal
+        }
+    }
     val konteks = androidx.compose.ui.platform.LocalContext.current
     remember { PengaturanApp.muat(konteks) }
     GoyangUntukLaporBug(aktif = PengaturanApp.goyangAktif.value, onGoyang = bukaLapor)
@@ -108,6 +118,7 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
         tab = when (current) {
             Tab.Pengaturan -> Tab.Profil.ordinal
             Tab.LaporBug -> sebelumLapor
+            Tab.Kartu -> sebelumKartu
             else -> Tab.Beranda.ordinal
         }
     }
@@ -124,6 +135,9 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
 
     Scaffold(containerColor = Canvas) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
+            if (current == Tab.Kartu) {
+                KartuNasabahScreen(client, user, onTutup = { tab = sebelumKartu })
+            } else {
             Column(Modifier.fillMaxSize().nestedScroll(scrollWatcher)) {
                 TopBar(user, current, belumDibaca, onRefresh = { refreshKey++ }, onNotif = { go(Tab.Notifikasi) }, onProfile = { go(Tab.Profil) })
 
@@ -136,6 +150,7 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
                     Tab.Saldo -> SaldoTab(client, user, refreshKey)
                     Tab.Profil -> ProfilTab(client, user, refreshKey, onUserChanged, onLogout, go)
                     Tab.Pengaturan -> PengaturanTab(onLaporBug = bukaLapor)
+                    Tab.Kartu -> Unit // ditangani layar penuh di atas
                     Tab.LaporBug -> LaporBugTab(client, layarAsal = Tab.entries[sebelumLapor].label, onKembali = { tab = sebelumLapor })
                     Tab.Notifikasi -> NotifikasiTab(client, refreshKey, onBerubah = segarkanNotif, go = go)
                 }
@@ -152,6 +167,7 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
                 androidx.compose.runtime.CompositionLocalProvider(
                     androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(density.density, minOf(density.fontScale, 1.1f)),
                 ) { FloatingFooter(current, go) }
+            }
             }
         }
     }
