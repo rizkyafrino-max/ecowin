@@ -69,7 +69,7 @@ export default function Dashboard() {
               </div>
               <div className="-mx-5 mt-3 flex gap-2.5 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {[
-                  { to: '/profil', icon: QrCode, label: 'Setor sampah' },
+                  { to: '/kartu', icon: QrCode, label: 'Setor sampah' },
                   { to: '/organik', icon: Recycle, label: 'Organik' },
                   { to: '/penarikan', icon: ArrowDownToLine, label: 'Tarik saldo' },
                   { to: '/transaksi', icon: Scale, label: 'Riwayat' },
