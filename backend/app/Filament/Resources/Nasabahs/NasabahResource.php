@@ -56,6 +56,8 @@ class NasabahResource extends Resource
                 TextInput::make('email')->label('Email Google')->email()->required()->maxLength(191)
                     ->helperText('Nasabah login di aplikasi Android dengan akun Google ini.')
                     ->rule(fn (?Nasabah $record) => Rule::unique('users', 'email')->ignore($record?->user_id)),
+                Select::make('jenis_kelamin')->label('Jenis kelamin')->options(User::JENIS_KELAMIN)->native(false)->placeholder('Belum diisi')
+                    ->helperText('Menentukan avatar bawaan bila nasabah belum memasang foto sendiri.'),
                 TextInput::make('no_hp')->label('No. HP')->required()->tel()->regex('/^(\+62|62|0)8[0-9]{7,12}$/')
                     ->unique(Nasabah::class, 'no_hp', ignoreRecord: true),
                 TextInput::make('alamat_rt_rw')->label('Alamat RT/RW')->required()->maxLength(255),
@@ -82,6 +84,7 @@ class NasabahResource extends Resource
                 TextColumn::make('nama')->searchable()->sortable(),
                 TextColumn::make('user.email')->label('Email Google')->searchable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('no_hp')->label('No. HP')->searchable()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('user.jenis_kelamin')->label('Jenis kelamin')->formatStateUsing(fn (?string $state): string => User::JENIS_KELAMIN[$state] ?? '-')->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('saldo')->money('IDR', locale: 'id', decimalPlaces: 0)->sortable(),
                 TextColumn::make('status_verifikasi')->label('Verifikasi')->badge()
                     ->formatStateUsing(fn (string $state): string => $state === 'verified' ? 'Terverifikasi' : 'Menunggu')

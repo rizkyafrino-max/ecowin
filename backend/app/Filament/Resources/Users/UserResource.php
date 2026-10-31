@@ -55,6 +55,8 @@ class UserResource extends Resource
                 TextInput::make('email')->label('Email Google')->email()->required()->maxLength(191)
                     ->unique(User::class, 'email', ignoreRecord: true)
                     ->helperText('Pengguna masuk dengan akun Google yang memakai email ini.'),
+                Select::make('jenis_kelamin')->label('Jenis kelamin')->options(User::JENIS_KELAMIN)->native(false)->placeholder('Belum diisi')
+                    ->helperText('Menentukan avatar bawaan bila pengguna belum memasang foto sendiri.'),
             ])->columns(2),
             Section::make('Akses sistem')->schema([
                 Select::make('role')->label('Peran')->options([Role::Petugas->value => 'Petugas', Role::Admin->value => 'Admin'])->default(Role::Petugas->value)->required()->live(),
@@ -74,6 +76,7 @@ class UserResource extends Resource
             TextColumn::make('email')->label('Email Google')->searchable(),
             TextColumn::make('role')->label('Peran')->badge()->formatStateUsing(fn (string $state): string => strtoupper($state))
                 ->color(fn (string $state): string => $state === 'admin' ? 'info' : 'success'),
+            TextColumn::make('jenis_kelamin')->label('Jenis kelamin')->formatStateUsing(fn (?string $state): string => User::JENIS_KELAMIN[$state] ?? '-')->toggleable(isToggledHiddenByDefault: true),
             TextColumn::make('bankSampah.nama_bank_sampah')->label('Bank Sampah')->placeholder('Semua'),
             TextColumn::make('status')->label('Status')->badge()->formatStateUsing(fn (string $state): string => ucfirst($state))
                 ->color(fn (string $state): string => $state === 'aktif' ? 'success' : 'danger'),

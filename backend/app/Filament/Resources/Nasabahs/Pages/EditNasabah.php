@@ -6,6 +6,7 @@ use App\Enums\Role;
 use App\Filament\Resources\Nasabahs\NasabahResource;
 use App\Models\Nasabah;
 use App\Models\User;
+use App\Services\AuditLogger;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -22,6 +23,7 @@ class EditNasabah extends EditRecord
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $data['email'] = $this->record->user?->email;
+        $data['jenis_kelamin'] = $this->record->user?->jenis_kelamin;
 
         return $data;
     }
@@ -47,9 +49,12 @@ class EditNasabah extends EditRecord
 
             // Nasabah data lama (belum punya akun Google) otomatis ditautkan ke akun baru.
             $user = $record->user ?? new User;
+            $jkSebelum = $user->jenis_kelamin;
+            $jkBaru = in_array($data['jenis_kelamin'] ?? null, [User::JK_LAKI, User::JK_PEREMPUAN], true) ? $data['jenis_kelamin'] : null;
             $user->forceFill([
                 'nama' => $record->nama,
                 'email' => mb_strtolower(trim($data['email'])),
+                'jenis_kelamin' => $jkBaru,
                 'role' => Role::Nasabah->value,
                 'bank_sampah_id' => $record->bank_sampah_id,
                 'status' => $record->status === 'aktif' ? User::STATUS_AKTIF : User::STATUS_NONAKTIF,
@@ -57,6 +62,10 @@ class EditNasabah extends EditRecord
 
             if (! $record->user_id) {
                 $record->forceFill(['user_id' => $user->id])->save();
+            }
+
+            if ($jkSebelum !== $jkBaru) {
+                app(AuditLogger::class)->log('ubah_jenis_kelamin', $record, ['jenis_kelamin' => $jkSebelum], ['jenis_kelamin' => $jkBaru], $actor);
             }
 
             return $record;

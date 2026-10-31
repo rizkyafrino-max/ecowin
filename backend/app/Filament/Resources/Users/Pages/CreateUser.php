@@ -25,6 +25,7 @@ class CreateUser extends CreateRecord
             'email' => mb_strtolower(trim($data['email'])),
             'role' => $data['role'],
             'status' => $data['status'] ?? User::STATUS_AKTIF,
+            'jenis_kelamin' => in_array($data['jenis_kelamin'] ?? null, [User::JK_LAKI, User::JK_PEREMPUAN], true) ? $data['jenis_kelamin'] : null,
             'bank_sampah_id' => $data['role'] === Role::Petugas->value ? $data['bank_sampah_id'] : null,
         ])->save();
 
