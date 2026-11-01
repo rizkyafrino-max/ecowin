@@ -15,8 +15,12 @@ class KartuNasabahController extends Controller
     {
         $this->authorize('update', $nasabah);
 
-        $qrDataUri = (new Builder(data: $nasabah->kartu_qr_token, size: 260, margin: 12))->build()->getDataUri();
+        // QR 600 px (margin 24) agar tetap tajam saat dicetak atau diunduh.
+        $qrDataUri = (new Builder(data: $nasabah->kartu_qr_token, size: 600, margin: 24))->build()->getDataUri();
 
-        return view('kartu-nasabah', compact('nasabah', 'qrDataUri'));
+        $bankSampah = $nasabah->bankSampah;
+        $bank = collect([$bankSampah?->nama_bank_sampah, $bankSampah?->rt ? 'RT '.$bankSampah->rt.($bankSampah->rw ? '/RW '.$bankSampah->rw : '') : null])->filter()->implode(' · ') ?: 'EcoWin';
+
+        return view('kartu-nasabah', compact('nasabah', 'qrDataUri', 'bank'));
     }
 }

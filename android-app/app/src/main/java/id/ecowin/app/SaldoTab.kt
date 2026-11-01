@@ -140,7 +140,7 @@ private fun PenarikanScreen(client: ApiClient, user: UserDto, refreshKey: Int, o
                     }
                 }
                 EcoTextField(catatan, { catatan = it.take(500) }, label = { Text("Catatan (opsional)") }, modifier = Modifier.fillMaxWidth())
-                message?.let { Text(it, color = if (success) Emerald else Red, fontSize = 13.sp) }
+                message?.let { PesanStatus(it, success) }
                 PrimaryButton("Ajukan penarikan", enabled = !belumVerifikasi, icon = Lucide.ArrowUpFromLine) {
                     val nominal = jumlah.toLongOrNull()
                     success = false

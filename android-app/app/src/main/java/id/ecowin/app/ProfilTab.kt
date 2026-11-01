@@ -184,7 +184,7 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
                         supportingText = { Text("Email tidak dapat diubah. Hubungi petugas Bank Sampah bila perlu.") },
                         modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp),
                     )
-                    message?.let { Text(it, fontSize = 13.sp, color = if (ok) Emerald else Red, fontWeight = FontWeight.SemiBold) }
+                    message?.let { PesanStatus(it, ok) }
                     PrimaryButton("Simpan perubahan", loading = saving) {
                         saving = true
                         scope.launch {

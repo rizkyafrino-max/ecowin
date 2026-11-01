@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.util.Base64
 import android.view.WindowManager
 import androidx.compose.foundation.Image
@@ -22,6 +23,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -83,11 +91,44 @@ private fun LayarUntukKartu() {
     }
 }
 
+/** Nama bank sampah beserta RT/RW, sama dengan yang tercetak di kartu. */
+internal fun ringkasBank(bank: BankSampahDto?): String =
+    listOfNotNull(bank?.nama, bank?.rt?.let { rt -> "RT $rt" + (bank.rw?.let { "/RW $it" } ?: "") }).joinToString(" · ")
+
 /** Halaman Kartu Nasabah layar penuh: kartu melintang berisi QR besar untuk dipindai petugas saat setor sampah. */
 @Composable
 fun KartuNasabahScreen(client: ApiClient, user: UserDto, onTutup: () -> Unit) {
     LayarUntukKartu()
     val qr = rememberLoadable(client) { client.api.qr() }
+    val konteks = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var sibuk by remember { mutableStateOf(false) }
+
+    // Menggambar kartu menjadi PNG di latar belakang (tidak mengganggu layar), lalu menyimpan ke galeri atau membagikannya.
+    fun olahKartu(simpan: Boolean) {
+        val q = qr.data ?: return
+        if (sibuk) return
+        sibuk = true
+        scope.launch {
+            try {
+                val gambar = withContext(Dispatchers.Default) {
+                    val bytes = Base64.decode(q.qrPngBase64, Base64.DEFAULT)
+                    val bmpQr = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: error("QR tidak dapat dibaca")
+                    KartuGambar.buat(konteks, q.nama ?: user.nama.orEmpty(), q.nomorNasabah.orEmpty(), ringkasBank(user.nasabah?.bankSampah), bmpQr)
+                }
+                if (simpan) {
+                    val ok = withContext(Dispatchers.IO) { KartuGambar.simpanKeGaleri(konteks, gambar, q.nomorNasabah) }
+                    android.widget.Toast.makeText(konteks, if (ok) "Kartu disimpan di galeri (Pictures/EcoWin)." else "Kartu gagal disimpan. Coba Bagikan.", android.widget.Toast.LENGTH_LONG).show()
+                } else {
+                    KartuGambar.bagikan(konteks, gambar, q.nomorNasabah)
+                }
+            } catch (e: Exception) {
+                android.widget.Toast.makeText(konteks, "Kartu gagal dibuat. Coba lagi.", android.widget.Toast.LENGTH_LONG).show()
+            } finally {
+                sibuk = false
+            }
+        }
+    }
 
     Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(EmeraldSoft, Canvas)))) {
         BoxWithConstraints(Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 24.dp, vertical = 12.dp), contentAlignment = Alignment.Center) {
@@ -110,7 +151,24 @@ fun KartuNasabahScreen(client: ApiClient, user: UserDto, onTutup: () -> Unit) {
                 .clickable(role = androidx.compose.ui.semantics.Role.Button, onClickLabel = "Tutup kartu", onClick = onTutup),
             contentAlignment = Alignment.Center,
         ) { Icon(Lucide.X, contentDescription = "Tutup kartu", tint = Slate900, modifier = Modifier.size(20.dp)) }
+
+        // Simpan ke galeri (Android 10+, tanpa izin) dan Bagikan (juga jalan menuju aplikasi cetak).
+        Row(Modifier.align(Alignment.TopEnd).safeDrawingPadding().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                TombolKartu(Lucide.Download, "Simpan kartu ke galeri", aktif = qr.data != null && !sibuk) { olahKartu(simpan = true) }
+            }
+            TombolKartu(Lucide.Share2, "Bagikan kartu", aktif = qr.data != null && !sibuk) { olahKartu(simpan = false) }
+        }
     }
+}
+
+@Composable
+private fun TombolKartu(ikon: androidx.compose.ui.graphics.vector.ImageVector, deskripsi: String, aktif: Boolean, onClick: () -> Unit) {
+    Box(
+        Modifier.size(44.dp).background(Color.White, CircleShape).border(1.dp, Slate200, CircleShape)
+            .clickable(enabled = aktif, role = androidx.compose.ui.semantics.Role.Button, onClickLabel = deskripsi, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) { Icon(ikon, contentDescription = deskripsi, tint = if (aktif) Slate900 else Slate400, modifier = Modifier.size(20.dp)) }
 }
 
 /** Kartu melintang: merek dan data nasabah di kiri, QR putih besar di kanan. Ukuran isi mengikuti tinggi kartu. */
@@ -175,8 +233,7 @@ private fun KartuHorizontal(q: QrDto, user: UserDto, modifier: Modifier = Modifi
                 }
 
                 // Bank sampah
-                val bank = user.nasabah?.bankSampah
-                val lokasi = listOfNotNull(bank?.nama, bank?.rt?.let { rt -> "RT $rt" + (bank.rw?.let { "/RW $it" } ?: "") }).joinToString(" · ")
+                val lokasi = ringkasBank(user.nasabah?.bankSampah)
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Icon(Lucide.MapPin, contentDescription = null, tint = Color(0xFFA7F3D0), modifier = Modifier.size((14 * skala).dp))
                     Text(lokasi.ifBlank { "EcoWin" }, color = Color.White.copy(alpha = 0.92f), fontSize = (12 * skala).sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)

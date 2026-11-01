@@ -1,4 +1,4 @@
-import { Maximize, Minimize, X } from 'lucide-react';
+import { Download, Maximize, Minimize, Printer, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EcoApi } from '../api/endpoints';
@@ -6,6 +6,7 @@ import QRCard from '../components/QRCard';
 import { ErrorState } from '../components/States';
 import { useAuth } from '../context/AuthContext';
 import { useQuery } from '../hooks/useQuery';
+import { ringkasBank, unduhKartuNasabah } from '../utils/kartu';
 
 /**
  * Kartu Nasabah layar penuh untuk dipindai petugas saat setor sampah. Kartu mengisi layar dengan rasio kartu asli (lebih besar
@@ -18,8 +19,9 @@ export default function KartuLayarPenuh() {
   const { user } = useAuth();
   const qr = useQuery(() => EcoApi.qr(), []);
   const [penuh, setPenuh] = useState(false);
-  const n = user?.nasabah;
-  const bank = [n?.bank_sampah?.nama, n?.bank_sampah?.rt ? `RT ${n.bank_sampah.rt}${n.bank_sampah.rw ? `/RW ${n.bank_sampah.rw}` : ''}` : null].filter(Boolean).join(' · ');
+  const [mengunduh, setMengunduh] = useState(false);
+  const [galatUnduh, setGalatUnduh] = useState('');
+  const bank = ringkasBank(user?.nasabah);
   const bisaLayarPenuh = typeof document !== 'undefined' && document.fullscreenEnabled === true;
 
   // Layar tetap menyala selama kartu tampil (bila peramban mendukung); dipasang lagi saat halaman kembali terlihat.
@@ -60,25 +62,39 @@ export default function KartuLayarPenuh() {
     } catch { /* ditolak peramban: tidak apa-apa, kartu tetap tampil */ }
   };
 
+  const unduh = async () => {
+    if (!qr.data || mengunduh) return;
+    setMengunduh(true); setGalatUnduh('');
+    try { await unduhKartuNasabah(qr.data, bank); }
+    catch { setGalatUnduh('Kartu gagal dibuat. Coba lagi atau gunakan tombol cetak.'); }
+    finally { setMengunduh(false); }
+  };
+
   const tutup = () => { if ((window.history.state?.idx ?? 0) > 0) navigate(-1); else navigate('/', { replace: true }); };
-  const tombol = 'absolute top-3 flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-ink shadow-soft transition hover:bg-canvas';
+  const tombol = 'flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-ink shadow-soft transition hover:bg-canvas disabled:opacity-60';
 
   return (
-    <main className="relative flex min-h-dvh flex-col items-center justify-center gap-3 bg-gradient-to-b from-tint to-canvas px-4 py-6">
-      <button type="button" onClick={tutup} aria-label="Tutup kartu" className={`${tombol} left-3`}><X className="h-5 w-5" aria-hidden /></button>
-      {bisaLayarPenuh && (
-        <button type="button" onClick={alihLayarPenuh} aria-label={penuh ? 'Keluar dari layar penuh' : 'Layar penuh'} className={`${tombol} right-3`}>
-          {penuh ? <Minimize className="h-5 w-5" aria-hidden /> : <Maximize className="h-5 w-5" aria-hidden />}
-        </button>
-      )}
+    <main className="relative flex min-h-dvh flex-col items-center justify-center gap-3 bg-gradient-to-b from-tint to-canvas px-4 py-6 print:block print:min-h-0 print:bg-none print:bg-white print:p-0">
+      <button type="button" onClick={tutup} aria-label="Tutup kartu" className={`${tombol} absolute left-3 top-3 print:hidden`}><X className="h-5 w-5" aria-hidden /></button>
+      {/* Unduh dan cetak selalu ada; layar penuh hanya bila peramban mendukung. */}
+      <div className="absolute right-3 top-3 flex gap-2 print:hidden">
+        <button type="button" onClick={unduh} disabled={!qr.data || mengunduh} aria-label="Unduh kartu (PNG)" className={tombol}><Download className="h-5 w-5" aria-hidden /></button>
+        <button type="button" onClick={() => window.print()} disabled={!qr.data} aria-label="Cetak kartu" className={tombol}><Printer className="h-5 w-5" aria-hidden /></button>
+        {bisaLayarPenuh && (
+          <button type="button" onClick={alihLayarPenuh} aria-label={penuh ? 'Keluar dari layar penuh' : 'Layar penuh'} className={tombol}>
+            {penuh ? <Minimize className="h-5 w-5" aria-hidden /> : <Maximize className="h-5 w-5" aria-hidden />}
+          </button>
+        )}
+      </div>
 
       {/* Lebar kartu: mengisi lebar layar, tetapi tidak lebih tinggi dari layar (rasio kartu 1,586). */}
-      <div className="w-full" style={{ maxWidth: 'min(94vw, calc((100dvh - 110px) * 1.586))' }}>
+      <div className="kartu-cetak w-full" style={{ maxWidth: 'min(94vw, calc((100dvh - 110px) * 1.586))' }}>
         {qr.error && !qr.data ? <ErrorState error={qr.error} onRetry={qr.reload} /> : <QRCard data={qr.data} loading={qr.loading} bank={bank} tanpaCatatan />}
       </div>
 
-      <p className="max-w-sm text-center text-xs text-muted">Tunjukkan kartu ini kepada petugas Bank Sampah. Naikkan kecerahan layar agar QR mudah dipindai.</p>
-      <p className="hidden text-center text-xs font-semibold text-primary-deep portrait:block">Putar HP ke samping agar kartu tampil lebih besar.</p>
+      {galatUnduh && <p role="alert" className="max-w-sm text-center text-xs font-semibold text-danger print:hidden">{galatUnduh}</p>}
+      <p className="max-w-sm text-center text-xs text-muted print:hidden">Tunjukkan kartu ini kepada petugas Bank Sampah. Naikkan kecerahan layar agar QR mudah dipindai.</p>
+      <p className="hidden text-center text-xs font-semibold text-primary-deep portrait:block print:!hidden">Putar HP ke samping agar kartu tampil lebih besar.</p>
     </main>
   );
 }

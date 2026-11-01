@@ -1,6 +1,9 @@
 package id.ecowin.app
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -148,7 +151,30 @@ fun StatTile(label: String, value: String, modifier: Modifier = Modifier, icon: 
 
 @Composable
 fun EmptyText(text: String) {
-    Text(text, color = Slate500, fontSize = 14.sp, modifier = Modifier.padding(vertical = 8.dp))
+    // Kalimat pertama menjadi judul, sisanya keterangan (sama dengan EmptyState di web).
+    val bagian = text.trim().split(". ", limit = 2)
+    val judul = bagian[0].trimEnd('.')
+    val pesan = bagian.getOrNull(1)?.trim()
+    Column(Modifier.fillMaxWidth().padding(vertical = 20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Box(Modifier.size(56.dp).background(EmeraldSoft, CircleShape), contentAlignment = Alignment.Center) {
+            Icon(Lucide.Inbox, contentDescription = null, tint = Emerald, modifier = Modifier.size(26.dp))
+        }
+        Text(judul, color = Slate900, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 4.dp))
+        if (!pesan.isNullOrBlank()) Text(pesan, color = Slate500, fontSize = 13.sp, lineHeight = 18.sp, textAlign = TextAlign.Center)
+    }
+}
+
+/** Pesan hasil aksi: sukses diberi ikon centang hijau (seperti di web), galat berupa teks merah. */
+@Composable
+fun PesanStatus(teks: String, sukses: Boolean) {
+    if (sukses) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Icon(Lucide.CircleCheck, contentDescription = null, tint = Emerald, modifier = Modifier.size(18.dp))
+            Text(teks, fontSize = 13.sp, color = Emerald, fontWeight = FontWeight.SemiBold)
+        }
+    } else {
+        Text(teks, fontSize = 13.sp, color = Red, fontWeight = FontWeight.SemiBold)
+    }
 }
 
 @Composable
