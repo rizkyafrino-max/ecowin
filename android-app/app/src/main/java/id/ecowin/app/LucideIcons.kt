@@ -176,6 +176,30 @@ object Lucide {
         "m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21",
         "M7 9a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"
     ) }
+    val Download: ImageVector by lazy { icon("Download",
+        "M12 15V3",
+        "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4",
+        "m7 10 5 5 5-5"
+    ) }
+    val Share2: ImageVector by lazy { icon("Share2",
+        "M15 5a3 3 0 1 0 6 0a3 3 0 1 0 -6 0",
+        "M3 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0",
+        "M15 19a3 3 0 1 0 6 0a3 3 0 1 0 -6 0",
+        "M8.59 13.51l6.83 3.98",
+        "M15.41 6.51l-6.82 3.98"
+    ) }
+    val Inbox: ImageVector by lazy { icon("Inbox",
+        "M22 12h-6l-2 3h-4l-2-3H2",
+        "M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+    ) }
+    val Plus: ImageVector by lazy { icon("Plus",
+        "M5 12h14",
+        "M12 5v14"
+    ) }
+    val CircleCheck: ImageVector by lazy { icon("CircleCheck",
+        "M2 12a10 10 0 1 0 20 0a10 10 0 1 0 -20 0",
+        "m9 12 2 2 4-4"
+    ) }
     val Megaphone: ImageVector by lazy { icon("Megaphone",
         "m3 11 18-5v12L3 14v-3z",
         "M11.6 16.8a3 3 0 1 1-5.8-1.6"

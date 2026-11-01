@@ -1,4 +1,4 @@
-import { Bug, Camera, CheckCircle2, LogOut, Maximize, ShieldCheck, Trash2, UserRound } from 'lucide-react';
+import { Bug, Camera, CheckCircle2, Download, LogOut, Maximize, ShieldCheck, Trash2, UserRound } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { EcoApi } from '../api/endpoints';
@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { useQuery } from '../hooks/useQuery';
 import { inisial } from '../utils/format';
 import { perkecilFoto } from '../utils/foto';
+import { ringkasBank, unduhKartuNasabah } from '../utils/kartu';
 
 const JENIS_KELAMIN = [
   { nilai: 'L', label: 'Laki-laki', gambar: '/avatar-laki.jpg' },
@@ -45,7 +46,16 @@ export default function Profil() {
   const [avatarRusak, setAvatarRusak] = useState(false);
   const berkas = useRef(null);
   const set = (k) => (e) => { setSaved(false); setForm((f) => ({ ...f, [k]: e.target.value })); };
-  const bank = [n?.bank_sampah?.nama, n?.bank_sampah?.rt ? `RT ${n.bank_sampah.rt}${n.bank_sampah.rw ? `/RW ${n.bank_sampah.rw}` : ''}` : null].filter(Boolean).join(' · ');
+  const bank = ringkasBank(n);
+  const [unduhBusy, setUnduhBusy] = useState(false);
+  const [unduhGalat, setUnduhGalat] = useState('');
+  const unduhKartu = async () => {
+    if (!qr.data) return;
+    setUnduhBusy(true); setUnduhGalat('');
+    try { await unduhKartuNasabah(qr.data, bank); }
+    catch { setUnduhGalat('Kartu gagal dibuat. Coba lagi.'); }
+    finally { setUnduhBusy(false); }
+  };
 
   const save = async (e) => {
     e.preventDefault();
@@ -86,7 +96,7 @@ export default function Profil() {
   return (
     <div className="space-y-5">
       <PageHeader title="Profil" subtitle="Data akun dan Kartu Nasabah Anda." />
-      <div className="grid gap-5 lg:grid-cols-[1.25fr_1fr] lg:items-start">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.25fr_1fr] lg:items-start">
         <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#065F46] via-primary to-secondary px-5 py-7 text-center text-white shadow-soft lg:col-start-1 lg:row-start-1">
           <span aria-hidden className="pointer-events-none absolute -right-12 -top-14 h-44 w-44 rounded-full bg-white/10" />
           <span aria-hidden className="pointer-events-none absolute -bottom-14 -left-10 h-36 w-36 rounded-full bg-white/[0.07]" />
@@ -124,6 +134,8 @@ export default function Profil() {
           <Link to="/kartu" className="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-tint px-5 text-sm font-semibold text-primary-deep transition hover:bg-emerald-100">
             <Maximize className="h-4 w-4" aria-hidden />Tampilkan layar penuh
           </Link>
+          <Button type="button" variant="outline" icon={Download} className="mt-2 w-full" loading={unduhBusy} disabled={!qr.data} onClick={unduhKartu}>Unduh kartu (PNG)</Button>
+          {unduhGalat && <p role="alert" className="mt-2 text-center text-xs font-semibold text-danger">{unduhGalat}</p>}
         </div>
 
         <section className="lg:col-start-1 lg:row-span-2 lg:row-start-2">

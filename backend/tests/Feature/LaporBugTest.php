@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\LaporanKendalas\Pages\ListLaporanKendalas;
 use App\Models\BankSampah;
 use App\Models\LaporanKendala;
 use App\Models\Nasabah;
@@ -10,6 +11,7 @@ use App\Services\FotoLaporanService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 /**
@@ -212,5 +214,19 @@ class LaporBugTest extends TestCase
 
         LaporanKendala::query()->where('kategori', 'bug')->update(['status' => 'disetujui']);
         $this->actingAs($admin, 'web')->get('/admin')->assertOk()->assertDontSee('eco-popup-title', false);
+    }
+
+    public function test_admin_table_shows_a_photo_link_only_when_the_file_exists(): void
+    {
+        Storage::fake(config('ecowin.upload.disk'));
+        $ada = LaporanKendala::query()->forceCreate(['kategori' => 'bug', 'deskripsi' => 'Foto ada', 'status' => 'menunggu', 'dilaporkan_oleh_user_id' => $this->nasabah->user_id, 'foto_bukti_path' => 'laporan/2026/10/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.jpg']);
+        $hilang = LaporanKendala::query()->forceCreate(['kategori' => 'bug', 'deskripsi' => 'Foto hilang', 'status' => 'menunggu', 'dilaporkan_oleh_user_id' => $this->nasabah->user_id, 'foto_bukti_path' => 'laporan/2026/10/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB.jpg']);
+        Storage::disk(config('ecowin.upload.disk'))->put($ada->foto_bukti_path, 'jpeg');
+
+        $this->actingAs(User::factory()->admin()->create(), 'web');
+
+        Livewire::test(ListLaporanKendalas::class)
+            ->assertTableColumnStateSet('foto', route('admin.berkas.laporan', $ada), $ada)
+            ->assertTableColumnStateSet('foto', null, $hilang);
     }
 }

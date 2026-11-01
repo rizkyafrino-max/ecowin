@@ -20,7 +20,7 @@ export default function Saldo() {
     <div className="space-y-5">
       <PageHeader title="Saldo" subtitle="Riwayat perubahan saldo EcoWin Anda." />
       {saldo.error ? <Card><ErrorState error={saldo.error} onRetry={saldo.reload} /></Card> : (
-        <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.4fr_1fr]">
           {saldo.loading ? <div className="h-44 ew-skeleton !rounded-[24px]" /> : (
             <BalanceCard saldo={s.saldo} tersedia={s.saldo_tersedia} ditahan={s.saldo_ditahan}
               actions={<Link to="/penarikan"><Button variant="outline" size="sm" className="!border-white/30 !bg-white/15 !text-white hover:!bg-white/25" icon={ArrowDownToLine}>Tarik saldo</Button></Link>} />

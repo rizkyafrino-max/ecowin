@@ -101,9 +101,9 @@ export default function Notifikasi() {
                   className={`flex w-full items-start gap-3 rounded-3xl border bg-surface p-4 pr-14 text-left transition hover:shadow-md ${n.dibaca ? 'border-line' : 'border-primary/40 shadow-sm'}`}>
                   <span className={`flex h-11 w-11 flex-none items-center justify-center rounded-2xl ${kelas}`}><Icon className="h-5 w-5" aria-hidden /></span>
                   <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-2">
-                      <span className={`truncate text-sm ${n.dibaca ? 'font-semibold' : 'font-extrabold'}`}>{n.judul}</span>
-                      {!n.dibaca && <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-white">Baru</span>}
+                    <span className="flex items-start gap-2">
+                      <span className={`line-clamp-2 break-words text-sm ${n.dibaca ? 'font-semibold' : 'font-extrabold'}`}>{n.judul}</span>
+                      {!n.dibaca && <span className="flex-none rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-white">Baru</span>}
                     </span>
                     <span className="mt-0.5 block text-sm text-muted">{n.isi}</span>
                     <span className="mt-1 block text-xs text-muted">{tanggal(n.created_at, true)}</span>

@@ -28,18 +28,18 @@ private val Grup: List<Pair<String, List<Fitur>>> = listOf(
     "UTAMA" to listOf(
         Fitur(Tab.Beranda, Tab.Beranda.icon, "Beranda", "Ringkasan saldo, setoran, dan aktivitas terbaru."),
         Fitur(Tab.Transaksi, Tab.Transaksi.icon, "Transaksi", "Riwayat setoran sampah anorganik dan nilainya."),
-        Fitur(Tab.Organik, Tab.Organik.icon, "Organik", "Setoran dan aktivitas organik: BioporiPrint, estimasi kompos."),
+        Fitur(Tab.Organik, Tab.Organik.icon, "Organik", "Setoran dan aktivitas organik: Biopori, BioporiPrint, estimasi kompos."),
     ),
     "KEUANGAN" to listOf(
         Fitur(Tab.Saldo, Tab.Saldo.icon, "Saldo", "Saldo, saldo tersedia, dan riwayat mutasi."),
         Fitur(Tab.Saldo, Lucide.ArrowDownToLine, "Tarik Saldo", "Ajukan penarikan dan pantau statusnya."),
     ),
     "AKUN" to listOf(
-        Fitur(Tab.Kartu, Lucide.QrCode, "Kartu Nasabah", "Tampilkan kartu melintang berisi QR untuk setor sampah."),
-        Fitur(Tab.Organik, Lucide.MapPin, "Peta BioporiPrint", "Lihat titik BioporiPrint di sekitar Anda."),
+        Fitur(Tab.Kartu, Lucide.QrCode, "Kartu Nasabah", "Tampilkan kartu layar penuh berisi QR untuk setor sampah."),
+        Fitur(Tab.Organik, Lucide.MapPin, "Peta Biopori", "Lihat titik Biopori dan BioporiPrint di sekitar Anda."),
         Fitur(Tab.Profil, Lucide.UserRound, "Profil", "Data diri, Bank Sampah, dan keluar dari akun."),
-        Fitur(Tab.Pengaturan, Lucide.Settings, "Pengaturan", "Pemberitahuan HP dan nada notifikasi."),
-        Fitur(Tab.LaporBug, Tab.LaporBug.icon, "Lapor Bug", "Laporkan masalah aplikasi. Bisa juga dengan mengguncang HP."),
+        Fitur(Tab.Pengaturan, Lucide.Settings, "Pengaturan", "Pemberitahuan HP, nada notifikasi, dan lapor bug."),
+        Fitur(Tab.LaporBug, Tab.LaporBug.icon, "Lapor Bug", "Laporkan masalah aplikasi beserta foto bukti. Bisa juga dengan mengguncang HP."),
     ),
 )
 

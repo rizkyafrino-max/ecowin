@@ -17,6 +17,9 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'camera=(self), geolocation=(self), microphone=()');
 
+        // Jangan membocorkan versi PHP kepada pihak luar (di php.ini sebaiknya juga expose_php=Off).
+        header_remove('X-Powered-By');
+
         if ($request->is('api/*')) {
             $response->headers->set('Cache-Control', 'no-store, private');
         }

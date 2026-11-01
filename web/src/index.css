@@ -62,3 +62,10 @@ body {
 .ew-launch-logo { animation: ew-logo-in .45s ease-out both, ew-breathe 1.3s ease-in-out .45s infinite; }
 .ew-bar { animation: ew-slide 1.1s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .ew-launch-logo, .ew-bar { animation: none; } }
+
+/* Cetak Kartu Nasabah: hanya kartu, berukuran kartu bank sebenarnya (85,6 mm), dengan warna latar tetap tercetak. */
+@media print {
+  @page { size: A4; margin: 15mm; }
+  .kartu-cetak { width: 85.6mm !important; max-width: 85.6mm !important; margin: 0 auto; }
+  [aria-label='Kartu Nasabah'] { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; }
+}

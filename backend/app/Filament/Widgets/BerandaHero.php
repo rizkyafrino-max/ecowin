@@ -64,21 +64,21 @@ class BerandaHero extends Widget
         // Pop-up pengingat: kategori yang punya tugas menunggu, lengkap dengan beberapa item terbaru yang langsung menuju halamannya.
         $filterNasabah = ['tableFilters' => ['status_verifikasi' => ['value' => 'pending']]];
         $nasabahBaru = Nasabah::query()->visibleTo($user)->where('status_verifikasi', 'pending')->where('status', 'aktif')->latest('id')->limit(3)->get()
-            ->map(fn (Nasabah $n) => ['title' => $n->nama, 'meta' => 'Mendaftar '.$n->created_at?->format('d M Y'), 'url' => NasabahResource::getUrl('index', $filterNasabah + ['tableSearch' => $n->nama])]);
+            ->map(fn (Nasabah $n) => ['title' => $n->nama, 'meta' => 'Mendaftar '.$n->created_at?->translatedFormat('d M Y'), 'url' => NasabahResource::getUrl('index', $filterNasabah + ['tableSearch' => $n->nama])]);
         $penarikan = PenarikanSaldo::query()->visibleTo($user)->with('nasabah')->where('status', PenarikanSaldo::STATUS_PENDING)->latest('id')->limit(3)->get()
-            ->map(fn (PenarikanSaldo $p) => ['title' => ($p->nasabah?->nama ?? 'Nasabah').' · Rp '.number_format((float) $p->jumlah, 0, ',', '.'), 'meta' => 'Diajukan '.$p->created_at?->format('d M Y'), 'url' => PenarikanSaldoResource::getUrl('index')]);
+            ->map(fn (PenarikanSaldo $p) => ['title' => ($p->nasabah?->nama ?? 'Nasabah').' · Rp '.number_format((float) $p->jumlah, 0, ',', '.'), 'meta' => 'Diajukan '.$p->created_at?->translatedFormat('d M Y'), 'url' => PenarikanSaldoResource::getUrl('index')]);
         $organik = AktivitasBiopori::query()->visibleTo($user)->with('nasabah')->where('status', AktivitasBiopori::STATUS_PENDING)->latest('id')->limit(3)->get()
             ->map(fn (AktivitasBiopori $a) => ['title' => ($a->nasabah?->nama ?? 'Nasabah').' · '.($a->jenis_sampah ?: 'Aktivitas'), 'meta' => number_format((float) $a->berat_kg, 1, ',', '.').' kg', 'url' => AktivitasBioporiResource::getUrl('view', ['record' => $a])]);
         $filterTitik = ['tableFilters' => ['verifikasi' => ['value' => 'pending']]];
         $titikBaru = TitikBiopori::query()->visibleTo($user)->where('verifikasi', TitikBiopori::VERIFIKASI_PENDING)->latest('id')->limit(3)->get()
-            ->map(fn (TitikBiopori $t) => ['title' => $t->nama_lokasi ?: 'Titik baru', 'meta' => 'Diajukan '.$t->created_at?->format('d M Y'), 'url' => TitikBioporiResource::getUrl('index', $filterTitik)]);
+            ->map(fn (TitikBiopori $t) => ['title' => $t->nama_lokasi ?: 'Titik baru', 'meta' => 'Diajukan '.$t->created_at?->translatedFormat('d M Y'), 'url' => TitikBioporiResource::getUrl('index', $filterTitik)]);
         $koreksi = KoreksiTransaksi::query()->visibleTo($user)->where('status', KoreksiTransaksi::STATUS_PENDING)->latest('id')->limit(3)->get()
             ->map(fn (KoreksiTransaksi $k) => ['title' => ucfirst($k->tipe_transaksi).' #'.$k->transaksi_id, 'meta' => 'Menunggu keputusan', 'url' => \App\Filament\Resources\KoreksiTransaksis\KoreksiTransaksiResource::getUrl('index')]);
 
         $filterBug = ['tableFilters' => ['status' => ['value' => 'menunggu'], 'kategori' => ['value' => 'bug']]];
         $bugBaru = $user->isAdmin()
             ? LaporanKendala::query()->with('pelaporUser')->where('kategori', 'bug')->where('status', 'menunggu')->latest('id')->limit(3)->get()
-                ->map(fn (LaporanKendala $l) => ['title' => \Illuminate\Support\Str::limit(trim((string) strtok($l->deskripsi, "\n")), 48), 'meta' => ($l->pelaporUser?->nama ?? 'Pengguna').' · '.$l->created_at?->format('d M Y'), 'url' => \App\Filament\Resources\LaporanKendalas\LaporanKendalaResource::getUrl('index', $filterBug)])
+                ->map(fn (LaporanKendala $l) => ['title' => \Illuminate\Support\Str::limit(trim((string) strtok($l->deskripsi, "\n")), 48), 'meta' => ($l->pelaporUser?->nama ?? 'Pengguna').' · '.$l->created_at?->translatedFormat('d M Y'), 'url' => \App\Filament\Resources\LaporanKendalas\LaporanKendalaResource::getUrl('index', $filterBug)])
             : collect();
 
         $popup = array_values(array_filter([

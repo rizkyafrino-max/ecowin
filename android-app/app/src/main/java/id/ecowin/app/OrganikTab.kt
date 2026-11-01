@@ -57,7 +57,8 @@ fun OrganikTab(client: ApiClient, refreshKey: Int) {
     TabList(aksi = {
         if (!formOpen) {
             androidx.compose.material3.Button(onClick = { formOpen = true }, modifier = Modifier.height(36.dp), shape = RoundedCornerShape(50), contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp)) {
-                Text("+ Tambah", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Icon(Lucide.Plus, contentDescription = null, modifier = Modifier.size(16.dp))
+                Text(" Tambah", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
         }
     }) {
