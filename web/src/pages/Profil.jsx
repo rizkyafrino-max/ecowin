@@ -86,7 +86,7 @@ export default function Profil() {
   return (
     <div className="space-y-5">
       <PageHeader title="Profil" subtitle="Data akun dan Kartu Nasabah Anda." />
-      <div className="grid gap-5 lg:grid-cols-[1.25fr_1fr] lg:items-start">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.25fr_1fr] lg:items-start">
         <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#065F46] via-primary to-secondary px-5 py-7 text-center text-white shadow-soft lg:col-start-1 lg:row-start-1">
           <span aria-hidden className="pointer-events-none absolute -right-12 -top-14 h-44 w-44 rounded-full bg-white/10" />
           <span aria-hidden className="pointer-events-none absolute -bottom-14 -left-10 h-36 w-36 rounded-full bg-white/[0.07]" />

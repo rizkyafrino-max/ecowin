@@ -16,6 +16,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Storage;
 use UnitEnum;
 
 class LaporanKendalaResource extends Resource
@@ -50,12 +51,14 @@ class LaporanKendalaResource extends Resource
             ->columns([
                 TextColumn::make('created_at')->label('Waktu')->dateTime('d M Y H:i'),
                 TextColumn::make('kategori')->badge(),
-                TextColumn::make('deskripsi')->limit(60)->wrap()
-                    // Teks utuh (termasuk info perangkat pada laporan bug) tampil saat kursor diarahkan.
-                    ->tooltip(fn (TextColumn $column): ?string => mb_strlen((string) $column->getState()) > 60 ? (string) $column->getState() : null),
+                // Daftar hanya menampilkan teks laporan; blok "Info otomatis" (versi aplikasi, jenis HP) ada di tooltip bersama teks utuh.
+                TextColumn::make('deskripsi')->label('Deskripsi')->wrap()->width('26rem')
+                    ->formatStateUsing(fn (string $state): string => \Illuminate\Support\Str::limit(trim(\Illuminate\Support\Str::before($state, '— Info otomatis —')), 140))
+                    ->tooltip(fn (LaporanKendala $record): string => $record->deskripsi),
+                // Tautan foto hanya dibuat bila berkasnya benar-benar ada, supaya tidak tampil gambar rusak.
                 ImageColumn::make('foto')->label('Foto')
-                    ->state(fn (LaporanKendala $r): ?string => $r->foto_bukti_path ? route('admin.berkas.laporan', $r) : null)
-                    ->url(fn (LaporanKendala $r): ?string => $r->foto_bukti_path ? route('admin.berkas.laporan', $r) : null, shouldOpenInNewTab: true)
+                    ->state(fn (LaporanKendala $r): ?string => static::fotoAda($r) ? route('admin.berkas.laporan', $r) : null)
+                    ->url(fn (LaporanKendala $r): ?string => static::fotoAda($r) ? route('admin.berkas.laporan', $r) : null, shouldOpenInNewTab: true)
                     ->imageHeight(48)->extraImgAttributes(['loading' => 'lazy', 'class' => 'rounded-lg']),
                 TextColumn::make('pelaporUser.nama')->label('Pelapor'),
                 TextColumn::make('bankSampah.nama_bank_sampah')->label('Bank Sampah')->placeholder('-'),
@@ -81,6 +84,12 @@ class LaporanKendalaResource extends Resource
                         app(AuditLogger::class)->log('ubah_laporan_kendala', $record, $before, $record->attributesToArray());
                     }),
             ]);
+    }
+
+    private static function fotoAda(LaporanKendala $laporan): bool
+    {
+        return $laporan->foto_bukti_path !== null
+            && Storage::disk(config('ecowin.upload.disk'))->exists($laporan->foto_bukti_path);
     }
 
     public static function getPages(): array

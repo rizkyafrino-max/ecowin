@@ -16,12 +16,23 @@ class SecureUploader
 {
     private const MIMES = ['image/jpeg', 'image/png', 'image/webp'];
 
+    private const MAKS_PIKSEL = 25_000_000;
+
     public function storeImage(UploadedFile $file, string $directory): string
     {
         $mime = $file->getMimeType();
 
-        if (! in_array($mime, self::MIMES, true) || @getimagesize($file->getRealPath()) === false) {
+        $info = @getimagesize($file->getRealPath());
+
+        if (! in_array($mime, self::MIMES, true) || $info === false) {
             throw ValidationException::withMessages(['foto' => ['File harus berupa gambar JPG, PNG, atau WEBP.']]);
+        }
+
+        // Dimensi dibatasi SEBELUM gambar didekode: PNG kecil yang menyatakan puluhan ribu piksel bisa menghabiskan memori server.
+        $maksSisi = (int) config('ecowin.upload.foto_max_dimensi');
+
+        if ($info[0] > $maksSisi || $info[1] > $maksSisi || $info[0] * $info[1] > self::MAKS_PIKSEL) {
+            throw ValidationException::withMessages(['foto' => ['Resolusi foto terlalu besar.']]);
         }
 
         if ($file->getSize() > config('ecowin.upload.foto_max_kb') * 1024) {

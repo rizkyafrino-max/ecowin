@@ -32,7 +32,7 @@ class PetaBiopori extends Page
             'bank' => $point->bankSampah?->nama_bank_sampah ?? 'Bank sampah tidak diketahui',
             'alamat' => $point->alamat_rt_rw,
             'keterangan' => $point->deskripsi_lokasi,
-            'tanggal' => $point->tanggal_tanam?->format('d M Y'),
+            'tanggal' => $point->tanggal_tanam?->translatedFormat('d M Y'),
             'pipa' => $point->jumlah_pipa,
             'status' => $point->status,
             'lat' => (float) $point->latitude,

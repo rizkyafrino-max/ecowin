@@ -41,7 +41,7 @@ class PendingApprovalsTable extends Widget
                     'label' => 'Aktivitas Biopori',
                     'count' => AktivitasBiopori::query()->visibleTo($user)->where('status', AktivitasBiopori::STATUS_PENDING)->count(),
                     'items' => AktivitasBiopori::query()->visibleTo($user)->with('nasabah')->where('status', AktivitasBiopori::STATUS_PENDING)->latest('id')->limit(5)->get()
-                        ->map(fn (AktivitasBiopori $a) => ['title' => $a->nasabah?->nama, 'meta' => $a->tanggal_pemasukan?->format('d M Y H:i').' · '.(float) $a->berat_kg.' kg', 'url' => AktivitasBioporiResource::getUrl('view', ['record' => $a])]),
+                        ->map(fn (AktivitasBiopori $a) => ['title' => $a->nasabah?->nama, 'meta' => $a->tanggal_pemasukan?->translatedFormat('d M Y H:i').' · '.(float) $a->berat_kg.' kg', 'url' => AktivitasBioporiResource::getUrl('view', ['record' => $a])]),
                     'url' => AktivitasBioporiResource::getUrl('index'),
                 ],
                 [
@@ -62,7 +62,7 @@ class PendingApprovalsTable extends Widget
                     'label' => 'Verifikasi Nasabah Baru',
                     'count' => Nasabah::query()->visibleTo($user)->where('status_verifikasi', 'pending')->count(),
                     'items' => Nasabah::query()->visibleTo($user)->where('status_verifikasi', 'pending')->latest('id')->limit(5)->get()
-                        ->map(fn (Nasabah $n) => ['title' => $n->nama, 'meta' => 'Mendaftar '.$n->created_at?->format('d M Y'), 'url' => NasabahResource::getUrl('index', ['tableFilters' => ['status_verifikasi' => ['value' => 'pending']]])]),
+                        ->map(fn (Nasabah $n) => ['title' => $n->nama, 'meta' => 'Mendaftar '.$n->created_at?->translatedFormat('d M Y'), 'url' => NasabahResource::getUrl('index', ['tableFilters' => ['status_verifikasi' => ['value' => 'pending']]])]),
                     'url' => NasabahResource::getUrl('index', ['tableFilters' => ['status_verifikasi' => ['value' => 'pending']]]),
                 ],
             ],

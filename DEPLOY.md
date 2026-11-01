@@ -20,6 +20,7 @@ Panduan singkat untuk memindahkan EcoWin dari mesin lokal ke server sungguhan. S
 APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://api.domain-anda.id
+APP_LOCALE=id                  # bahasa Indonesia (nama bulan, pesan validasi); zona waktu sudah dikunci Asia/Jakarta
 
 SESSION_SECURE_COOKIE=true
 SESSION_ENCRYPT=true
@@ -93,6 +94,24 @@ npm ci && npm run build        # keluaran di web/dist
 ```
 
 Sajikan `web/dist` lewat HTTPS dan arahkan semua rute yang tidak dikenal ke `index.html` (SPA).
+
+### Header keamanan untuk web nasabah (wajib)
+
+Token login web disimpan di `localStorage`, jadi perlindungan dari XSS dan clickjacking harus dipasang di server web:
+
+- **Content-Security-Policy** sudah disisipkan otomatis ke `index.html` saat `npm run build`: hanya skrip dari origin sendiri yang boleh jalan, dan permintaan jaringan hanya boleh ke alamat API di `VITE_API_BASE_URL` (plus foto akun Google dan ubin peta OpenStreetMap). Karena itu **bangun ulang web setiap kali alamat API berubah**, dan pastikan `VITE_API_BASE_URL` benar sebelum build.
+- Tag `<meta>` tidak bisa mengatur `frame-ancestors`, jadi pasang header berikut di server web (contoh nginx, blok `server` untuk web nasabah):
+
+```nginx
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-Frame-Options "DENY" always;
+add_header Content-Security-Policy "frame-ancestors 'none'" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+add_header Permissions-Policy "microphone=(), geolocation=(self)" always;
+```
+
+Di hosting statis (Netlify, Cloudflare Pages), pasang header yang sama lewat berkas `_headers`. API dan panel Laravel sudah mengirim header keamanannya sendiri (diuji otomatis).
 
 ## 4. Android
 

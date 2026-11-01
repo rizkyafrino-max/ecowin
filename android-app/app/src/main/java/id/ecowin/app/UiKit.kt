@@ -75,8 +75,8 @@ fun TransactionRow(title: String, subtitle: String?, amount: String, kredit: Boo
             Icon(if (kredit) Lucide.ArrowDownLeft else Lucide.ArrowUpRight, contentDescription = null, tint = if (kredit) Emerald else Amber, modifier = Modifier.size(20.dp))
         }
         Column(Modifier.weight(1f)) {
-            Text(title, fontWeight = FontWeight.SemiBold, color = Slate900, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            if (!subtitle.isNullOrBlank()) Text(subtitle, color = Slate500, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(title, fontWeight = FontWeight.SemiBold, color = Slate900, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            if (!subtitle.isNullOrBlank()) Text(subtitle, color = Slate500, fontSize = 12.sp, lineHeight = 17.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
         Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text((if (kredit) "+" else "−") + amount, fontWeight = FontWeight.Bold, color = if (kredit) Emerald else Slate900)
@@ -97,8 +97,8 @@ fun ActivityRow(icon: ImageVector, title: String, subtitle: String?, right: Stri
             Icon(icon, contentDescription = null, tint = Emerald, modifier = Modifier.size(20.dp))
         }
         Column(Modifier.weight(1f)) {
-            Text(title, fontWeight = FontWeight.SemiBold, color = Slate900, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            if (!subtitle.isNullOrBlank()) Text(subtitle, color = Slate500, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(title, fontWeight = FontWeight.SemiBold, color = Slate900, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            if (!subtitle.isNullOrBlank()) Text(subtitle, color = Slate500, fontSize = 12.sp, lineHeight = 17.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
         Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
             if (right != null) Text(right, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Slate900)

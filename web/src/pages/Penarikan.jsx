@@ -61,7 +61,7 @@ export default function Penarikan() {
     <div className="space-y-5">
       <PageHeader title="Tarik saldo" subtitle="Ajukan penarikan. Petugas akan memeriksa dan menyetujuinya." />
       <VerifikasiBanner compact />
-      <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1.2fr]">
         <Card>
           <p className="text-sm text-muted">Saldo tersedia</p>
           <p className="mt-1 text-3xl font-extrabold tabular-nums text-primary-deep">{saldo.loading ? '…' : rupiah(tersedia)}</p>

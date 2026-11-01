@@ -31,7 +31,7 @@ class CreatePengumuman extends CreateRecord
                 $user = auth()->user();
                 $bankId = $user->isAdmin() ? ($this->data['bank_sampah_id'] ?? null) : $user->bank_sampah_id;
                 $n = app(PengumumanService::class)->hitungPenerima($bankId ? (int) $bankId : null);
-                $jadwal = ! empty($this->data['kirim_pada']) ? ' pada '.\Illuminate\Support\Carbon::parse($this->data['kirim_pada'])->format('d M Y H:i') : '';
+                $jadwal = ! empty($this->data['kirim_pada']) ? ' pada '.\Illuminate\Support\Carbon::parse($this->data['kirim_pada'])->translatedFormat('d M Y H:i') : '';
 
                 return $jadwal !== ''
                     ? "Pengumuman akan dijadwalkan{$jadwal} untuk {$n} nasabah aktif dan hanya bisa dibatalkan sebelum waktunya."

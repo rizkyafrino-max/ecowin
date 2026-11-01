@@ -12,10 +12,10 @@ export function TransactionCard({ title, subtitle, amount, kind = 'kredit', date
         <Icon className="h-5 w-5" aria-hidden />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="truncate font-semibold">{title}</p>
-        <p className="truncate text-xs text-muted">{[subtitle, tanggal(date, true)].filter(Boolean).join(' · ')}</p>
+        <p className="line-clamp-2 break-words font-semibold leading-snug">{title}</p>
+        <p className="line-clamp-2 break-words text-xs leading-snug text-muted">{[subtitle, tanggal(date, true)].filter(Boolean).join(' · ')}</p>
       </div>
-      <div className="flex flex-col items-end gap-1">
+      <div className="flex flex-none flex-col items-end gap-1 whitespace-nowrap">
         <p className={`font-bold tabular-nums ${credit ? 'text-primary-deep' : 'text-ink'}`}>{credit ? '+' : '−'}{rupiah(amount)}</p>
         {status && <StatusBadge status={status} />}
       </div>
@@ -30,8 +30,8 @@ export function ActivityCard({ icon: Icon = Leaf, title, subtitle, status, right
     <Tag onClick={onClick} className="flex w-full items-center gap-3.5 py-3 text-left">
       <span className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl bg-tint text-primary-deep"><Icon className="h-5 w-5" aria-hidden /></span>
       <div className="min-w-0 flex-1">
-        <p className="truncate font-semibold">{title}</p>
-        <p className="truncate text-xs text-muted">{subtitle}</p>
+        <p className="line-clamp-2 break-words font-semibold leading-snug">{title}</p>
+        <p className="line-clamp-2 break-words text-xs leading-snug text-muted">{subtitle}</p>
       </div>
       <div className="flex flex-col items-end gap-1">
         {right}
