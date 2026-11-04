@@ -1,0 +1,2 @@
+# Skrip dan konfigurasi server harus LF (dijalankan di Linux)
+deploy/** text eol=lf
