@@ -5,6 +5,7 @@ import { EcoApi } from '../api/endpoints';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import { Input, Textarea } from '../components/Field';
+import HapusAkunDialog from '../components/HapusAkunDialog';
 import { Baris, Kelompok } from '../components/Kelompok';
 import PageHeader from '../components/PageHeader';
 import { ConfirmationDialog } from '../components/Modal';
@@ -35,6 +36,7 @@ export default function Profil() {
   const { user, refreshUser, signOut } = useAuth();
   const [keluar, setKeluar] = useState(false);
   const [keluarBusy, setKeluarBusy] = useState(false);
+  const [hapusAkun, setHapusAkun] = useState(false);
   const qr = useQuery(() => EcoApi.qr(), []);
   const n = user?.nasabah;
   const [form, setForm] = useState({ nama: user?.nama ?? '', no_hp: n?.no_hp ?? '', alamat_rt_rw: n?.alamat_rt_rw ?? '', jenis_kelamin: user?.jenis_kelamin ?? '' });
@@ -177,10 +179,14 @@ export default function Profil() {
         <div className="lg:col-start-2 lg:row-start-3">
           <Button type="button" variant="danger" icon={LogOut} className="w-full" onClick={() => setKeluar(true)}>Keluar</Button>
           <p className="mt-2 text-center text-xs text-muted">Setelah keluar, Anda perlu masuk kembali dengan Google.</p>
+          <button type="button" onClick={() => setHapusAkun(true)} className="mx-auto mt-4 flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold text-danger hover:bg-red-50">
+            <Trash2 className="h-3.5 w-3.5" aria-hidden />Hapus akun saya
+          </button>
         </div>
       </div>
       <ConfirmationDialog open={keluar} title="Keluar dari EcoWin?" message="Anda harus masuk lagi dengan akun Google untuk mengakses EcoWin."
         confirmLabel="Keluar" loading={keluarBusy} onConfirm={async () => { setKeluarBusy(true); await signOut(); }} onClose={() => setKeluar(false)} />
+      <HapusAkunDialog open={hapusAkun} onClose={() => setHapusAkun(false)} onDeleted={signOut} />
     </div>
   );
 }

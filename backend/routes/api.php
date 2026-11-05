@@ -59,6 +59,7 @@ Route::middleware(['auth:sanctum', 'active', 'abilities:access'])->name('api.')-
         Route::get('/saldo', [NasabahController::class, 'saldo'])->name('saldo');
         Route::get('/mutasi-saldo', [NasabahController::class, 'mutasi'])->name('mutasi');
         Route::get('/qr', [NasabahController::class, 'qr'])->name('qr');
+        Route::post('/akun/hapus', [\App\Http\Controllers\Api\AkunController::class, 'hapus'])->middleware('throttle:5,1')->name('akun.hapus');
     });
 
     // Alias singkat untuk aplikasi Web & Android Nasabah (kontrak sama dengan endpoint /me/* dan /organik/biopori)

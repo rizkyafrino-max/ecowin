@@ -18,6 +18,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\Sanctum;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -169,6 +170,71 @@ class PenghapusanAkunTest extends TestCase
         }
         $this->assertFalse($this->admin->can('delete', $this->admin));
         $this->assertFalse($this->admin->can('delete', $this->petugas));
+    }
+
+    public function test_nasabah_deletes_own_account_via_api_and_personal_data_is_gone(): void
+    {
+        $trx = app(TransaksiService::class)->catatAnorganik($this->petugas, $this->nasabah, $this->jenis, 4);
+        $this->nasabah->forceFill(['saldo' => 0])->save(); // sudah ditarik habis
+        $user = $this->nasabah->user;
+        $user->createToken('hp');
+        Sanctum::actingAs($user, ['access']);
+
+        $this->postJson('/api/me/akun/hapus', ['konfirmasi' => 'HAPUS'])
+            ->assertOk()->assertJsonPath('message', 'Akun Anda telah dihapus.');
+
+        $this->assertSoftDeleted('users', ['id' => $user->id]);
+        $this->assertSoftDeleted('nasabah', ['id' => $this->nasabah->id]);
+        $raw = Nasabah::withTrashed()->find($this->nasabah->id);
+        $this->assertSame('Nasabah dihapus', $raw->nama);
+        $this->assertStringNotContainsString('Budi', (string) json_encode($raw->getAttributes()));
+        $u = User::withTrashed()->find($user->id);
+        $this->assertStringEndsWith('@ecowin.invalid', $u->email);
+        $this->assertNull($u->google_id);
+        $this->assertSame(0, $u->tokens()->count());
+        // Riwayat keuangan tetap ada secara anonim; jejak audit mencatat siapa yang menghapus.
+        $this->assertSame('Nasabah dihapus', TransaksiAnorganik::query()->with('nasabah')->find($trx->id)->nasabah->nama);
+        $this->assertDatabaseHas('audit_log', ['aksi' => 'hapus_akun_sendiri', 'user_id' => $user->id]);
+        $this->assertStringNotContainsString('Budi', json_encode(DB::table('audit_log')->where('aksi', 'hapus_akun_sendiri')->first()));
+    }
+
+    public function test_self_delete_requires_exact_confirmation_word(): void
+    {
+        Sanctum::actingAs($this->nasabah->user, ['access']);
+
+        $this->postJson('/api/me/akun/hapus')->assertStatus(422)->assertJsonValidationErrors('konfirmasi');
+        $this->postJson('/api/me/akun/hapus', ['konfirmasi' => 'hapus'])->assertStatus(422)->assertJsonValidationErrors('konfirmasi');
+
+        $this->assertDatabaseHas('users', ['id' => $this->nasabah->user_id, 'deleted_at' => null]);
+    }
+
+    public function test_self_delete_is_refused_while_balance_or_requests_are_pending(): void
+    {
+        app(TransaksiService::class)->catatAnorganik($this->petugas, $this->nasabah, $this->jenis, 4);
+        Sanctum::actingAs($this->nasabah->fresh()->user, ['access']);
+
+        $this->postJson('/api/me/akun/hapus', ['konfirmasi' => 'HAPUS'])
+            ->assertStatus(422)->assertJsonValidationErrors('akun');
+        $this->assertStringContainsString('Saldo Anda', $this->postJson('/api/me/akun/hapus', ['konfirmasi' => 'HAPUS'])->json('errors.akun.0'));
+
+        $this->nasabah->forceFill(['saldo' => 0])->save();
+        $p = new PenarikanSaldo;
+        $p->forceFill(['nasabah_id' => $this->nasabah->id, 'bank_sampah_id' => $this->bank->id, 'jumlah' => 1000, 'status' => 'pending'])->save();
+
+        $this->postJson('/api/me/akun/hapus', ['konfirmasi' => 'HAPUS'])->assertStatus(422);
+        $this->assertDatabaseHas('nasabah', ['id' => $this->nasabah->id, 'deleted_at' => null]);
+        $this->assertDatabaseHas('users', ['id' => $this->nasabah->user_id, 'deleted_at' => null]);
+    }
+
+    public function test_self_delete_is_only_for_nasabah_and_needs_login(): void
+    {
+        $this->postJson('/api/me/akun/hapus', ['konfirmasi' => 'HAPUS'])->assertUnauthorized();
+
+        foreach ([$this->petugas, $this->admin] as $staf) {
+            Sanctum::actingAs($staf, ['access']);
+            $this->postJson('/api/me/akun/hapus', ['konfirmasi' => 'HAPUS'])->assertForbidden();
+            $this->assertDatabaseHas('users', ['id' => $staf->id, 'deleted_at' => null]);
+        }
     }
 
     public function test_panel_action_deletes_for_admin_and_is_hidden_for_petugas(): void

@@ -7,6 +7,7 @@ export const EcoApi = {
   updateProfile: (data) => api('/profile', { method: 'PATCH', body: data }),
   gantiFoto: (blob) => { const fd = new FormData(); fd.append('foto', blob, 'foto.jpg'); return api('/profile/foto', { method: 'POST', body: fd }); },
   hapusFoto: () => api('/profile/foto', { method: 'DELETE' }),
+  hapusAkun: (konfirmasi) => api('/me/akun/hapus', { method: 'POST', body: { konfirmasi } }),
   kirimLaporan: (deskripsi, foto) => { const fd = new FormData(); fd.append('kategori', 'bug'); fd.append('deskripsi', deskripsi); if (foto) fd.append('foto', foto, 'bukti.jpg'); return api('/laporan-kendala', { method: 'POST', body: fd }); },
 
   dashboard: () => api('/dashboard/summary'),
