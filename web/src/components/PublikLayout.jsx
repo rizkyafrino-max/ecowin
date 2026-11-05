@@ -1,5 +1,14 @@
 import { Link } from 'react-router-dom';
 import emblem from '../assets/ecowin-emblem.png';
+import { NAMA_PENGEMBANG, URL_PORTOFOLIO } from '../utils/kontak';
+
+/** Tautan ke situs luar: dibuka di tab baru tanpa mengirim asal halaman (rel noopener noreferrer). */
+export const TautanLuar = ({ href, children }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
+);
+
+/** Nama pengembang yang menaut ke portofolionya. */
+export const Pengembang = () => <TautanLuar href={URL_PORTOFOLIO}>{NAMA_PENGEMBANG}</TautanLuar>;
 
 /** Kerangka halaman publik (tanpa login): kebijakan privasi dan cara menghapus akun. Dapat dibuka siapa saja. */
 export default function PublikLayout({ judul, ringkas, children }) {
@@ -28,29 +37,30 @@ export default function PublikLayout({ judul, ringkas, children }) {
           <Link to="/hapus-akun" className="hover:underline">Hapus Akun</Link>
           <Link to="/masuk" className="hover:underline">Masuk</Link>
         </nav>
-        <p className="mt-3 text-center text-xs text-slate-400">© {new Date().getFullYear()} EcoWin · Bank Sampah Digital Berkelanjutan</p>
+        <p className="mt-3 text-center text-xs text-slate-400">
+          © {new Date().getFullYear()} EcoWin · Bank Sampah Digital Berkelanjutan · Dikembangkan oleh{' '}
+          <a href={URL_PORTOFOLIO} target="_blank" rel="noopener noreferrer" className="font-semibold text-primary-deep hover:underline">{NAMA_PENGEMBANG}</a>
+        </p>
       </main>
     </div>
   );
 }
 
-/** Bagian bernomor di dalam artikel. */
+const TEKS = 'space-y-3 text-[15px] leading-relaxed text-muted [&_strong]:text-ink [&_a]:font-semibold [&_a]:text-primary-deep [&_a]:underline';
+
+/** Bagian di dalam artikel; judul bernomor ditulis oleh pemanggil. */
 export function Bagian({ id, judul, children }) {
   return (
-    <section id={id} className="mt-8 first:mt-0 scroll-mt-6">
-      <h2 className="text-lg font-extrabold text-ink">{judul}</h2>
-      <div className="mt-2 space-y-3 text-[15px] leading-relaxed text-muted [&_strong]:text-ink [&_a]:font-semibold [&_a]:text-primary-deep [&_a]:underline">{children}</div>
+    <section id={id} className="mt-9 scroll-mt-6 first:mt-0">
+      <h2 className="border-b border-line pb-2 text-lg font-extrabold text-ink">{judul}</h2>
+      <div className={`mt-3 ${TEKS}`}>{children}</div>
     </section>
   );
 }
 
 /** Daftar butir dengan penanda hijau. */
 export function Butir({ children }) {
-  return (
-    <ul className="space-y-2">
-      {children}
-    </ul>
-  );
+  return <ul className="space-y-2">{children}</ul>;
 }
 
 export function Item({ children }) {
@@ -59,5 +69,66 @@ export function Item({ children }) {
       <span aria-hidden className="mt-2 h-1.5 w-1.5 flex-none rounded-full bg-primary" />
       <span>{children}</span>
     </li>
+  );
+}
+
+/** Kotak ringkasan di awal halaman. */
+export function Ringkasan({ judul, children }) {
+  return (
+    <aside className="mb-8 rounded-2xl border border-emerald-200 bg-tint p-5" aria-label={judul}>
+      <p className="text-sm font-extrabold uppercase tracking-wider text-primary-deep">{judul}</p>
+      <div className={`mt-2 ${TEKS}`}>{children}</div>
+    </aside>
+  );
+}
+
+/** Daftar isi dengan tautan ke tiap bagian. */
+export function DaftarIsi({ bagian }) {
+  return (
+    <nav aria-label="Daftar isi" className="mb-8 rounded-2xl border border-line bg-canvas p-5">
+      <p className="text-sm font-extrabold uppercase tracking-wider text-muted">Daftar isi</p>
+      <ol className="mt-2 grid gap-x-6 gap-y-1 text-[14px] sm:grid-cols-2">
+        {bagian.map(([id, judul], i) => (
+          <li key={id} className="flex gap-2"><span className="w-5 flex-none text-right font-bold text-primary-deep">{i + 1}.</span><a href={`#${id}`} className="text-ink hover:text-primary-deep hover:underline">{judul}</a></li>
+        ))}
+      </ol>
+    </nav>
+  );
+}
+
+/**
+ * Tabel yang tetap terbaca di HP: layar lebar memakai tabel, layar sempit menumpuk tiap baris menjadi kartu.
+ * `kolom`: judul kolom; `baris`: larik larik sel (sel pertama dicetak tebal).
+ */
+export function Tabel({ kolom, baris, label }) {
+  return (
+    <>
+      <div className="hidden overflow-hidden rounded-2xl border border-line md:block">
+        <table className="w-full border-collapse text-left text-[14px]" aria-label={label}>
+          <thead className="bg-canvas text-xs uppercase tracking-wider text-muted">
+            <tr>{kolom.map((k) => <th key={k} scope="col" className="px-4 py-2.5 font-bold">{k}</th>)}</tr>
+          </thead>
+          <tbody className="divide-y divide-line">
+            {baris.map((b) => (
+              <tr key={b[0]} className="align-top">
+                {b.map((sel, i) => <td key={i} className={`px-4 py-3 ${i === 0 ? 'font-bold text-ink' : ''}`}>{sel}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <ul className="space-y-3 md:hidden" aria-label={label}>
+        {baris.map((b) => (
+          <li key={b[0]} className="rounded-2xl border border-line bg-canvas p-4">
+            <p className="font-bold text-ink">{b[0]}</p>
+            <dl className="mt-1.5 space-y-1.5 text-[14px]">
+              {b.slice(1).map((sel, i) => (
+                <div key={i}><dt className="text-[11px] font-bold uppercase tracking-wider text-muted">{kolom[i + 1]}</dt><dd>{sel}</dd></div>
+              ))}
+            </dl>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }

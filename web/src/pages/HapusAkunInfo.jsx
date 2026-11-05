@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import PublikLayout, { Bagian, Butir, Item } from '../components/PublikLayout';
+import PublikLayout, { Bagian, Butir, Item, Pengembang } from '../components/PublikLayout';
 import { KONTAK_EMAIL } from '../utils/kontak';
 
 /**
@@ -29,7 +29,8 @@ export default function HapusAkunInfo() {
       <Bagian id="data" judul="Data apa yang terhapus">
         <Butir>
           <Item><strong>Dihapus permanen:</strong> nama, email, nomor HP, alamat, NISN/NIK dan foto identitas (bila ada), foto profil, tautan akun Google, token login, dan token notifikasi. Kartu QR lama tidak berlaku lagi.</Item>
-          <Item><strong>Tetap tersimpan tanpa identitas:</strong> riwayat transaksi dan log audit, hanya untuk pembukuan Bank Sampah. Riwayat itu tampil sebagai &ldquo;Nasabah dihapus&rdquo; dan tidak lagi terhubung dengan nama atau email Anda.</Item>
+          <Item><strong>Tetap tersimpan tanpa identitas:</strong> riwayat transaksi dan aktivitas organik (termasuk foto buktinya), laporan bug yang pernah Anda kirim, dan log audit, hanya untuk pembukuan, perbaikan aplikasi, dan keamanan. Semuanya tampil sebagai &ldquo;Nasabah dihapus&rdquo; dan tidak lagi terhubung dengan nama atau email Anda.</Item>
+          <Item><strong>Cadangan server:</strong> salinan cadangan harian disimpan 14 hari lalu terhapus otomatis, sehingga data yang sudah Anda hapus dapat masih ada di cadangan hingga 14 hari.</Item>
         </Butir>
         <p>Penghapusan <strong>tidak dapat dibatalkan</strong>. Untuk memakai EcoWin lagi, Anda perlu mendaftar ulang sebagai nasabah baru.</p>
       </Bagian>
@@ -37,7 +38,7 @@ export default function HapusAkunInfo() {
       <Bagian id="bantuan" judul="Tidak bisa membuka aplikasi?">
         <p>Kirim email ke <a href={`mailto:${KONTAK_EMAIL}`}>{KONTAK_EMAIL}</a> dari alamat email Google yang Anda pakai untuk EcoWin, dan sertakan nama serta nomor nasabah Anda. Kami memprosesnya paling lambat 30 hari dengan aturan yang sama (saldo harus Rp 0).</p>
         <p>Akun petugas atau admin dihapus oleh pengelola Bank Sampah; hubungi pengelola Anda.</p>
-        <p>Selengkapnya tentang data Anda ada di <Link to="/privasi">Kebijakan Privasi</Link>.</p>
+        <p>Selengkapnya tentang data Anda ada di <Link to="/privasi">Kebijakan Privasi</Link>. Layanan ini dikembangkan oleh <Pengembang />.</p>
       </Bagian>
     </PublikLayout>
   );

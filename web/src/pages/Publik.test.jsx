@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../App';
-import { KONTAK_EMAIL } from '../utils/kontak';
+import { KONTAK_EMAIL, NAMA_PENGEMBANG, URL_PORTOFOLIO } from '../utils/kontak';
 
 vi.mock('../utils/navigate', () => ({
   LOGIN_URL: 'http://localhost:8000/masuk',
@@ -22,11 +22,29 @@ describe('halaman publik', () => {
     window.history.pushState({}, '', '/privasi');
     render(<App />);
     expect(await screen.findByRole('heading', { level: 1, name: 'Kebijakan Privasi' })).toBeInTheDocument();
-    for (const judul of [/Data yang kami kumpulkan/, /Siapa yang dapat melihat data Anda/, /Berapa lama data disimpan/, /Hak Anda/]) {
+    for (const judul of [/Siapa pengelola data Anda/, /Data yang kami kumpulkan/, /Izin yang diminta aplikasi Android/, /Siapa yang dapat mengakses data Anda/, /Lama penyimpanan data/, /Keamanan data/, /Hak Anda/, /Kontak/]) {
       expect(screen.getByRole('heading', { level: 2, name: judul })).toBeInTheDocument();
     }
+    // Daftar isi menaut ke setiap bagian.
+    expect(screen.getByRole('navigation', { name: 'Daftar isi' }).querySelectorAll('a[href^="#"]').length).toBeGreaterThanOrEqual(12);
     for (const tautan of screen.getAllByRole('link', { name: KONTAK_EMAIL })) expect(tautan).toHaveAttribute('href', `mailto:${KONTAK_EMAIL}`);
     expect(window.location.pathname).toBe('/privasi'); // tidak dialihkan ke halaman masuk
+  });
+
+  it('nama pengembang menaut ke portofolio dengan aman (tab baru, tanpa referrer)', async () => {
+    window.history.pushState({}, '', '/privasi');
+    render(<App />);
+    await screen.findByRole('heading', { level: 1, name: 'Kebijakan Privasi' });
+    const tautan = screen.getAllByRole('link', { name: NAMA_PENGEMBANG });
+    expect(tautan.length).toBeGreaterThanOrEqual(2); // bagian pengelola, kontak, dan kaki halaman
+    for (const a of tautan) {
+      expect(a).toHaveAttribute('href', URL_PORTOFOLIO);
+      expect(a).toHaveAttribute('target', '_blank');
+      expect(a.getAttribute('rel')).toContain('noopener');
+      expect(a.getAttribute('rel')).toContain('noreferrer');
+    }
+    // Setiap tautan keluar lain (kebijakan pihak ketiga) juga aman.
+    for (const a of document.querySelectorAll('a[target="_blank"]')) expect(a.getAttribute('rel')).toContain('noopener');
   });
 
   it('/hapus-akun dapat dibuka tanpa login dan menjelaskan langkah serta syaratnya', async () => {
