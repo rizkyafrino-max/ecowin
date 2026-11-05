@@ -217,6 +217,7 @@ fun RegisterScreen(
                     ) { if (setuju) Icon(Lucide.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp)) }
                     Text("Saya menyatakan data di atas benar dan bersedia diverifikasi oleh petugas Bank Sampah.", fontSize = 13.sp, color = Slate500, modifier = Modifier.weight(1f))
                 }
+                TautanKebijakan(Modifier.fillMaxWidth())
 
                 error?.let {
                     Text(
@@ -266,8 +267,9 @@ private fun LangkahGoogle(busy: Boolean, error: String?, onClick: () -> Unit) {
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Top) {
             Icon(Lucide.ShieldCheck, contentDescription = null, tint = Emerald, modifier = Modifier.size(16.dp).padding(top = 2.dp))
-            Text("Kami hanya membaca nama dan email dari akun Google Anda. Tidak ada kata sandi yang dibuat.", color = Slate500, fontSize = 13.sp)
+            Text("Kami hanya membaca nama, email, dan foto profil dari akun Google Anda. Tidak ada kata sandi yang dibuat.", color = Slate500, fontSize = 13.sp)
         }
+        TautanKebijakan(Modifier.fillMaxWidth())
         error?.let {
             Text(it, color = Red, fontSize = 13.sp, modifier = Modifier.fillMaxWidth().background(Color(0xFFFEF2F2), RoundedCornerShape(12.dp)).padding(12.dp))
         }

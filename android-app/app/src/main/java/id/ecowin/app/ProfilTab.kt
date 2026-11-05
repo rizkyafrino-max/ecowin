@@ -216,6 +216,8 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
             Kelompok("Akun") {
                 Baris(Lucide.Settings, "Pengaturan", "Pemberitahuan, nada, dan lapor bug", warnaIkon = Slate500, latarIkon = LatarNetral, onClick = { go(Tab.Pengaturan) }) { PanahBaris() }
                 Pemisah()
+                Baris(Lucide.ShieldCheck, "Kebijakan privasi", "Data apa yang kami kumpulkan dan hak Anda", onClick = { runCatching { situs.openUri(URL_PRIVASI) } }) { TautanLuar() }
+                Pemisah()
                 Baris(Lucide.UserRound, "Dibuat oleh Rizky", "rizky.pplgku.my.id", onClick = { runCatching { situs.openUri(URL_PEMBUAT) } }) { TautanLuar() }
             }
         }
