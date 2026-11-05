@@ -31,8 +31,8 @@ android {
         applicationId = "id.ecowin.app"
         minSdk = 26
         targetSdk = 36 // Google Play mewajibkan API 36 untuk aplikasi baru dan pembaruan sejak 31 Agustus 2026
-        versionCode = 3
-        versionName = "2.1"
+        versionCode = 4
+        versionName = "2.2"
         buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
         buildConfigField("String", "WEB_URL", "\"$webUrl\"")
