@@ -32,17 +32,47 @@ class PenghapusanAkunService
         if ($nasabah->status === 'aktif' || ($user && $user->isActive())) {
             $this->tolak('Hanya nasabah yang sudah tidak aktif yang bisa dihapus. Nonaktifkan dulu akunnya.');
         }
+        $this->pastikanTanpaTanggungan($nasabah, 'Saldo nasabah', 'Selesaikan penarikan sampai saldo Rp 0 sebelum menghapus.');
+
+        $this->hapusDataNasabah($actor, $nasabah, $user, 'hapus_nasabah');
+    }
+
+    /**
+     * Penghapusan oleh nasabah sendiri dari aplikasi (wajib untuk Google Play). Aturan tanggungan sama dengan
+     * penghapusan oleh Admin; bedanya akun boleh masih aktif karena pemiliknya sendiri yang memintanya.
+     */
+    public function hapusAkunSendiri(User $user): void
+    {
+        if (! $user->isNasabah() || ! $user->isActive()) {
+            throw new AuthorizationException('Hanya akun nasabah yang aktif yang dapat dihapus sendiri.');
+        }
+
+        $nasabah = $user->nasabah;
+        if (! $nasabah) {
+            $this->tolak('Data nasabah tidak ditemukan.');
+        }
+        $this->pastikanTanpaTanggungan($nasabah, 'Saldo Anda', 'Ajukan penarikan sampai saldo Rp 0, lalu hapus akun.');
+
+        $this->hapusDataNasabah($user, $nasabah, $user, 'hapus_akun_sendiri');
+    }
+
+    /** Saldo harus Rp 0 dan tidak ada permintaan yang menunggu keputusan. */
+    private function pastikanTanpaTanggungan(Nasabah $nasabah, string $subjekSaldo, string $arahanSaldo): void
+    {
         if ((float) $nasabah->saldo > 0) {
-            $this->tolak('Saldo nasabah masih Rp '.number_format((float) $nasabah->saldo, 0, ',', '.').'. Selesaikan penarikan sampai saldo Rp 0 sebelum menghapus.');
+            $this->tolak($subjekSaldo.' masih Rp '.number_format((float) $nasabah->saldo, 0, ',', '.').'. '.$arahanSaldo);
         }
         if (PenarikanSaldo::query()->where('nasabah_id', $nasabah->id)->where('status', PenarikanSaldo::STATUS_PENDING)->exists()) {
             $this->tolak('Masih ada penarikan saldo yang menunggu keputusan. Selesaikan atau tolak dulu.');
         }
         if (AktivitasBiopori::query()->where('nasabah_id', $nasabah->id)->where('status', AktivitasBiopori::STATUS_PENDING)->exists()) {
-            $this->tolak('Masih ada aktivitas organik yang menunggu verifikasi. Periksa dulu.');
+            $this->tolak('Masih ada aktivitas organik yang menunggu verifikasi. Tunggu hingga selesai diperiksa.');
         }
+    }
 
-        DB::transaction(function () use ($actor, $nasabah, $user): void {
+    private function hapusDataNasabah(User $actor, Nasabah $nasabah, ?User $user, string $aksiAudit): void
+    {
+        DB::transaction(function () use ($actor, $nasabah, $user, $aksiAudit): void {
             $jejak = ['nasabah_id' => $nasabah->id, 'nomor_nasabah' => $nasabah->nomor_nasabah, 'bank_sampah_id' => $nasabah->bank_sampah_id];
 
             foreach ([config('ecowin.upload.disk'), 'public'] as $disk) {
@@ -67,7 +97,7 @@ class PenghapusanAkunService
             }
 
             $nasabah->delete();
-            $this->audit->log('hapus_nasabah', null, $jejak, null, $actor);
+            $this->audit->log($aksiAudit, null, $jejak, null, $actor);
         });
     }
 

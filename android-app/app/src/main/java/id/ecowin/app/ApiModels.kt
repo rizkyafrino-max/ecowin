@@ -159,6 +159,9 @@ data class PenarikanDto(
 
 data class PenarikanRequest(val jumlah: Long, val catatan: String?)
 
+/** Hapus akun sendiri: server meminta kata konfirmasi persis "HAPUS". */
+data class HapusAkunRequest(val konfirmasi: String)
+
 data class ProfileUpdateRequest(val nama: String?, val noHp: String?, val alamatRtRw: String?, val jenisKelamin: String? = null)
 
 data class AnorganikSummary(val totalBeratKg: Double = 0.0, val jumlahTransaksi: Int = 0, val totalNilai: Long = 0)

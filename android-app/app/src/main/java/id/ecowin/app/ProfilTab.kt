@@ -25,9 +25,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,6 +67,10 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
     var jenisKelamin by remember(user) { mutableStateOf(user.jenisKelamin) }
     var fotoBusy by remember { mutableStateOf(false) }
     var fotoPesan by remember { mutableStateOf<String?>(null) }
+    var hapusAkunDialog by remember { mutableStateOf(false) }
+    var kataHapus by remember { mutableStateOf("") }
+    var hapusBusy by remember { mutableStateOf(false) }
+    var hapusPesan by remember { mutableStateOf<String?>(null) }
     val konteks = androidx.compose.ui.platform.LocalContext.current
     // Pilih foto dari galeri: diperkecil dan di-encode ulang di perangkat (tanpa metadata), lalu diunggah; server memeriksa dan menggambar ulang lagi.
     val pilihFoto = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.GetContent()) { uri ->
@@ -227,7 +233,50 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
                 color = Slate500, fontSize = 12.sp, textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             )
+            TextButton(onClick = { hapusAkunDialog = true }, modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) {
+                Icon(Lucide.Trash2, contentDescription = null, tint = Red, modifier = Modifier.size(16.dp))
+                Text("  Hapus akun saya", color = Red, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+            }
         }
+    }
+
+    if (hapusAkunDialog) {
+        val tutup = { if (!hapusBusy) { hapusAkunDialog = false; kataHapus = ""; hapusPesan = null } }
+        AlertDialog(
+            onDismissRequest = { tutup() },
+            title = { Text("Hapus akun?") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        "Data pribadi Anda (nama, email, nomor HP, alamat, foto, dan tautan akun Google) dihapus permanen dan tidak bisa dikembalikan. " +
+                            "Riwayat transaksi tetap tersimpan tanpa identitas untuk pembukuan Bank Sampah.",
+                        fontSize = 13.sp, lineHeight = 18.sp,
+                    )
+                    Text("Syarat: saldo Rp 0 dan tidak ada permintaan yang menunggu.", fontSize = 13.sp, color = Slate500)
+                    EcoTextField(
+                        kataHapus, { kataHapus = it.take(10); hapusPesan = null }, label = { Text("Ketik HAPUS untuk melanjutkan") },
+                        singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp),
+                    )
+                    hapusPesan?.let { PesanStatus(it, false) }
+                }
+            },
+            confirmButton = {
+                TextButton(enabled = !hapusBusy && kataHapus == "HAPUS", onClick = {
+                    hapusBusy = true
+                    hapusPesan = null
+                    scope.launch {
+                        try {
+                            client.api.hapusAkun(HapusAkunRequest(kataHapus))
+                            onLogout() // sesi sudah dicabut server: bersihkan data lokal dan kembali ke layar masuk
+                        } catch (e: Exception) {
+                            hapusPesan = client.errorMessage(e)
+                            hapusBusy = false
+                        }
+                    }
+                }) { Text(if (hapusBusy) "Menghapus…" else "Hapus akun saya", color = Red, fontWeight = FontWeight.Bold) }
+            },
+            dismissButton = { TextButton(enabled = !hapusBusy, onClick = { tutup() }) { Text("Batal") } },
+        )
     }
 }
 

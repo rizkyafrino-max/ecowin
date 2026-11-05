@@ -49,6 +49,10 @@ interface EcoWinApi {
     @retrofit2.http.DELETE("profile/foto")
     suspend fun hapusFoto(): DataWrapper<UserDto>
 
+    /** Nasabah menghapus akunnya sendiri. Ditolak (422) bila saldo belum Rp 0 atau masih ada permintaan menunggu. */
+    @POST("me/akun/hapus")
+    suspend fun hapusAkun(@Body body: HapusAkunRequest)
+
     @GET("dashboard/summary")
     suspend fun dashboard(): DashboardDto
 
