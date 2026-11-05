@@ -25,14 +25,14 @@ if (taskDir.any { it.contains("Release", ignoreCase = true) && !it.contains("rel
 
 android {
     namespace = "id.ecowin.app"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "id.ecowin.app"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 2
-        versionName = "2.0"
+        targetSdk = 36 // Google Play mewajibkan API 36 untuk aplikasi baru dan pembaruan sejak 31 Agustus 2026
+        versionCode = 3
+        versionName = "2.1"
         buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
         buildConfigField("String", "WEB_URL", "\"$webUrl\"")
