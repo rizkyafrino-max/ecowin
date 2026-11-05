@@ -84,6 +84,37 @@ scp -P 1610 rizki@IP-SERVER:/home/rizki/cadangan-ecowin/db-*.sql.gz .
 
 Pulihkan: `gunzip -c db-AAAAMMDD-JJMMSS.sql.gz | mysql -u ecowin -p NAMA_DATABASE`. Berkas cadangan berisi data nasabah: jangan di-commit dan jangan dibagikan.
 
+## Pindah ke VPS lain (atau pulihkan dari nol)
+
+Cadangan harian (`05-cadangan.sh`) hanya berisi database dan foto. Untuk **memindahkan seluruh EcoWin** ke VPS lain, buat satu **paket pindah** terenkripsi yang berisi database, seluruh `storage/app` (termasuk kunci Firebase), dan `backend/.env`. Paket ini berisi rahasia, jadi dienkripsi (AES-256) dengan kata sandi yang Anda ketik dan **harus dicatat**: tanpa kata sandinya paket tidak bisa dibuka. Skrip sudah diuji dari awal sampai akhir (cadangkan, enkripsi, dekripsi, pulihkan ke database lain, data identik).
+
+**A. Di server lama** (sebagai pengguna biasa pemilik `.env`, terminal interaktif):
+```bash
+bash /var/www/ecowin/deploy/skrip/06-paket-pindah.sh
+```
+Skrip meminta kata sandi dua kali, lalu menghasilkan `~/paket-pindah/ecowin-pindah-AAAAMMDD-JJMMSS.tar.gz.enc` dan berkas `.sha256`-nya. **Segera salin keduanya ke komputer Anda** (jangan hanya di server): dari laptop,
+```powershell
+scp -P 1610 "rizki@IP-SERVER:/home/rizki/paket-pindah/ecowin-pindah-*" D:\paket-pindah\
+```
+Buat paket baru setiap kali data banyak berubah (misalnya seminggu sekali); paket hanya berisi data sampai saat dibuat.
+
+**B. Di VPS baru** (Ubuntu 22.04/24.04, akun yang boleh `sudo`):
+1. Ikuti **Urutan** langkah 1 sampai 3 di atas: clone kode, `01-pasang-paket.sh`, dan `02-database.sh` (database kosong dengan pengguna dan sandi baru; jangan isi `.env` dulu).
+2. Kirim paket ke VPS baru (dari laptop): `scp -P PORT D:\paket-pindah\ecowin-pindah-* pengguna@IP-VPS-BARU:~/`
+3. Pulihkan:
+   ```bash
+   cd /var/www/ecowin
+   bash deploy/skrip/07-pulihkan.sh ~/ecowin-pindah-AAAAMMDD-JJMMSS.tar.gz.enc
+   ```
+   Skrip memeriksa keutuhan paket, meminta kata sandi paket, menolak berjalan bila database tujuan sudah berisi tabel atau `.env` sudah ada (tidak menimpa apa pun tanpa `ECOWIN_TIMPA=1`), memasang `.env` lama dengan **pengaturan database VPS baru**, mengimpor database, dan mengembalikan berkas unggahan beserta izinnya.
+4. Lanjutkan seperti pemasangan biasa: `bash deploy/skrip/04-rilis.sh API_DOMAIN`, `sudo bash deploy/skrip/03-nginx.sh API_DOMAIN WEB_DOMAIN`, arahkan **A record** domain ke IP VPS baru, lalu `sudo certbot --nginx -d API_DOMAIN -d WEB_DOMAIN --redirect`. Pasang cron (langkah 7) dan cadangan harian.
+5. Uji: buka web dan `/admin`, masuk dengan Google, dan pastikan data nasabah dan foto tampil.
+
+**Penting:**
+- Coba pemulihan di VPS uji **sebelum** server lama dimatikan, dan jangan memindahkan DNS sebelum hasilnya diperiksa.
+- Bila server lama diduga diretas, anggap seluruh rahasia di dalam paket bocor: setelah pemulihan, buat **Google Client Secret baru** (hapus yang lama), ganti `GOOGLE_CLIENT_SECRET` di `.env`, dan pertimbangkan membuat `APP_KEY` baru (`php artisan key:generate --force`; akibatnya semua pengguna harus masuk lagi dan token notifikasi terdaftar ulang). Jangan memulihkan berkas apa pun dari server yang diretas selain paket ini.
+- Data nasabah bersifat pribadi: simpan paket dan kata sandinya di tempat berbeda, dan jangan dikirim lewat chat atau di-commit.
+
 ## Pengecekan setelah selesai
 
 ```bash
