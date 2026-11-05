@@ -86,7 +86,7 @@ fun RegisterScreen(
             alamat.trim().length < 5 -> "Isi alamat."
             jenisKelamin.isEmpty() -> "Pilih jenis kelamin."
             bankId == null -> "Pilih Bank Sampah."
-            !setuju -> "Anda harus menyetujui pernyataan."
+            !setuju -> "Kamu perlu menyetujui pernyataannya dulu ya."
             else -> null
         }
         val token = idToken
@@ -155,7 +155,7 @@ fun RegisterScreen(
                                 namaDariTokenGoogle(r.idToken)?.let { if (nama.isBlank()) { nama = it; namaDariGoogle = it } }
                             }
                             is GoogleAuth.Result.Failure -> error = r.message
-                            GoogleAuth.Result.Cancelled -> error = "Pemilihan akun Google ditutup. Jika Anda tidak membatalkannya, Google belum mengenali aplikasi ini: buat OAuth client tipe Android (package id.ecowin.app + SHA-1 kunci debug) di Google Cloud, dan pastikan email Anda terdaftar sebagai Test user."
+                            GoogleAuth.Result.Cancelled -> error = "Pemilihan akun Google ditutup. Kalau kamu tidak membatalkannya, Google belum mengenali aplikasi ini: buat OAuth client tipe Android (package id.ecowin.app + SHA-1 kunci debug) di Google Cloud, dan pastikan emailmu terdaftar sebagai Test user."
                         }
                         busy = false
                     }
@@ -179,12 +179,12 @@ fun RegisterScreen(
                 ) {
                     EcoTextField(
                         nama, { nama = it.take(150) }, label = { Text("Nama lengkap") }, singleLine = true, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth(),
-                        supportingText = if (namaDariGoogle != null && nama == namaDariGoogle) ({ Text("Diisi dari akun Google Anda. Ubah bila tidak sesuai.") }) else null,
+                        supportingText = if (namaDariGoogle != null && nama == namaDariGoogle) ({ Text("Diisi dari akun Google kamu. Ubah saja kalau tidak sesuai.") }) else null,
                     )
                     EcoTextField(
                         noHp, { noHp = it.filter { c -> c.isDigit() || c == '+' }.take(16) },
                         label = { Text("Nomor HP") }, placeholder = { Text("081234567890") }, singleLine = true,
-                        supportingText = { Text("Nomor aktif agar petugas dapat menghubungi Anda.") },
+                        supportingText = { Text("Pakai nomor yang aktif supaya petugas bisa menghubungimu.") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth(),
                     )
                     EcoTextField(
@@ -251,7 +251,7 @@ private fun LangkahGoogle(busy: Boolean, error: String?, onClick: () -> Unit) {
             modifier = Modifier.fillMaxWidth().height(140.dp),
         )
         Text("Buat akun EcoWin", fontWeight = FontWeight.ExtraBold, fontSize = 22.sp, color = Slate900)
-        Text("Daftar sebagai nasabah Bank Sampah RT/RW Anda dengan akun Google. Akun diperiksa petugas sebelum aktif sepenuhnya.", color = Slate500, fontSize = 14.sp)
+        Text("Daftar sebagai nasabah Bank Sampah RT/RW-mu dengan akun Google. Akunmu diperiksa petugas dulu sebelum aktif sepenuhnya.", color = Slate500, fontSize = 14.sp)
 
         Row(
             Modifier.fillMaxWidth().height(56.dp).clip(RoundedCornerShape(14.dp))
@@ -267,7 +267,7 @@ private fun LangkahGoogle(busy: Boolean, error: String?, onClick: () -> Unit) {
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Top) {
             Icon(Lucide.ShieldCheck, contentDescription = null, tint = Emerald, modifier = Modifier.size(16.dp).padding(top = 2.dp))
-            Text("Kami hanya membaca nama, email, dan foto profil dari akun Google Anda. Tidak ada kata sandi yang dibuat.", color = Slate500, fontSize = 13.sp)
+            Text("Kami hanya membaca nama, email, dan foto profil dari akun Google kamu. Tidak ada kata sandi yang dibuat.", color = Slate500, fontSize = 13.sp)
         }
         TautanKebijakan(Modifier.fillMaxWidth())
         error?.let {

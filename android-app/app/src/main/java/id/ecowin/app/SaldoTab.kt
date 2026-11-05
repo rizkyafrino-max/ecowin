@@ -157,7 +157,7 @@ private fun PenarikanScreen(client: ApiClient, user: UserDto, refreshKey: Int, o
         item { Text("Riwayat penarikan", fontWeight = FontWeight.Bold) }
         item {
             LoadableContent(penarikan) { list ->
-                ListCardOf(list, "Belum ada penarikan. Pengajuan penarikan Anda akan tampil di sini.") { p ->
+                ListCardOf(list, "Belum ada penarikan. Pengajuan penarikanmu akan muncul di sini.") { p ->
                     TransactionRow("Penarikan saldo", p.catatan ?: tanggal(p.createdAt), rupiah(p.jumlah), kredit = false, status = p.status)
                 }
             }
@@ -169,7 +169,7 @@ private fun PenarikanScreen(client: ApiClient, user: UserDto, refreshKey: Int, o
         AlertDialog(
             onDismissRequest = { if (!sending) confirm = false },
             title = { Text("Ajukan penarikan?") },
-            text = { Text("Anda akan mengajukan penarikan ${rupiah(nominal)}. Saldo dikurangi setelah petugas menyetujui.") },
+            text = { Text("Kamu akan mengajukan penarikan ${rupiah(nominal)}. Saldomu baru berkurang setelah petugas menyetujuinya.") },
             confirmButton = {
                 TextButton(enabled = !sending, onClick = {
                     sending = true
@@ -177,7 +177,7 @@ private fun PenarikanScreen(client: ApiClient, user: UserDto, refreshKey: Int, o
                         try {
                             client.api.ajukanPenarikan(PenarikanRequest(nominal, catatan.ifBlank { null }))
                             success = true
-                            message = "Pengajuan terkirim, menunggu petugas."
+                            message = "Pengajuan terkirim. Tunggu petugas memeriksanya ya."
                             jumlah = ""
                             catatan = ""
                             localRefresh++

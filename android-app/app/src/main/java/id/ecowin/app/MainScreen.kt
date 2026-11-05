@@ -327,13 +327,13 @@ fun TabList(aksi: (@Composable () -> Unit)? = null, content: LazyListScope.() ->
 }
 
 private fun subjudul(tab: Tab): String? = when (tab) {
-    Tab.Transaksi -> "Riwayat setoran sampah anorganik Anda."
+    Tab.Transaksi -> "Riwayat setoran sampah anorganikmu."
     Tab.Organik -> "Kelola aktivitas organikmu. Organik tidak menjadi saldo rupiah."
-    Tab.Saldo -> "Riwayat perubahan saldo EcoWin Anda."
-    Tab.Profil -> "Data akun dan QR Card Anda."
-    Tab.Fitur -> "Semua yang bisa Anda lakukan di EcoWin."
-    Tab.Notifikasi -> "Kabar terbaru tentang setoran, penarikan, dan aktivitas Anda."
+    Tab.Saldo -> "Riwayat saldo EcoWin kamu."
+    Tab.Profil -> "Data akun dan QR Card kamu."
+    Tab.Fitur -> "Semua yang bisa kamu lakukan di EcoWin."
+    Tab.Notifikasi -> "Kabar terbaru tentang setoran, penarikan, dan aktivitasmu."
     Tab.Pengaturan -> "Pemberitahuan HP, nada notifikasi, dan lapor bug."
-    Tab.LaporBug -> "Laporkan masalah yang Anda temui di aplikasi."
+    Tab.LaporBug -> "Ceritakan masalah yang kamu temui di aplikasi."
     else -> null
 }

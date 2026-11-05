@@ -18,7 +18,7 @@
             <span class="ecl-kicker">MASUK KE ECOWIN</span>
 
             <h2>Selamat datang</h2>
-            <p class="ecl-sub">Masuk ke EcoWin dengan akun Google Anda. Peran dan akses ditentukan oleh sistem.</p>
+            <p class="ecl-sub">Masuk ke EcoWin dengan akun Google kamu. Peran dan aksesmu ditentukan oleh sistem.</p>
 
             @if (session('auth_error'))
                 <div class="ecl-err" role="alert">{{ session('auth_error') }}</div>
@@ -31,7 +31,7 @@
 
             <p class="ecl-note">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 5 3 8.5 7 10 4-1.5 7-5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
-                <span>Akun Google harus memiliki email terverifikasi dan terdaftar di EcoWin.</span>
+                <span>Akun Google-nya harus punya email terverifikasi dan sudah terdaftar di EcoWin.</span>
             </p>
 
             <p class="ecl-or">Belum punya akun? <a class="ecl-link" href="{{ route('daftar', $flow) }}">Daftar sebagai nasabah</a></p>

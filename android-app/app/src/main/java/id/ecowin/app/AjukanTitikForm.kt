@@ -92,7 +92,7 @@ fun AjukanTitikForm(client: ApiClient, onDone: () -> Unit, onCancel: () -> Unit)
         scope.launch {
             val hasil = gps.cari(
                 onUpdate = { l ->
-                    pilih(l.latitude, l.longitude, "Akurasi ±${l.accuracy.toInt()} m" + if (l.accuracy > 100) ". Kurang akurat: geser penanda ke posisi yang benar." else ". Anda masih bisa menggeser penanda.")
+                    pilih(l.latitude, l.longitude, "Akurasi ±${l.accuracy.toInt()} m" + if (l.accuracy > 100) ". Kurang akurat: geser penanda ke posisi yang benar." else ". Kamu masih bisa menggeser penanda.")
                 },
             )
             mencari = false
@@ -107,7 +107,7 @@ fun AjukanTitikForm(client: ApiClient, onDone: () -> Unit, onCancel: () -> Unit)
 
     val izin = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { hasil ->
         if (hasil.values.any { it }) mulaiCari()
-        else info = "Izin lokasi ditolak. Anda tetap dapat mengetuk peta untuk menandai posisi."
+        else info = "Izin lokasi ditolak. Kamu tetap bisa mengetuk peta untuk menandai posisi."
     }
 
     fun gunakanLokasi() {

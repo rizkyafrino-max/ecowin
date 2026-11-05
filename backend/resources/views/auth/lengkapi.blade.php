@@ -7,8 +7,8 @@
 @section('card')
     @include('auth.stepper', ['aktif' => 2])
     <span class="ecl-kicker">DAFTAR NASABAH</span>
-    <h2>Lengkapi data Anda</h2>
-    <p class="ecl-sub">Data ini diperiksa petugas Bank Sampah sebelum akun Anda aktif sepenuhnya.</p>
+    <h2>Lengkapi datamu</h2>
+    <p class="ecl-sub">Data ini diperiksa petugas Bank Sampah dulu sebelum akunmu aktif sepenuhnya.</p>
 
     <div class="ecl-who">
         @if ($identity['avatar'])
@@ -29,7 +29,7 @@
         <div class="ecl-field">
             <label for="no_hp">Nomor HP</label>
             <input class="ecl-input" id="no_hp" name="no_hp" value="{{ old('no_hp', $form['no_hp'] ?? '') }}" inputmode="tel" placeholder="081234567890" required autocomplete="tel">
-            <p class="ecl-hint">Gunakan nomor HP yang aktif agar petugas dapat menghubungi Anda.</p>
+            <p class="ecl-hint">Pakai nomor HP yang aktif supaya petugas bisa menghubungimu.</p>
             @error('no_hp')<p class="ecl-field-err" role="alert">{{ $message }}</p>@enderror
         </div>
 
@@ -52,12 +52,12 @@
                     </label>
                 @endforeach
             </div>
-            <p class="ecl-hint">Menentukan foto profil bawaan. Anda bisa menggantinya dengan foto sendiri nanti.</p>
+            <p class="ecl-hint">Menentukan foto profil bawaan. Kamu bisa menggantinya dengan foto sendiri nanti.</p>
             @error('jenis_kelamin')<p class="ecl-field-err" role="alert">{{ $message }}</p>@enderror
         </fieldset>
 
         <fieldset class="ecl-field ecl-banks">
-            <legend>Pilih Bank Sampah RT/RW Anda</legend>
+            <legend>Pilih Bank Sampah RT/RW-mu</legend>
             @php($terpilih = (string) old('bank_sampah_id', $form['bank_sampah_id'] ?? ''))
             @foreach ($banks as $bank)
                 <label class="ecl-bank">
@@ -72,7 +72,7 @@
 
         <label class="ecl-check">
             <input type="checkbox" name="setuju" value="1" @checked(old('setuju')) required>
-            <span>Saya menyatakan data di atas benar, bersedia diverifikasi oleh petugas Bank Sampah, dan telah membaca <a class="ecl-link" href="{{ config('ecowin.web_url') }}/privasi" target="_blank" rel="noopener">Kebijakan Privasi</a>.</span>
+            <span>Saya menyatakan data di atas benar, bersedia diperiksa oleh petugas Bank Sampah, dan sudah membaca <a class="ecl-link" href="{{ config('ecowin.web_url') }}/privasi" target="_blank" rel="noopener">Kebijakan Privasi</a>.</span>
         </label>
         @error('setuju')<p class="ecl-field-err" role="alert">{{ $message }}</p>@enderror
 

@@ -56,7 +56,7 @@ fun BerandaTab(client: ApiClient, user: UserDto, refreshKey: Int, onNavigate: (T
                         Icon(Lucide.TriangleAlert, contentDescription = null, tint = Amber, modifier = Modifier.size(18.dp))
                         Text("Akun menunggu verifikasi petugas", fontWeight = FontWeight.Bold, color = Amber)
                     }
-                    Text("Petugas Bank Sampah Anda akan memeriksa data pendaftaran. Penarikan saldo aktif setelah akun diverifikasi.", color = Amber, fontSize = 13.sp)
+                    Text("Petugas Bank Sampahmu akan memeriksa data pendaftaranmu. Penarikan saldo baru bisa dipakai setelah akunmu diverifikasi.", color = Amber, fontSize = 13.sp)
                 }
             }
         }

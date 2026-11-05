@@ -38,7 +38,7 @@ private fun deskripsi(n: NotifikasiHp.Nada) = when (n) {
     NotifikasiHp.Nada.Ecowin -> "Tiga denting naik, nada khas EcoWin"
     NotifikasiHp.Nada.Daun -> "Dua nada kayu yang lembut"
     NotifikasiHp.Nada.Koin -> "Dua \"ting\" cepat yang ceria"
-    NotifikasiHp.Nada.Sistem -> "Nada notifikasi bawaan HP Anda"
+    NotifikasiHp.Nada.Sistem -> "Nada notifikasi bawaan HP-mu"
 }
 
 /**
@@ -78,7 +78,7 @@ fun PengaturanTab(onLaporBug: () -> Unit) {
         item {
             Kelompok(
                 "Pemberitahuan",
-                catatan = "Dicek tiap ±15 menit saat ada koneksi internet. Di layar kunci isi pesan disembunyikan; nominal baru terlihat setelah HP dibuka. Mati otomatis saat Anda keluar akun.",
+                catatan = "Dicek tiap ±15 menit saat ada koneksi internet. Di layar kunci isi pesan disembunyikan; nominal baru terlihat setelah HP dibuka. Mati otomatis saat kamu keluar akun.",
             ) {
                 Baris(
                     Lucide.Bell, "Pemberitahuan di HP", "Kabar setoran dan penarikan walau aplikasi tertutup",

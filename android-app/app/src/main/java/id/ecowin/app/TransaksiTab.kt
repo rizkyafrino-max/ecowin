@@ -50,7 +50,7 @@ fun TransaksiTab(client: ApiClient, refreshKey: Int) {
                 if (jenis.isNotEmpty()) {
                     EcoCard {
                         Text("Harga sampah anorganik saat ini", fontWeight = FontWeight.Bold)
-                        Text("Harga bertingkat mengikuti berat setoran dan dapat berubah sewaktu-waktu.", color = Slate500, fontSize = 12.sp)
+                        Text("Harganya bertingkat sesuai berat setoran, dan bisa berubah sewaktu-waktu.", color = Slate500, fontSize = 12.sp)
                         Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             jenis.forEach { j ->
                                 Column(Modifier.fillMaxWidth().background(Canvas, RoundedCornerShape(16.dp)).padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
