@@ -181,7 +181,7 @@ class PenghapusanAkunTest extends TestCase
         Sanctum::actingAs($user, ['access']);
 
         $this->postJson('/api/me/akun/hapus', ['konfirmasi' => 'HAPUS'])
-            ->assertOk()->assertJsonPath('message', 'Akun Anda telah dihapus.');
+            ->assertOk()->assertJsonPath('message', 'Akunmu sudah dihapus.');
 
         $this->assertSoftDeleted('users', ['id' => $user->id]);
         $this->assertSoftDeleted('nasabah', ['id' => $this->nasabah->id]);
@@ -215,7 +215,7 @@ class PenghapusanAkunTest extends TestCase
 
         $this->postJson('/api/me/akun/hapus', ['konfirmasi' => 'HAPUS'])
             ->assertStatus(422)->assertJsonValidationErrors('akun');
-        $this->assertStringContainsString('Saldo Anda', $this->postJson('/api/me/akun/hapus', ['konfirmasi' => 'HAPUS'])->json('errors.akun.0'));
+        $this->assertStringContainsString('Saldomu',$this->postJson('/api/me/akun/hapus', ['konfirmasi' => 'HAPUS'])->json('errors.akun.0'));
 
         $this->nasabah->forceFill(['saldo' => 0])->save();
         $p = new PenarikanSaldo;

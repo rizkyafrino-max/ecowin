@@ -22,7 +22,7 @@ describe('HapusAkunDialog', () => {
   });
 
   it('memanggil API lalu keluar setelah berhasil', async () => {
-    EcoApi.hapusAkun.mockResolvedValue({ message: 'Akun Anda telah dihapus.' });
+    EcoApi.hapusAkun.mockResolvedValue({ message: 'Akunmu sudah dihapus.' });
     const onDeleted = vi.fn();
     render(<HapusAkunDialog open onClose={() => {}} onDeleted={onDeleted} />);
     isi('HAPUS');
@@ -32,12 +32,12 @@ describe('HapusAkunDialog', () => {
   });
 
   it('menampilkan alasan dari server (mis. saldo belum nol) dan tidak keluar', async () => {
-    EcoApi.hapusAkun.mockRejectedValue(new ApiError('x', 422, { akun: ['Saldo Anda masih Rp 12.000. Ajukan penarikan sampai saldo Rp 0, lalu hapus akun.'] }));
+    EcoApi.hapusAkun.mockRejectedValue(new ApiError('x', 422, { akun: ['Saldomu masih Rp 12.000. Ajukan penarikan sampai saldo Rp 0, lalu hapus akun.'] }));
     const onDeleted = vi.fn();
     render(<HapusAkunDialog open onClose={() => {}} onDeleted={onDeleted} />);
     isi('HAPUS');
     fireEvent.click(tombolHapus());
-    expect(await screen.findByText(/Saldo Anda masih Rp 12\.000/)).toBeInTheDocument();
+    expect(await screen.findByText(/Saldomu masih Rp 12\.000/)).toBeInTheDocument();
     expect(onDeleted).not.toHaveBeenCalled();
     expect(tombolHapus()).toBeEnabled(); // bisa dicoba lagi setelah saldo ditarik
   });

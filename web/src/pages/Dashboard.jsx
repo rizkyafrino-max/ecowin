@@ -99,7 +99,7 @@ export default function Dashboard() {
             <Card>
               <div className="mb-1 flex items-center justify-between"><h3 className="font-bold">Transaksi terbaru</h3><Link to="/transaksi" className="text-sm font-semibold text-primary-deep">Lihat semua</Link></div>
               {dash.loading ? <LoadingState rows={3} /> : d.transaksi_terakhir.length === 0
-                ? <EmptyState title="Belum ada transaksi" message="Setoran sampah anorganik Anda akan tampil di sini." />
+                ? <EmptyState title="Belum ada transaksi" message="Setoran sampah anorganikmu akan muncul di sini." />
                 : <ul className="divide-y divide-line">{d.transaksi_terakhir.map((t) => (
                   <li key={t.id}><TransactionCard title={t.jenis_sampah ?? 'Setoran anorganik'} subtitle={kg(t.berat_kg)} amount={t.nilai_rupiah} date={t.created_at} /></li>
                 ))}</ul>}
@@ -108,7 +108,7 @@ export default function Dashboard() {
             <Card>
               <div className="mb-1 flex items-center justify-between"><h3 className="font-bold">Aktivitas Organik</h3><Link to="/organik" className="text-sm font-semibold text-primary-deep">Lihat semua</Link></div>
               {dash.loading ? <LoadingState rows={3} /> : d.biopori_terakhir.length === 0
-                ? <EmptyState icon={Leaf} title="Belum ada aktivitas" message="Tambahkan aktivitas saat Anda mengolah sampah organik."
+                ? <EmptyState icon={Leaf} title="Belum ada aktivitas" message="Catat aktivitasmu saat mengolah sampah organik ya."
                   action={<Link to="/organik"><Button size="sm">Tambah Aktivitas</Button></Link>} />
                 : <ul className="divide-y divide-line">{d.biopori_terakhir.map((a) => (
                   <li key={a.id}><ActivityCard title={a.jenis_sampah} subtitle={`${a.lokasi ?? 'Lokasi'} · ${tanggal(a.tanggal_pemasukan)}`} status={a.status} right={<p className="text-sm font-bold">{kg(a.berat_kg)}</p>} /></li>

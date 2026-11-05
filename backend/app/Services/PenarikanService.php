@@ -26,7 +26,7 @@ class PenarikanService
 
         // Nasabah yang mendaftar sendiri baru boleh menarik saldo setelah diverifikasi Petugas.
         if ($milikSendiri && $nasabah->status_verifikasi !== 'verified') {
-            throw ValidationException::withMessages(['jumlah' => ['Akun Anda belum diverifikasi petugas Bank Sampah, penarikan belum dapat diajukan.']]);
+            throw ValidationException::withMessages(['jumlah' => ['Akunmu belum diverifikasi petugas Bank Sampah, jadi penarikan belum bisa diajukan.']]);
         }
 
         if ($jumlah < config('ecowin.penarikan.minimal')) {
@@ -120,7 +120,7 @@ class PenarikanService
             $locked->forceFill(['status' => PenarikanSaldo::STATUS_COMPLETED, 'diselesaikan_at' => now()])->save();
 
             $this->audit->log('selesaikan_penarikan', $locked, $before, $locked->attributesToArray(), $actor);
-            app(\App\Services\NotifikasiService::class)->kirim($locked->nasabah?->user, 'penarikan_selesai', 'Penarikan selesai', 'Uang '.\App\Services\NotifikasiService::rupiah($locked->jumlah).' sudah diserahkan kepada Anda.', 'saldo');
+            app(\App\Services\NotifikasiService::class)->kirim($locked->nasabah?->user, 'penarikan_selesai', 'Penarikan selesai', 'Uang '.\App\Services\NotifikasiService::rupiah($locked->jumlah).' sudah diserahkan kepadamu.', 'saldo');
 
             return $locked;
         });

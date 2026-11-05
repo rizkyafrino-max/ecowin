@@ -97,7 +97,7 @@ export default function Profil() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Profil" subtitle="Data akun dan Kartu Nasabah Anda." />
+      <PageHeader title="Profil" subtitle="Data akun dan Kartu Nasabahmu." />
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.25fr_1fr] lg:items-start">
         <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#065F46] via-primary to-secondary px-5 py-7 text-center text-white shadow-soft lg:col-start-1 lg:row-start-1">
           <span aria-hidden className="pointer-events-none absolute -right-12 -top-14 h-44 w-44 rounded-full bg-white/10" />
@@ -159,12 +159,12 @@ export default function Profil() {
                     );
                   })}
                 </div>
-                <p className="mt-1.5 text-xs text-muted">Menentukan avatar bawaan bila Anda belum memasang foto sendiri.</p>
+                <p className="mt-1.5 text-xs text-muted">Menentukan avatar bawaan kalau kamu belum memasang foto sendiri.</p>
                 {errors.jenis_kelamin && <p role="alert" className="mt-1 text-xs font-semibold text-danger">{errors.jenis_kelamin}</p>}
               </fieldset>
               <Input label="Nomor HP" inputMode="tel" value={form.no_hp} onChange={set('no_hp')} error={errors.no_hp} placeholder="08xxxxxxxxxx" />
               <Textarea label="Alamat (RT/RW)" value={form.alamat_rt_rw} onChange={set('alamat_rt_rw')} error={errors.alamat_rt_rw} maxLength={255} />
-              <Input label="Email Google" value={user?.email ?? ''} disabled readOnly hint="Email tidak dapat diubah. Hubungi petugas Bank Sampah bila perlu." />
+              <Input label="Email Google" value={user?.email ?? ''} disabled readOnly hint="Email tidak bisa diubah. Hubungi petugas Bank Sampah kalau perlu." />
               <Button type="submit" size="lg" className="w-full sm:w-auto" loading={busy}>Simpan perubahan</Button>
               {saved && <p className="flex items-center gap-2 text-sm font-semibold text-primary-deep" role="status"><CheckCircle2 className="h-4 w-4" aria-hidden />Profil diperbarui.</p>}
             </form>
@@ -178,13 +178,13 @@ export default function Profil() {
 
         <div className="lg:col-start-2 lg:row-start-3">
           <Button type="button" variant="danger" icon={LogOut} className="w-full" onClick={() => setKeluar(true)}>Keluar</Button>
-          <p className="mt-2 text-center text-xs text-muted">Setelah keluar, Anda perlu masuk kembali dengan Google.</p>
+          <p className="mt-2 text-center text-xs text-muted">Setelah keluar, kamu perlu masuk lagi dengan Google.</p>
           <button type="button" onClick={() => setHapusAkun(true)} className="mx-auto mt-4 flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold text-danger hover:bg-red-50">
             <Trash2 className="h-3.5 w-3.5" aria-hidden />Hapus akun saya
           </button>
         </div>
       </div>
-      <ConfirmationDialog open={keluar} title="Keluar dari EcoWin?" message="Anda harus masuk lagi dengan akun Google untuk mengakses EcoWin."
+      <ConfirmationDialog open={keluar} title="Keluar dari EcoWin?" message="Kamu perlu masuk lagi dengan akun Google untuk memakai EcoWin."
         confirmLabel="Keluar" loading={keluarBusy} onConfirm={async () => { setKeluarBusy(true); await signOut(); }} onClose={() => setKeluar(false)} />
       <HapusAkunDialog open={hapusAkun} onClose={() => setHapusAkun(false)} onDeleted={signOut} />
     </div>

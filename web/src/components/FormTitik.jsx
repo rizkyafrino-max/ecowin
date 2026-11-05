@@ -33,7 +33,7 @@ function Pindah({ titik }) {
 export default function FormTitik({ onDone }) {
   const [form, setForm] = useState({ nama_lokasi: '', deskripsi_lokasi: '' });
   const [titik, setTitik] = useState(null); // { lat, lng }
-  const [info, setInfo] = useState('Ketuk peta untuk menandai lokasi, atau gunakan lokasi perangkat.');
+  const [info, setInfo] = useState('Ketuk peta untuk menandai lokasi, atau pakai lokasi perangkatmu.');
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -54,7 +54,7 @@ export default function FormTitik({ onDone }) {
   };
 
   const gunakanLokasi = () => {
-    if (!navigator.geolocation) { setInfo('Perangkat tidak mendukung lokasi. Ketuk peta untuk menandai posisi.'); return; }
+    if (!navigator.geolocation) { setInfo('Perangkatmu belum mendukung lokasi. Ketuk peta untuk menandai posisi ya.'); return; }
     stop();
     setMencari(true);
     setInfo('Mencari sinyal terbaik…');
@@ -64,7 +64,7 @@ export default function FormTitik({ onDone }) {
         const a = p.coords.accuracy;
         if (a >= terbaik) return;
         terbaik = a;
-        pilih(p.coords.latitude, p.coords.longitude, `Akurasi ±${Math.round(a)} m${a > 100 ? '. Kurang akurat: geser penanda ke posisi yang benar.' : '. Anda masih bisa menggeser penanda.'}`);
+        pilih(p.coords.latitude, p.coords.longitude, `Akurasi ±${Math.round(a)} m${a > 100 ? '. Kurang akurat: geser penanda ke posisi yang benar.' : '. Kamu masih bisa menggeser penanda.'}`);
         if (a <= 20) stop();
       },
       (err) => { stop(); setInfo(err.code === 1 ? 'Izin lokasi ditolak. Ketuk peta untuk menandai posisi.' : 'Lokasi belum tersedia. Ketuk peta untuk menandai posisi.'); },
@@ -127,7 +127,7 @@ export default function FormTitik({ onDone }) {
 
       {message && <p className="rounded-2xl bg-danger-tint p-3 text-sm text-danger" role="alert">{message}</p>}
       <Button type="submit" size="lg" className="w-full" loading={busy}>Ajukan titik</Button>
-      <p className="text-center text-xs text-muted">Titik akan diperiksa petugas Bank Sampah. Setelah disetujui, titik tampil di peta dan bisa dipakai untuk melapor aktivitas.</p>
+      <p className="text-center text-xs text-muted">Titik akan diperiksa petugas Bank Sampah. Setelah disetujui, titiknya muncul di peta dan bisa dipakai untuk melapor aktivitas.</p>
     </form>
   );
 }

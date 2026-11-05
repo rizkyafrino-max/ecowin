@@ -17,7 +17,7 @@ export function ErrorState({ error, onRetry }) {
     <div className="flex flex-col items-center px-6 py-12 text-center" role="alert">
       <span className="flex h-14 w-14 items-center justify-center rounded-3xl bg-danger-tint text-danger"><AlertTriangle className="h-7 w-7" aria-hidden /></span>
       <p className="mt-4 font-semibold">Gagal memuat data</p>
-      <p className="mt-1 max-w-xs text-sm text-muted">{error?.message || 'Terjadi kesalahan. Coba lagi.'}</p>
+      <p className="mt-1 max-w-xs text-sm text-muted">{error?.message || 'Ada yang salah. Coba lagi ya.'}</p>
       {onRetry && <Button className="mt-5" variant="outline" onClick={onRetry}>Coba lagi</Button>}
     </div>
   );

@@ -40,7 +40,7 @@ function refreshSession() {
 
 async function accessToken() {
   let s = loadSession();
-  if (!s) throw new ApiError('Belum login.', 401);
+  if (!s) throw new ApiError('Kamu belum masuk.', 401);
   if (isExpired(s.access_expires_at)) s = await refreshSession();
   return s.access_token;
 }
@@ -78,13 +78,13 @@ export async function api(path, { method = 'GET', body, query, raw = false } = {
       onSessionLost();
       throw e;
     }
-    throw new ApiError('Tidak dapat terhubung ke server. Periksa koneksi Anda.', 0);
+    throw new ApiError('Tidak bisa terhubung ke server. Periksa koneksi internetmu ya.', 0);
   }
 
   if (res.status === 401) {
     clearSession();
     onSessionLost();
-    throw new ApiError('Sesi berakhir. Silakan masuk kembali.', 401);
+    throw new ApiError('Sesimu sudah berakhir. Silakan masuk lagi ya.', 401);
   }
 
   if (raw) {
@@ -93,7 +93,7 @@ export async function api(path, { method = 'GET', body, query, raw = false } = {
   }
 
   const data = await parse(res);
-  if (!res.ok) throw new ApiError(data.message || 'Terjadi kesalahan.', res.status, data.errors || {});
+  if (!res.ok) throw new ApiError(data.message || 'Ada yang salah. Coba lagi ya.', res.status, data.errors || {});
   return data;
 }
 
@@ -107,13 +107,13 @@ export async function exchangeCode(code, verifier) {
       body: JSON.stringify({ code, verifier }),
     });
   } catch {
-    throw new ApiError('Tidak dapat terhubung ke server. Pastikan backend EcoWin berjalan.', 0);
+    throw new ApiError('Tidak bisa terhubung ke server. Pastikan server EcoWin sedang berjalan.', 0);
   }
 
   const data = await parse(res);
   if (!res.ok) {
     const first = Object.values(data.errors || {}).flat()[0];
-    throw new ApiError(first || data.message || 'Login gagal.', res.status, data.errors || {});
+    throw new ApiError(first || data.message || 'Login belum berhasil.', res.status, data.errors || {});
   }
   return data;
 }

@@ -35,7 +35,7 @@ function Harga() {
   return (
     <Card>
       <h3 className="font-bold">Harga sampah anorganik saat ini</h3>
-      <p className="mt-0.5 text-xs text-muted">Harga bertingkat mengikuti berat setoran dan dapat berubah sewaktu-waktu.</p>
+      <p className="mt-0.5 text-xs text-muted">Harganya bertingkat sesuai berat setoran, dan bisa berubah sewaktu-waktu.</p>
       <ul className="mt-3 grid gap-3 sm:grid-cols-2">
         {jenis.map((j) => (
           <li key={j.id} className="rounded-2xl bg-canvas p-3.5">
@@ -58,7 +58,7 @@ export default function Transaksi() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Transaksi" subtitle="Riwayat setoran sampah anorganik Anda." />
+      <PageHeader title="Transaksi" subtitle="Riwayat setoran sampah anorganikmu." />
       <PagedList list={list} empty={{ icon: Scale, title: 'Belum ada transaksi', message: 'Setoran anorganik yang dicatat petugas akan muncul di sini.' }}
         renderItem={(t) => (
           <button className="block w-full text-left" onClick={() => setOpen(t.id)}>

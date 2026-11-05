@@ -32,7 +32,7 @@ class PenghapusanAkunService
         if ($nasabah->status === 'aktif' || ($user && $user->isActive())) {
             $this->tolak('Hanya nasabah yang sudah tidak aktif yang bisa dihapus. Nonaktifkan dulu akunnya.');
         }
-        $this->pastikanTanpaTanggungan($nasabah, 'Saldo nasabah', 'Selesaikan penarikan sampai saldo Rp 0 sebelum menghapus.');
+        $this->pastikanTanpaTanggungan($nasabah, sendiri: false);
 
         $this->hapusDataNasabah($actor, $nasabah, $user, 'hapus_nasabah');
     }
@@ -51,22 +51,32 @@ class PenghapusanAkunService
         if (! $nasabah) {
             $this->tolak('Data nasabah tidak ditemukan.');
         }
-        $this->pastikanTanpaTanggungan($nasabah, 'Saldo Anda', 'Ajukan penarikan sampai saldo Rp 0, lalu hapus akun.');
+        $this->pastikanTanpaTanggungan($nasabah, sendiri: true);
 
         $this->hapusDataNasabah($user, $nasabah, $user, 'hapus_akun_sendiri');
     }
 
-    /** Saldo harus Rp 0 dan tidak ada permintaan yang menunggu keputusan. */
-    private function pastikanTanpaTanggungan(Nasabah $nasabah, string $subjekSaldo, string $arahanSaldo): void
+    /**
+     * Saldo harus Rp 0 dan tidak ada permintaan yang menunggu keputusan. Pesan untuk nasabah yang menghapus akunnya sendiri
+     * memakai bahasa sehari-hari; pesan untuk Admin tetap baku.
+     */
+    private function pastikanTanpaTanggungan(Nasabah $nasabah, bool $sendiri): void
     {
         if ((float) $nasabah->saldo > 0) {
-            $this->tolak($subjekSaldo.' masih Rp '.number_format((float) $nasabah->saldo, 0, ',', '.').'. '.$arahanSaldo);
+            $nominal = number_format((float) $nasabah->saldo, 0, ',', '.');
+            $this->tolak($sendiri
+                ? "Saldomu masih Rp {$nominal}. Ajukan penarikan sampai saldo Rp 0, lalu hapus akun."
+                : "Saldo nasabah masih Rp {$nominal}. Selesaikan penarikan sampai saldo Rp 0 sebelum menghapus.");
         }
         if (PenarikanSaldo::query()->where('nasabah_id', $nasabah->id)->where('status', PenarikanSaldo::STATUS_PENDING)->exists()) {
-            $this->tolak('Masih ada penarikan saldo yang menunggu keputusan. Selesaikan atau tolak dulu.');
+            $this->tolak($sendiri
+                ? 'Masih ada penarikan saldo yang menunggu keputusan petugas. Tunggu selesai dulu ya, baru hapus akun.'
+                : 'Masih ada penarikan saldo yang menunggu keputusan. Selesaikan atau tolak dulu.');
         }
         if (AktivitasBiopori::query()->where('nasabah_id', $nasabah->id)->where('status', AktivitasBiopori::STATUS_PENDING)->exists()) {
-            $this->tolak('Masih ada aktivitas organik yang menunggu verifikasi. Tunggu hingga selesai diperiksa.');
+            $this->tolak($sendiri
+                ? 'Masih ada aktivitas organik yang menunggu verifikasi petugas. Tunggu selesai diperiksa dulu ya.'
+                : 'Masih ada aktivitas organik yang menunggu verifikasi. Tunggu hingga selesai diperiksa.');
         }
     }
 

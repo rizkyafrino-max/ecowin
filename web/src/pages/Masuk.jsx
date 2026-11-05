@@ -17,7 +17,7 @@ const GoogleG = () => (
 );
 
 const FITUR = [
-  { icon: QrCode, judul: 'Setor dengan QR Card', isi: 'Petugas mencatat setoran Anda dalam hitungan detik.' },
+  { icon: QrCode, judul: 'Setor dengan QR Card', isi: 'Petugas mencatat setoranmu dalam hitungan detik.' },
   { icon: Wallet, judul: 'Saldo transparan', isi: 'Pantau saldo dan riwayat setoran kapan saja.' },
   { icon: Sprout, judul: 'Organik dan Biopori', isi: 'Catat aktivitas organik dan temukan titik biopori terdekat.' },
 ];
@@ -37,7 +37,7 @@ export default function Masuk({ daftar = false }) {
   const { status } = useAuth();
   const { search } = useLocation();
   const failed = new URLSearchParams(search).has('gagal');
-  const [error, setError] = useState(failed ? 'Login belum berhasil. Silakan coba lagi.' : null);
+  const [error, setError] = useState(failed ? 'Login belum berhasil. Coba lagi ya.' : null);
   const [busy, setBusy] = useState(false);
 
   if (status === 'loading') return <LaunchScreen />;
@@ -52,7 +52,7 @@ export default function Masuk({ daftar = false }) {
       goExternal(`${base}?${new URLSearchParams({ app: 'web', c: challenge })}`);
     } catch {
       setBusy(false);
-      setError('Browser Anda tidak mendukung login aman. Perbarui browser lalu coba lagi.');
+      setError('Browser kamu belum mendukung login aman. Perbarui browser, lalu coba lagi ya.');
     }
   };
 
@@ -86,7 +86,7 @@ export default function Masuk({ daftar = false }) {
           </span>
           <h2 className="mt-3.5 text-[1.65rem] font-extrabold leading-tight tracking-tight lg:text-[2rem]">{daftar ? 'Buat akun EcoWin' : 'Selamat datang'}</h2>
           <p className="mt-2 text-[15px] leading-relaxed text-muted">
-            {daftar ? 'Daftar sebagai nasabah Bank Sampah RT/RW Anda dengan akun Google.' : 'Masuk dengan akun Google Anda untuk melihat saldo, setoran, dan aktivitas organik.'}
+            {daftar ? 'Daftar sebagai nasabah Bank Sampah RT/RW-mu dengan akun Google.' : 'Masuk dengan akun Google kamu untuk melihat saldo, setoran, dan aktivitas organik.'}
           </p>
 
           {error && <p className="mt-5 rounded-2xl border border-red-200 bg-danger-tint p-3.5 text-sm text-danger" role="alert">{error}</p>}
@@ -99,7 +99,7 @@ export default function Masuk({ daftar = false }) {
 
           <p className="mt-5 flex items-start gap-2.5 text-sm leading-relaxed text-muted">
             <ShieldCheck className="mt-0.5 h-[18px] w-[18px] flex-none text-primary" aria-hidden />
-            <span>Akun Google harus memiliki email terverifikasi dan terdaftar di EcoWin.</span>
+            <span>Akun Google-nya harus punya email terverifikasi dan sudah terdaftar di EcoWin.</span>
           </p>
 
           <p className="mt-6 border-t border-line pt-5 text-center text-sm text-muted">
@@ -108,7 +108,7 @@ export default function Masuk({ daftar = false }) {
               : <>Belum punya akun? <Link className="font-bold text-primary-deep hover:underline" to="/daftar">Daftar sebagai nasabah</Link></>}
           </p>
           <p className="mt-4 text-center text-xs text-muted">
-            Dengan melanjutkan, Anda menyetujui <Link className="font-semibold text-primary-deep hover:underline" to="/privasi">Kebijakan Privasi</Link> kami.
+            Dengan melanjutkan, kamu setuju dengan <Link className="font-semibold text-primary-deep hover:underline" to="/privasi">Kebijakan Privasi</Link> kami.
             {' '}<Link className="font-semibold text-primary-deep hover:underline" to="/hapus-akun">Hapus akun</Link>
           </p>
           <p className="mt-3 text-center text-xs text-slate-400">© {new Date().getFullYear()} EcoWin · Bank Sampah Digital Berkelanjutan</p>

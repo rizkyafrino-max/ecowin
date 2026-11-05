@@ -12,7 +12,7 @@ export async function perkecilFoto(file, maks = 1024) {
   try {
     bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
   } catch {
-    throw new Error('Foto tidak dapat dibaca. Coba foto lain.');
+    throw new Error('Fotonya tidak bisa dibaca. Coba foto lain ya.');
   }
 
   const skala = Math.min(1, maks / Math.max(bitmap.width, bitmap.height));
@@ -28,6 +28,6 @@ export async function perkecilFoto(file, maks = 1024) {
   bitmap.close?.();
 
   const blob = await new Promise((ok) => kanvas.toBlob(ok, 'image/jpeg', 0.88));
-  if (!blob) throw new Error('Foto gagal diproses. Coba foto lain.');
+  if (!blob) throw new Error('Foto gagal diproses. Coba foto lain ya.');
   return blob;
 }

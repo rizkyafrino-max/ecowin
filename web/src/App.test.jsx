@@ -111,7 +111,7 @@ describe('login satu pintu (halaman Laravel)', () => {
     window.history.pushState({}, '', '/auth/callback?code=' + 'C'.repeat(64));
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(json(200, { access_token: 'A', access_expires_at: future(1e6), refresh_token: 'R', refresh_expires_at: future(1e8), user: { ...nasabah, role: 'petugas' } }));
     render(<App />);
-    expect(await screen.findByRole('alert')).toHaveTextContent('masuk melalui dashboard');
+    expect(await screen.findByRole('alert')).toHaveTextContent('masuk lewat dashboard');
     expect(localStorage.getItem('ecowin.session')).toBeNull();
   });
 });

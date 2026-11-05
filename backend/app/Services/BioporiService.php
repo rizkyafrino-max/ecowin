@@ -32,7 +32,7 @@ class BioporiService
         $titik = TitikBiopori::query()->findOrFail($data['titik_biopori_id']);
 
         if ((int) $titik->bank_sampah_id !== (int) $nasabah->bank_sampah_id || $titik->status !== 'aktif' || $titik->verifikasi !== TitikBiopori::VERIFIKASI_APPROVED) {
-            throw ValidationException::withMessages(['titik_biopori_id' => ['Lokasi Biopori tidak tersedia untuk Bank Sampah Anda.']]);
+            throw ValidationException::withMessages(['titik_biopori_id' => ['Lokasi Biopori tidak tersedia untuk Bank Sampahmu.']]);
         }
 
         $metode = $data['metode_pengolahan'] ?? ($titik->bioporiprint ? 'bioporiprint' : 'biopori');
@@ -97,7 +97,7 @@ class BioporiService
         }
 
         if ($nasabah->status_verifikasi !== 'verified') {
-            throw ValidationException::withMessages(['nama_lokasi' => ['Akun Anda belum diverifikasi petugas, sehingga belum bisa mengajukan titik baru.']]);
+            throw ValidationException::withMessages(['nama_lokasi' => ['Akunmu belum diverifikasi petugas, jadi belum bisa mengajukan titik baru.']]);
         }
 
         $lat = (float) $data['latitude'];
@@ -109,7 +109,7 @@ class BioporiService
 
             $menunggu = TitikBiopori::query()->where('diajukan_oleh', $actor->id)->where('verifikasi', TitikBiopori::VERIFIKASI_PENDING)->count();
             if ($menunggu >= self::MAKS_PENGAJUAN_PENDING) {
-                throw ValidationException::withMessages(['nama_lokasi' => ['Anda sudah memiliki '.self::MAKS_PENGAJUAN_PENDING.' pengajuan yang menunggu verifikasi. Tunggu keputusan petugas dulu.']]);
+                throw ValidationException::withMessages(['nama_lokasi' => ['Kamu sudah punya '.self::MAKS_PENGAJUAN_PENDING.' pengajuan yang masih menunggu verifikasi. Tunggu keputusan petugas dulu ya.']]);
             }
 
             $dekat = TitikBiopori::query()
@@ -181,7 +181,7 @@ class BioporiService
             $aksi = $status === TitikBiopori::VERIFIKASI_APPROVED ? 'setujui_titik_biopori' : 'tolak_titik_biopori';
             $this->audit->log($aksi, $locked, $before, $locked->attributesToArray(), $actor);
             $disetujui = $status === TitikBiopori::VERIFIKASI_APPROVED;
-            app(\App\Services\NotifikasiService::class)->kirim($locked->pengaju, $disetujui ? 'titik_disetujui' : 'titik_ditolak', $disetujui ? 'Titik Biopori disetujui' : 'Titik Biopori ditolak', $disetujui ? 'Titik "'.$locked->nama_lokasi.'" sudah disetujui dan tampil di peta. Anda bisa melapor aktivitas di sana.' : 'Titik "'.$locked->nama_lokasi.'" ditolak. Alasan: '.($catatan ?: '-'), 'organik');
+            app(\App\Services\NotifikasiService::class)->kirim($locked->pengaju, $disetujui ? 'titik_disetujui' : 'titik_ditolak', $disetujui ? 'Titik Biopori disetujui' : 'Titik Biopori ditolak', $disetujui ? 'Titik "'.$locked->nama_lokasi.'" sudah disetujui dan muncul di peta. Kamu bisa melapor aktivitas di sana.' : 'Titik "'.$locked->nama_lokasi.'" ditolak. Alasan: '.($catatan ?: '-'), 'organik');
 
             return $locked;
         });
@@ -268,7 +268,7 @@ class BioporiService
             $aksi = $status === AktivitasBiopori::STATUS_APPROVED ? 'approve_biopori' : 'reject_biopori';
             $this->audit->log($aksi, $locked, $before, $locked->attributesToArray(), $actor);
             $disetujui = $status === AktivitasBiopori::STATUS_APPROVED;
-            app(\App\Services\NotifikasiService::class)->kirim($locked->nasabah?->user, $disetujui ? 'biopori_disetujui' : 'biopori_ditolak', $disetujui ? 'Aktivitas organik disetujui' : 'Aktivitas organik ditolak', $disetujui ? 'Aktivitas Biopori Anda ('.number_format((float) $locked->berat_kg, 2, ',', '.').' kg) sudah disetujui petugas.' : 'Aktivitas Biopori Anda ditolak. Alasan: '.($catatan ?: '-'), 'organik');
+            app(\App\Services\NotifikasiService::class)->kirim($locked->nasabah?->user, $disetujui ? 'biopori_disetujui' : 'biopori_ditolak', $disetujui ? 'Aktivitas organik disetujui' : 'Aktivitas organik ditolak', $disetujui ? 'Aktivitas Biopori kamu ('.number_format((float) $locked->berat_kg, 2, ',', '.').' kg) sudah disetujui petugas.' : 'Aktivitas Biopori kamu ditolak. Alasan: '.($catatan ?: '-'), 'organik');
 
             return $locked;
         });
