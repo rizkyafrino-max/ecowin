@@ -8,7 +8,7 @@
     @include('auth.stepper', ['aktif' => 1])
     <span class="ecl-kicker">DAFTAR NASABAH</span>
     <h2>Buat akun EcoWin</h2>
-    <p class="ecl-sub">Daftar sebagai nasabah Bank Sampah RT/RW Anda dengan akun Google. Akun diperiksa petugas sebelum aktif sepenuhnya.</p>
+    <p class="ecl-sub">Daftar sebagai nasabah Bank Sampah RT/RW-mu dengan akun Google. Akunmu diperiksa petugas dulu sebelum aktif sepenuhnya.</p>
 
     @if (session('auth_error'))
         <div class="ecl-err" role="alert">{{ session('auth_error') }}</div>
@@ -21,7 +21,7 @@
 
     <p class="ecl-note">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 5 3 8.5 7 10 4-1.5 7-5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
-        <span>Kami hanya membaca nama, email, dan foto profil dari akun Google Anda. Tidak ada kata sandi yang dibuat. Baca <a class="ecl-link" href="{{ config('ecowin.web_url') }}/privasi" target="_blank" rel="noopener">Kebijakan Privasi</a>.</span>
+        <span>Kami hanya membaca nama, email, dan foto profil dari akun Google kamu. Tidak ada kata sandi yang dibuat. Baca <a class="ecl-link" href="{{ config('ecowin.web_url') }}/privasi" target="_blank" rel="noopener">Kebijakan Privasi</a>.</span>
     </p>
 
     <p class="ecl-or">Sudah punya akun? <a class="ecl-link" href="{{ route('filament.admin.auth.login') }}">Masuk</a></p>

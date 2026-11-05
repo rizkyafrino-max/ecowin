@@ -122,7 +122,7 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
     LaunchedEffect(Unit) {
         client.sessionExpired.collect {
             NotifikasiHp.berhenti(konteks)
-            state = AppState.LoggedOut("Sesi Anda berakhir. Silakan masuk kembali dengan Google.")
+            state = AppState.LoggedOut("Sesimu sudah berakhir. Silakan masuk lagi dengan Google ya.")
         }
     }
 
@@ -138,7 +138,7 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
                 if (e.code() == 401 || e.code() == 403) {
                     session.clear()
                     NotifikasiHp.berhenti(konteks)
-                    AppState.LoggedOut("Sesi Anda berakhir. Silakan masuk kembali.")
+                    AppState.LoggedOut("Sesimu sudah berakhir. Silakan masuk lagi ya.")
                 } else AppState.Offline(client.errorMessage(e))
             } catch (e: Exception) {
                 AppState.Offline(client.errorMessage(e))

@@ -127,14 +127,14 @@ class ApiClient(private val session: SessionStore) {
             parsed?.errors?.values?.flatten()?.firstOrNull()
                 ?: parsed?.message
                 ?: when (e.code()) {
-                    401 -> "Sesi berakhir. Silakan masuk lagi."
-                    403 -> "Anda tidak memiliki akses."
+                    401 -> "Sesimu sudah berakhir. Silakan masuk lagi ya."
+                    403 -> "Kamu tidak punya akses ke bagian ini."
                     404 -> "Data tidak ditemukan."
-                    429 -> "Terlalu banyak percobaan. Coba lagi sebentar."
-                    else -> "Terjadi kesalahan server (${e.code()})."
+                    429 -> "Terlalu banyak percobaan. Coba lagi sebentar ya."
+                    else -> "Ada gangguan di server (${e.code()}). Coba lagi nanti ya."
                 }
         }
-        is java.io.IOException -> "Tidak dapat terhubung ke server. Periksa koneksi internet."
-        else -> e.message ?: "Terjadi kesalahan."
+        is java.io.IOException -> "Tidak bisa terhubung ke server. Periksa koneksi internetmu ya."
+        else -> e.message ?: "Ada yang salah. Coba lagi ya."
     }
 }

@@ -89,7 +89,7 @@ fun LaporBugTab(client: ApiClient, layarAsal: String, onKembali: () -> Unit) {
                     berkas = hasil
                     pratinjau = gambar
                 } catch (e: Exception) {
-                    galat = if (e is IllegalArgumentException) "Berkas bukan gambar yang valid." else "Foto tidak dapat dibaca. Coba foto lain."
+                    galat = if (e is IllegalArgumentException) "Berkas bukan gambar yang valid." else "Fotonya tidak bisa dibaca. Coba foto lain ya."
                 } finally {
                     menyiapkan = false
                 }
@@ -104,7 +104,7 @@ fun LaporBugTab(client: ApiClient, layarAsal: String, onKembali: () -> Unit) {
                     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Icon(Lucide.ShieldCheck, contentDescription = null, tint = Emerald, modifier = Modifier.size(28.dp))
                         Text("Terima kasih, laporan terkirim", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Slate900)
-                        Text("Laporan Anda sudah masuk ke tim EcoWin dan akan kami periksa.", color = Slate500, fontSize = 14.sp)
+                        Text("Laporanmu sudah masuk ke tim EcoWin dan akan segera kami periksa.", color = Slate500, fontSize = 14.sp)
                         Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             PrimaryButton("Kembali") { onKembali() }
                             OutlinedButton(
@@ -119,7 +119,7 @@ fun LaporBugTab(client: ApiClient, layarAsal: String, onKembali: () -> Unit) {
             item {
                 EcoCard {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text("Ceritakan masalah yang Anda temui: apa yang Anda lakukan, apa yang terjadi, dan apa yang seharusnya terjadi.", color = Slate500, fontSize = 14.sp)
+                        Text("Ceritakan masalah yang kamu temui ya: apa yang kamu lakukan, apa yang terjadi, dan apa yang seharusnya terjadi.", color = Slate500, fontSize = 14.sp)
                         EcoTextField(
                             teks, { teks = it.take(BATAS_TEKS); galat = null },
                             label = { Text("Apa masalahnya?") },
@@ -154,7 +154,7 @@ fun LaporBugTab(client: ApiClient, layarAsal: String, onKembali: () -> Unit) {
                                     ) { Icon(Lucide.X, contentDescription = "Hapus foto", tint = Color.White, modifier = Modifier.size(18.dp)) }
                                 }
                             }
-                            Text("Foto membantu kami melihat masalahnya. Hindari menampilkan data pribadi Anda; lokasi dan metadata foto dihapus otomatis.", color = Slate500, fontSize = 12.sp)
+                            Text("Foto membantu kami melihat masalahnya. Usahakan jangan menampilkan data pribadimu; lokasi dan metadata foto dihapus otomatis.", color = Slate500, fontSize = 12.sp)
                         }
 
                         Text("Info teknis aplikasi (versi aplikasi dan jenis HP) ikut terkirim untuk membantu kami memperbaiki masalah. Tidak ada data pribadi atau saldo yang dikirim.", color = Slate500, fontSize = 12.sp)

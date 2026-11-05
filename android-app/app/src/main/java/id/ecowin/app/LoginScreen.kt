@@ -114,7 +114,7 @@ fun LoginScreen(
                 modifier = Modifier.background(EmeraldSoft, RoundedCornerShape(999.dp)).padding(horizontal = 12.dp, vertical = 5.dp),
             )
             Text("Selamat datang", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = Slate900, modifier = Modifier.padding(top = 2.dp))
-            Text("Masuk dengan akun Google Anda untuk melihat saldo, setoran, dan aktivitas organik.", color = Slate500, fontSize = 15.sp)
+            Text("Masuk dengan akun Google kamu untuk melihat saldo, setoran, dan aktivitas organik.", color = Slate500, fontSize = 15.sp)
 
             message?.let {
                 Text(
@@ -142,8 +142,8 @@ fun LoginScreen(
                                 }
                                 is GoogleAuth.Result.Failure -> message = result.message
                                 GoogleAuth.Result.Cancelled -> message =
-                                    "Pemilihan akun Google ditutup. Jika Anda tidak membatalkannya, Google belum mengenali aplikasi ini: " +
-                                        "buat OAuth client tipe Android (package id.ecowin.app + SHA-1) di Google Cloud dan daftarkan email Anda sebagai Test user."
+                                    "Pemilihan akun Google ditutup. Kalau kamu tidak membatalkannya, Google belum mengenali aplikasi ini: " +
+                                        "buat OAuth client tipe Android (package id.ecowin.app + SHA-1) di Google Cloud dan daftarkan emailmu sebagai Test user."
                             }
                             loading = false
                         }
@@ -159,7 +159,7 @@ fun LoginScreen(
 
             Row(Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Top) {
                 Icon(Lucide.ShieldCheck, contentDescription = null, tint = Emerald, modifier = Modifier.size(16.dp).padding(top = 2.dp))
-                Text("Akun Google harus memiliki email terverifikasi dan terdaftar di EcoWin.", color = Slate500, fontSize = 13.sp)
+                Text("Akun Google-nya harus punya email terverifikasi dan sudah terdaftar di EcoWin.", color = Slate500, fontSize = 13.sp)
             }
 
             Box(Modifier.fillMaxWidth().padding(top = 8.dp).height(1.dp).background(Slate200))

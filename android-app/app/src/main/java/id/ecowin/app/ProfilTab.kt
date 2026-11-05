@@ -187,7 +187,7 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
                     EcoTextField(alamat, { alamat = it.take(255); ok = false }, label = { Text("Alamat (RT/RW)") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp))
                     EcoTextField(
                         user.email.orEmpty(), {}, label = { Text("Email Google") }, singleLine = true, enabled = false,
-                        supportingText = { Text("Email tidak dapat diubah. Hubungi petugas Bank Sampah bila perlu.") },
+                        supportingText = { Text("Email tidak bisa diubah. Hubungi petugas Bank Sampah kalau perlu.") },
                         modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp),
                     )
                     message?.let { PesanStatus(it, ok) }
@@ -216,7 +216,7 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
             Kelompok("Akun") {
                 Baris(Lucide.Settings, "Pengaturan", "Pemberitahuan, nada, dan lapor bug", warnaIkon = Slate500, latarIkon = LatarNetral, onClick = { go(Tab.Pengaturan) }) { PanahBaris() }
                 Pemisah()
-                Baris(Lucide.ShieldCheck, "Kebijakan privasi", "Data apa yang kami kumpulkan dan hak Anda", onClick = { runCatching { situs.openUri(URL_PRIVASI) } }) { TautanLuar() }
+                Baris(Lucide.ShieldCheck, "Kebijakan privasi", "Data apa yang kami kumpulkan dan hak kamu", onClick = { runCatching { situs.openUri(URL_PRIVASI) } }) { TautanLuar() }
                 Pemisah()
                 Baris(Lucide.UserRound, "Dibuat oleh Rizky", "rizky.pplgku.my.id", onClick = { runCatching { situs.openUri(URL_PEMBUAT) } }) { TautanLuar() }
             }
@@ -231,7 +231,7 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
                 Text("  Keluar", color = Color.White, fontWeight = FontWeight.SemiBold)
             }
             Text(
-                "Setelah keluar, Anda perlu masuk kembali dengan Google.",
+                "Setelah keluar, kamu perlu masuk lagi dengan Google.",
                 color = Slate500, fontSize = 12.sp, textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             )
@@ -250,11 +250,11 @@ fun ProfilTab(client: ApiClient, user: UserDto, refreshKey: Int, onUserChanged: 
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        "Data pribadi Anda (nama, email, nomor HP, alamat, foto, dan tautan akun Google) dihapus permanen dan tidak bisa dikembalikan. " +
+                        "Data pribadimu (nama, email, nomor HP, alamat, foto, dan tautan akun Google) akan dihapus permanen dan tidak bisa dikembalikan. " +
                             "Riwayat transaksi tetap tersimpan tanpa identitas untuk pembukuan Bank Sampah.",
                         fontSize = 13.sp, lineHeight = 18.sp,
                     )
-                    Text("Syarat: saldo Rp 0 dan tidak ada permintaan yang menunggu.", fontSize = 13.sp, color = Slate500)
+                    Text("Syaratnya: saldo Rp 0 dan tidak ada permintaan yang masih menunggu. Kalau masih ada saldo, tarik dulu ya.",fontSize = 13.sp, color = Slate500)
                     EcoTextField(
                         kataHapus, { kataHapus = it.take(10); hapusPesan = null }, label = { Text("Ketik HAPUS untuk melanjutkan") },
                         singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp),

@@ -138,7 +138,7 @@ fun KartuNasabahScreen(client: ApiClient, user: UserDto, onTutup: () -> Unit) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     KartuHorizontal(q, user, Modifier.width(lebarKartu).aspectRatio(RASIO_KARTU))
                     Text(
-                        "Tunjukkan kartu ini kepada petugas. Kecerahan layar dinaikkan agar mudah dipindai.",
+                        "Tunjukkan kartu ini ke petugas. Kecerahan layar dinaikkan supaya QR mudah dipindai.",
                         color = Slate500, fontSize = 12.sp, textAlign = TextAlign.Center, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     )
                 }

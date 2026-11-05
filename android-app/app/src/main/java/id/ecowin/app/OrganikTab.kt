@@ -77,7 +77,7 @@ fun OrganikTab(client: ApiClient, refreshKey: Int) {
                 LoadableContent(aktivitas) { akt ->
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         SectionTitle("Aktivitas Terbaru")
-                        if (list.isEmpty() && akt.isEmpty()) ListCard { EmptyText("Belum ada aktivitas organik. Tambahkan aktivitas pertama Anda dengan foto bukti.") }
+                        if (list.isEmpty() && akt.isEmpty()) ListCard { EmptyText("Belum ada aktivitas organik. Tambahkan aktivitas pertamamu, lengkap dengan foto bukti.") }
                         // Gabungan dua sumber, terbaru di atas.
                         val gabungan = list.map { Triple(it.tanggal.orEmpty(), true, it) } +
                             akt.map { Triple(it.tanggalPemasukan.orEmpty(), false, it) }
@@ -126,9 +126,9 @@ fun OrganikTab(client: ApiClient, refreshKey: Int) {
                                 .padding(horizontal = 14.dp, vertical = 8.dp),
                         )
                     }
-                    if (resmi.isEmpty() && pengajuan.isEmpty()) EmptyText("Belum ada lokasi di Bank Sampah Anda. Ajukan titik pertama agar bisa melapor aktivitas.")
+                    if (resmi.isEmpty() && pengajuan.isEmpty()) EmptyText("Belum ada lokasi di Bank Sampahmu. Ajukan titik pertama dulu supaya bisa melapor aktivitas.")
                     if (pengajuan.isNotEmpty()) {
-                        Text("Pengajuan Anda", color = Slate500, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                        Text("Pengajuanmu",color = Slate500, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                         pengajuan.forEach { t ->
                             EcoCard {
                                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {

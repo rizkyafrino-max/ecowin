@@ -36,7 +36,7 @@ private val Grup: List<Pair<String, List<Fitur>>> = listOf(
     ),
     "AKUN" to listOf(
         Fitur(Tab.Kartu, Lucide.QrCode, "Kartu Nasabah", "Tampilkan kartu layar penuh berisi QR untuk setor sampah."),
-        Fitur(Tab.Organik, Lucide.MapPin, "Peta Biopori", "Lihat titik Biopori dan BioporiPrint di sekitar Anda."),
+        Fitur(Tab.Organik, Lucide.MapPin, "Peta Biopori", "Lihat titik Biopori dan BioporiPrint di sekitarmu."),
         Fitur(Tab.Profil, Lucide.UserRound, "Profil", "Data diri, Bank Sampah, dan keluar dari akun."),
         Fitur(Tab.Pengaturan, Lucide.Settings, "Pengaturan", "Pemberitahuan HP, nada notifikasi, dan lapor bug."),
         Fitur(Tab.LaporBug, Tab.LaporBug.icon, "Lapor Bug", "Laporkan masalah aplikasi beserta foto bukti. Bisa juga dengan mengguncang HP."),

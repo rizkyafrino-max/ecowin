@@ -123,7 +123,7 @@ object NotifikasiHp {
         nm.notificationChannels.filter { it.id.startsWith(KANAL) && it.id != id }.forEach { nm.deleteNotificationChannel(it.id) }
         if (nm.getNotificationChannel(id) == null) {
             val kanal = NotificationChannel(id, "Kabar EcoWin", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                description = "Setoran, penarikan, dan aktivitas akun Anda."
+                description = "Setoran, penarikan, dan aktivitas akunmu."
                 lockscreenVisibility = android.app.Notification.VISIBILITY_PRIVATE
                 setShowBadge(true)
                 val uri = n.raw?.let { android.net.Uri.parse("android.resource://${app.packageName}/$it") } ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)

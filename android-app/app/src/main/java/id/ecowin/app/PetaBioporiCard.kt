@@ -61,20 +61,20 @@ fun PetaBioporiCard(titik: List<TitikBioporiDto>) {
 
     EcoCard {
         Text("Peta lokasi Biopori", fontWeight = FontWeight.Bold)
-        Text("Titik Biopori di Bank Sampah Anda. Ketuk penanda untuk detail.", color = Slate500, fontSize = 12.sp)
+        Text("Titik Biopori di Bank Sampahmu. Ketuk penanda untuk melihat detailnya.", color = Slate500, fontSize = 12.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) {
             FilterPill("Semua (${titik.size})", !hanyaPrint) { hanyaPrint = false }
             FilterPill("BioporiPrint ($jumlahPrint)", hanyaPrint) { hanyaPrint = true }
         }
 
         if (dipeta.isEmpty()) {
-            EmptyText(if (hanyaPrint) "Belum ada titik BioporiPrint yang berkoordinat di Bank Sampah Anda." else "Belum ada titik Biopori berkoordinat di Bank Sampah Anda.")
+            EmptyText(if (hanyaPrint) "Belum ada titik BioporiPrint yang berkoordinat di Bank Sampahmu." else "Belum ada titik Biopori berkoordinat di Bank Sampahmu.")
         } else {
             OsmMap(dipeta, Modifier.fillMaxWidth().height(300.dp).clip(RoundedCornerShape(16.dp)))
         }
         if (tanpaKoordinat.isNotEmpty()) {
             Text(
-                "${tanpaKoordinat.size} titik belum memiliki koordinat: " + tanpaKoordinat.joinToString(", ") { it.namaLokasi ?: "Lokasi #${it.id}" } + ".",
+                "${tanpaKoordinat.size} titik belum punya koordinat:" + tanpaKoordinat.joinToString(", ") { it.namaLokasi ?: "Lokasi #${it.id}" } + ".",
                 color = Slate500, fontSize = 12.sp,
             )
         }
