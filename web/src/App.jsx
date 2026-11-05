@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import AppLayout from './layouts/AppLayout';
 import Dashboard from './pages/Dashboard';
 import Fitur from './pages/Fitur';
+import HapusAkunInfo from './pages/HapusAkunInfo';
 import KartuLayarPenuh from './pages/KartuLayarPenuh';
 import AuthCallback from './pages/AuthCallback';
 import LaporBug from './pages/LaporBug';
@@ -11,6 +12,7 @@ import Masuk from './pages/Masuk';
 import Notifikasi from './pages/Notifikasi';
 import Organik from './pages/Organik';
 import Penarikan from './pages/Penarikan';
+import Privasi from './pages/Privasi';
 import Profil from './pages/Profil';
 import Saldo from './pages/Saldo';
 import Transaksi from './pages/Transaksi';
@@ -32,6 +34,9 @@ export default function App() {
           <Route path="/masuk" element={<Masuk />} />
           <Route path="/daftar" element={<Masuk daftar />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          {/* Halaman publik (tanpa login): dibutuhkan Google Play dan layar persetujuan Google */}
+          <Route path="/privasi" element={<Privasi />} />
+          <Route path="/hapus-akun" element={<HapusAkunInfo />} />
           <Route element={<Protected />}>
             <Route index element={<Dashboard />} />
             <Route path="transaksi" element={<Transaksi />} />

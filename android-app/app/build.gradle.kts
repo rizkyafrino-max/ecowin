@@ -15,6 +15,8 @@ if (file("google-services.json").exists()) {
 //   ECOWIN_GOOGLE_WEB_CLIENT_ID = OAuth client ID tipe "Web application" (sama dengan GOOGLE_CLIENT_ID di .env Laravel)
 val apiBaseUrl: String = (project.findProperty("ECOWIN_API_BASE_URL") as String?) ?: "http://10.0.2.2:8000/api/"
 val googleWebClientId: String = (project.findProperty("ECOWIN_GOOGLE_WEB_CLIENT_ID") as String?) ?: ""
+// Alamat web nasabah (tempat halaman Kebijakan Privasi dan Hapus Akun); dibuka dari aplikasi di peramban.
+val webUrl: String = (project.findProperty("ECOWIN_WEB_URL") as String?) ?: "https://ecowin.rplxsata.com"
 
 val taskDir = gradle.startParameter.taskNames
 if (taskDir.any { it.contains("Release", ignoreCase = true) && !it.contains("releaseCheck", ignoreCase = true) } && !apiBaseUrl.startsWith("https://")) {
@@ -33,6 +35,7 @@ android {
         versionName = "2.0"
         buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
+        buildConfigField("String", "WEB_URL", "\"$webUrl\"")
     }
 
     buildTypes {

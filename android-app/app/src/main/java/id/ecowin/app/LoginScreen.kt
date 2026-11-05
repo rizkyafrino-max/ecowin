@@ -174,9 +174,10 @@ fun LoginScreen(
             }
         }
 
+        TautanKebijakan(Modifier.fillMaxWidth().padding(top = 4.dp))
         Text(
             "© ${java.time.Year.now().value} EcoWin · Bank Sampah Digital Berkelanjutan", color = Color(0xFF94A3B8), fontSize = 12.sp,
-            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 24.dp),
+            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 24.dp),
         )
     }
 }

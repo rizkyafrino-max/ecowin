@@ -36,6 +36,22 @@ import androidx.compose.ui.unit.sp
 /** Situs pembuat aplikasi, dibuka di peramban. */
 internal const val URL_PEMBUAT = "https://rizky.pplgku.my.id/"
 
+/** Halaman publik di web nasabah (alamat dasarnya dari ECOWIN_WEB_URL saat build), dibuka di peramban. */
+internal val URL_PRIVASI = BuildConfig.WEB_URL.trimEnd('/') + "/privasi"
+internal val URL_HAPUS_AKUN = BuildConfig.WEB_URL.trimEnd('/') + "/hapus-akun"
+
+/** Teks kecil "Kebijakan Privasi · Hapus akun" yang membuka halaman publiknya. */
+@Composable
+internal fun TautanKebijakan(modifier: Modifier = Modifier) {
+    val situs = androidx.compose.ui.platform.LocalUriHandler.current
+    val gaya = androidx.compose.ui.text.TextStyle(color = EmeraldDeep, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline)
+    Row(modifier, horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+        Text("Kebijakan Privasi", style = gaya, modifier = Modifier.clickable(role = Role.Button) { runCatching { situs.openUri(URL_PRIVASI) } }.padding(horizontal = 8.dp, vertical = 10.dp))
+        Text("·", color = Slate400, fontSize = 12.sp)
+        Text("Hapus akun", style = gaya, modifier = Modifier.clickable(role = Role.Button) { runCatching { situs.openUri(URL_HAPUS_AKUN) } }.padding(horizontal = 8.dp, vertical = 10.dp))
+    }
+}
+
 internal val LatarNetral = Color(0xFFF1F5F9)
 internal val Slate400 = Color(0xFF94A3B8)
 

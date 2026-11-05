@@ -72,7 +72,7 @@
 
         <label class="ecl-check">
             <input type="checkbox" name="setuju" value="1" @checked(old('setuju')) required>
-            <span>Saya menyatakan data di atas benar dan bersedia diverifikasi oleh petugas Bank Sampah.</span>
+            <span>Saya menyatakan data di atas benar, bersedia diverifikasi oleh petugas Bank Sampah, dan telah membaca <a class="ecl-link" href="{{ config('ecowin.web_url') }}/privasi" target="_blank" rel="noopener">Kebijakan Privasi</a>.</span>
         </label>
         @error('setuju')<p class="ecl-field-err" role="alert">{{ $message }}</p>@enderror
 
