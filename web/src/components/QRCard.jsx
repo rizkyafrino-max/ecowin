@@ -53,7 +53,7 @@ export default function QRCard({ data, loading, bank, tanpaCatatan = false }) {
           </div>
         </div>
       </section>
-      {!tanpaCatatan && <p className="mx-auto mt-3 max-w-sm text-center text-xs text-muted">Tunjukkan kartu ini kepada petugas Bank Sampah. QR hanya berisi kode acak, bukan data pribadi.</p>}
+      {!tanpaCatatan && <p className="mx-auto mt-3 max-w-sm text-center text-xs text-muted">Tunjukkan kartu ini ke petugas Bank Sampah. QR-nya hanya berisi kode acak, bukan data pribadi.</p>}
     </div>
   );
 }

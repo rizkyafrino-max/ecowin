@@ -21,10 +21,10 @@ const GROUPS = [
   {
     title: 'Akun',
     items: [
-      { to: '/kartu', icon: QrCode, label: 'Kartu Nasabah', text: 'Tampilkan kartu layar penuh berisi QR untuk setor sampah.' },
-      { to: '/organik', icon: MapPin, label: 'Peta Biopori', text: 'Lihat titik Biopori dan BioporiPrint di sekitar Anda.' },
+      { to: '/kartu', icon: QrCode, label: 'Kartu Nasabah', text: 'Tampilkan kartu QR layar penuh untuk setor sampah.' },
+      { to: '/organik', icon: MapPin, label: 'Peta Biopori', text: 'Lihat titik Biopori dan BioporiPrint di sekitarmu.' },
       { to: '/profil', icon: UserRound, label: 'Profil', text: 'Data diri, Bank Sampah, dan keluar dari akun.' },
-      { to: '/lapor-bug', icon: Bug, label: 'Lapor Bug', text: 'Laporkan masalah aplikasi beserta foto bukti.' },
+      { to: '/lapor-bug', icon: Bug, label: 'Lapor Bug', text: 'Laporkan masalah di aplikasi, boleh sambil kirim foto.' },
     ],
   },
 ];
@@ -32,7 +32,7 @@ const GROUPS = [
 export default function Fitur() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Semua Fitur" subtitle="Semua yang bisa Anda lakukan di EcoWin." />
+      <PageHeader title="Semua Fitur" subtitle="Semua yang bisa kamu lakukan di EcoWin." />
       {GROUPS.map((g) => (
         <section key={g.title}>
           <h2 className="mb-2.5 text-sm font-bold uppercase tracking-wider text-muted">{g.title}</h2>

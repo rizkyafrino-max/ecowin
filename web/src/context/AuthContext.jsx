@@ -37,13 +37,13 @@ export function AuthProvider({ children }) {
 
   const exchange = useCallback(async (code) => {
     const verifier = takeVerifier();
-    if (!code || !verifier) throw new ApiError('Sesi login tidak ditemukan. Silakan masuk lagi.', 400);
+    if (!code || !verifier) throw new ApiError('Sesi login tidak ditemukan. Silakan masuk lagi ya.', 400);
 
     const data = await exchangeCode(code, verifier);
     const user = data.user?.data ?? data.user;
 
     if (user?.role !== 'nasabah') {
-      throw new ApiError('Akun Admin/Petugas masuk melalui dashboard EcoWin, bukan aplikasi nasabah.', 403);
+      throw new ApiError('Akun Admin/Petugas masuk lewat dashboard EcoWin, bukan lewat aplikasi nasabah.', 403);
     }
 
     const { user: _u, ...pair } = data;

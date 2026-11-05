@@ -7,7 +7,7 @@ export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
  * Hasil selalu JPEG maksimal 1600px agar upload dari kamera HP cepat.
  */
 export async function prepareImage(file) {
-  if (!file) throw new Error('Pilih foto terlebih dahulu.');
+  if (!file) throw new Error('Pilih foto dulu ya.');
   if (!ALLOWED.includes(file.type)) throw new Error('Format foto harus JPG, PNG, atau WebP.');
 
   try {

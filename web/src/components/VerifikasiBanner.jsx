@@ -10,7 +10,7 @@ export default function VerifikasiBanner({ compact = false }) {
       <ShieldAlert className="mt-0.5 h-5 w-5 flex-none text-warn" aria-hidden />
       <div className="text-sm">
         <p className="font-semibold text-amber-900">Akun menunggu verifikasi petugas</p>
-        {!compact && <p className="mt-0.5 text-amber-800/90">Petugas Bank Sampah Anda akan memeriksa data pendaftaran. Penarikan saldo aktif setelah akun diverifikasi.</p>}
+        {!compact && <p className="mt-0.5 text-amber-800/90">Petugas Bank Sampahmu akan memeriksa data pendaftaranmu. Penarikan saldo baru bisa dipakai setelah akunmu diverifikasi.</p>}
       </div>
     </div>
   );

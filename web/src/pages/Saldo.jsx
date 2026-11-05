@@ -18,7 +18,7 @@ export default function Saldo() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Saldo" subtitle="Riwayat perubahan saldo EcoWin Anda." />
+      <PageHeader title="Saldo" subtitle="Riwayat saldo EcoWin kamu." />
       {saldo.error ? <Card><ErrorState error={saldo.error} onRetry={saldo.reload} /></Card> : (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.4fr_1fr]">
           {saldo.loading ? <div className="h-44 ew-skeleton !rounded-[24px]" /> : (

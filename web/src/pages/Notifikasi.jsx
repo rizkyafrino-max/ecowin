@@ -67,7 +67,7 @@ export default function Notifikasi() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Notifikasi" subtitle="Kabar terbaru tentang setoran, penarikan, dan aktivitas Anda."
+      <PageHeader title="Notifikasi" subtitle="Kabar terbaru tentang setoran, penarikan, dan aktivitasmu."
         action={adaBelum ? <Button size="sm" variant="soft" icon={CheckCheck} onClick={bacaSemua}>Tandai dibaca</Button> : null} />
 
       {daftar.loading && !daftar.data ? <LoadingState rows={4} /> : null}
@@ -84,7 +84,7 @@ export default function Notifikasi() {
       )}
       {konfirmasi && (
         <div role="alertdialog" aria-label="Konfirmasi hapus notifikasi" className="flex flex-wrap items-center gap-3 rounded-2xl border border-danger/30 bg-danger-tint p-4 text-sm">
-          <span className="flex-1 font-semibold text-danger">{konfirmasi === 'semua' ? 'Hapus semua notifikasi? Tindakan ini tidak bisa dibatalkan.' : 'Hapus semua notifikasi yang sudah dibaca?'}</span>
+          <span className="flex-1 font-semibold text-danger">{konfirmasi === 'semua' ? 'Hapus semua notifikasi? Ini tidak bisa dibatalkan ya.' : 'Hapus semua notifikasi yang sudah dibaca?'}</span>
           <Button size="sm" variant="danger" onClick={hapusBanyak}>Ya, hapus</Button>
           <Button size="sm" variant="outline" onClick={() => setKonfirmasi(null)}>Batal</Button>
         </div>

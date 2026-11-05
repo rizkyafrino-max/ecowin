@@ -5,7 +5,7 @@ import Card from './Card';
 export default function OrganikFlow({ compact = false }) {
   const steps = [
     { icon: Recycle, title: 'Organik', text: 'Satu fitur untuk semua aktivitas sampah organik. Tidak menjadi saldo rupiah.' },
-    { icon: Leaf, title: 'Pilih metode', text: 'Biopori atau BioporiPrint, isi data dan unggah foto bukti.' },
+    { icon: Leaf, title: 'Pilih metode', text: 'Pilih Biopori atau BioporiPrint, lalu isi data dan unggah foto bukti.' },
     { icon: Printer, title: 'BioporiPrint', text: 'Metode pipa biopori hasil 3D printing dari plastik warga yang didaur ulang.' },
   ];
   return (

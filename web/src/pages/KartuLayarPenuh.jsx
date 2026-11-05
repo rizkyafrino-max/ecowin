@@ -66,7 +66,7 @@ export default function KartuLayarPenuh() {
     if (!qr.data || mengunduh) return;
     setMengunduh(true); setGalatUnduh('');
     try { await unduhKartuNasabah(qr.data, bank); }
-    catch { setGalatUnduh('Kartu gagal dibuat. Coba lagi atau gunakan tombol cetak.'); }
+    catch { setGalatUnduh('Kartu gagal dibuat. Coba lagi atau pakai tombol cetak.'); }
     finally { setMengunduh(false); }
   };
 
@@ -93,8 +93,8 @@ export default function KartuLayarPenuh() {
       </div>
 
       {galatUnduh && <p role="alert" className="max-w-sm text-center text-xs font-semibold text-danger print:hidden">{galatUnduh}</p>}
-      <p className="max-w-sm text-center text-xs text-muted print:hidden">Tunjukkan kartu ini kepada petugas Bank Sampah. Naikkan kecerahan layar agar QR mudah dipindai.</p>
-      <p className="hidden text-center text-xs font-semibold text-primary-deep portrait:block print:!hidden">Putar HP ke samping agar kartu tampil lebih besar.</p>
+      <p className="max-w-sm text-center text-xs text-muted print:hidden">Tunjukkan kartu ini ke petugas Bank Sampah ya. Naikkan kecerahan layar supaya QR mudah dipindai.</p>
+      <p className="hidden text-center text-xs font-semibold text-primary-deep portrait:block print:!hidden">Putar HP ke samping supaya kartunya tampil lebih besar.</p>
     </main>
   );
 }

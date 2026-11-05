@@ -22,6 +22,6 @@ class AkunController extends Controller
 
         $service->hapusAkunSendiri($request->user());
 
-        return response()->json(['message' => 'Akun Anda telah dihapus.']);
+        return response()->json(['message' => 'Akunmu sudah dihapus.']);
     }
 }

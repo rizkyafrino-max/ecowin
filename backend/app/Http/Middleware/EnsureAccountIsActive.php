@@ -21,7 +21,7 @@ class EnsureAccountIsActive
             if ($request->expectsJson() || $request->is('api/*')) {
                 $user->tokens()->delete();
 
-                return response()->json(['message' => 'Akun Anda dinonaktifkan.'], Response::HTTP_FORBIDDEN);
+                return response()->json(['message' => 'Akunmu sedang dinonaktifkan. Hubungi petugas Bank Sampahmu ya.'], Response::HTTP_FORBIDDEN);
             }
 
             Auth::guard('web')->logout();

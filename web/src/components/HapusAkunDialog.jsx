@@ -35,10 +35,10 @@ export default function HapusAkunDialog({ open, onClose, onDeleted }) {
   return (
     <BottomSheet open={open} onClose={tutup} title="Hapus akun?">
       <p className="text-sm leading-relaxed text-muted">
-        Data pribadi Anda (nama, email, nomor HP, alamat, foto, dan tautan akun Google) dihapus <strong className="text-ink">permanen</strong> dan
+        Data pribadimu (nama, email, nomor HP, alamat, foto, dan tautan akun Google) akan dihapus <strong className="text-ink">permanen</strong> dan
         tidak bisa dikembalikan. Riwayat transaksi tetap tersimpan tanpa identitas untuk pembukuan Bank Sampah.
       </p>
-      <p className="mt-2 text-sm leading-relaxed text-muted">Syarat: saldo Rp 0 dan tidak ada permintaan yang menunggu. Tarik saldo Anda lebih dulu bila masih ada.</p>
+      <p className="mt-2 text-sm leading-relaxed text-muted">Syaratnya: saldo Rp 0 dan tidak ada permintaan yang masih menunggu. Kalau masih ada saldo, tarik dulu ya.</p>
       <div className="mt-4">
         <Input label={`Ketik ${KATA_KUNCI} untuk melanjutkan`} value={kata} onChange={(e) => { setKata(e.target.value); setGalat(''); }}
           autoComplete="off" autoCapitalize="characters" spellCheck={false} error={galat} />

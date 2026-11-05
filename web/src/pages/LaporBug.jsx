@@ -36,7 +36,7 @@ export default function LaporBug() {
       const blob = await perkecilFoto(file, 1600);
       setFoto({ blob, url: typeof URL.createObjectURL === 'function' ? URL.createObjectURL(blob) : null });
     } catch (err) {
-      setGalat(err.message || 'Foto tidak dapat dibaca. Coba foto lain.');
+      setGalat(err.message || 'Fotonya tidak bisa dibaca. Coba foto lain ya.');
     } finally { setMenyiapkan(false); }
   };
 
@@ -55,11 +55,11 @@ export default function LaporBug() {
   if (terkirim) {
     return (
       <div className="space-y-5">
-        <PageHeader title="Lapor bug" subtitle="Laporkan masalah yang Anda temui di aplikasi." />
+        <PageHeader title="Lapor bug" subtitle="Ceritakan masalah yang kamu temui di aplikasi." />
         <Card className="max-w-xl space-y-3">
           <CheckCircle2 className="h-8 w-8 text-primary" aria-hidden />
           <h3 className="text-lg font-bold">Terima kasih, laporan terkirim</h3>
-          <p role="status" className="text-sm text-muted">Laporan Anda sudah masuk ke tim EcoWin dan akan kami periksa.</p>
+          <p role="status" className="text-sm text-muted">Laporanmu sudah masuk ke tim EcoWin dan akan segera kami periksa.</p>
           <div className="flex flex-col gap-2 pt-2 sm:flex-row">
             <Button type="button" onClick={() => navigate(-1)}>Kembali</Button>
             <Button type="button" variant="outline" onClick={() => setTerkirim(false)}>Kirim laporan lain</Button>
@@ -71,10 +71,10 @@ export default function LaporBug() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Lapor bug" subtitle="Laporkan masalah yang Anda temui di aplikasi." />
+      <PageHeader title="Lapor bug" subtitle="Ceritakan masalah yang kamu temui di aplikasi." />
       <Card className="max-w-xl">
         <form onSubmit={kirim} className="space-y-5" noValidate>
-          <p className="text-sm text-muted">Ceritakan masalah yang Anda temui: apa yang Anda lakukan, apa yang terjadi, dan apa yang seharusnya terjadi.</p>
+          <p className="text-sm text-muted">Ceritakan masalah yang kamu temui ya: apa yang kamu lakukan, apa yang terjadi, dan apa yang seharusnya terjadi.</p>
 
           <Textarea
             label="Apa masalahnya?" rows={6} value={teks} maxLength={BATAS_TEKS}
@@ -100,10 +100,10 @@ export default function LaporBug() {
                 {menyiapkan ? 'Menyiapkan foto…' : 'Tambah foto atau tangkapan layar'}
               </Button>
             )}
-            <p className="mt-1.5 text-xs text-muted">Foto membantu kami melihat masalahnya. Hindari menampilkan data pribadi Anda; lokasi dan metadata foto dihapus otomatis.</p>
+            <p className="mt-1.5 text-xs text-muted">Foto membantu kami melihat masalahnya. Usahakan jangan menampilkan data pribadimu; lokasi dan metadata foto dihapus otomatis.</p>
           </div>
 
-          <p className="text-xs text-muted">Info teknis aplikasi (jenis peramban dan ukuran layar) ikut terkirim untuk membantu kami memperbaiki masalah. Tidak ada data pribadi atau saldo yang dikirim.</p>
+          <p className="text-xs text-muted">Info teknis (jenis peramban dan ukuran layar) ikut terkirim supaya kami lebih mudah memperbaiki masalahnya. Data pribadi dan saldomu tidak ikut terkirim.</p>
 
           {galat && <p role="alert" className="text-sm font-semibold text-danger">{galat}</p>}
           <Button type="submit" size="lg" icon={Bug} className="w-full sm:w-auto" loading={mengirim} disabled={!cukup || menyiapkan}>Kirim laporan</Button>

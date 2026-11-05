@@ -74,7 +74,7 @@ class RegistrationController extends Controller
             'no_hp.regex' => 'Nomor HP tidak valid (contoh 081234567890).',
             'no_hp.unique' => 'Nomor HP sudah terdaftar.',
             'bank_sampah_id.exists' => 'Pilih Bank Sampah yang tersedia.',
-            'setuju.accepted' => 'Anda harus menyetujui ketentuan.',
+            'setuju.accepted' => 'Kamu perlu menyetujui ketentuannya dulu ya.',
         ]);
         unset($data['setuju']);
 

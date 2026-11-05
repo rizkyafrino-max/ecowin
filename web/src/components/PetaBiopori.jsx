@@ -50,7 +50,7 @@ export default function PetaBiopori({ titik = [], onLapor }) {
       <div className="flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5">
         <div>
           <h3 className="font-bold">Peta lokasi Biopori</h3>
-          <p className="mt-0.5 text-xs text-muted">Titik Biopori di Bank Sampah Anda. Ketuk penanda untuk detail.</p>
+          <p className="mt-0.5 text-xs text-muted">Titik Biopori di Bank Sampahmu. Ketuk penanda untuk melihat detailnya.</p>
         </div>
         <div className="flex gap-2" role="group" aria-label="Filter peta">
           <button type="button" aria-pressed={!hanyaPrint} onClick={() => setHanyaPrint(false)}
@@ -89,7 +89,7 @@ export default function PetaBiopori({ titik = [], onLapor }) {
         </div>
       ) : (
         <div className="px-5 pb-6 text-center text-sm text-muted">
-          {hanyaPrint ? 'Belum ada titik BioporiPrint yang berkoordinat di Bank Sampah Anda.' : 'Belum ada titik Biopori berkoordinat di Bank Sampah Anda.'}
+          {hanyaPrint ? 'Belum ada titik BioporiPrint yang berkoordinat di Bank Sampahmu.' : 'Belum ada titik Biopori berkoordinat di Bank Sampahmu.'}
         </div>
       )}
 

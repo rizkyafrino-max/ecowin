@@ -32,8 +32,8 @@ class StoreTitikBioporiRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'latitude.between' => 'Koordinat di luar wilayah Indonesia. Periksa kembali lokasi Anda.',
-            'longitude.between' => 'Koordinat di luar wilayah Indonesia. Periksa kembali lokasi Anda.',
+            'latitude.between' => 'Koordinatnya di luar wilayah Indonesia. Periksa lagi lokasimu ya.',
+            'longitude.between' => 'Koordinatnya di luar wilayah Indonesia. Periksa lagi lokasimu ya.',
             'nama_lokasi.min' => 'Nama lokasi minimal 3 karakter.',
         ];
     }

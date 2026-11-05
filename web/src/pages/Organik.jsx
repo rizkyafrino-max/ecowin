@@ -43,11 +43,11 @@ function Lokasi({ lokasi, onLapor, onAjukan }) {
         {tombol}
       </div>
       {resmi.length === 0 && pengajuan.length === 0 && (
-        <Card className="!p-4 text-sm text-muted">Belum ada lokasi di Bank Sampah Anda. Ajukan titik pertama agar bisa melapor aktivitas.</Card>
+        <Card className="!p-4 text-sm text-muted">Belum ada lokasi di Bank Sampahmu. Ajukan titik pertama dulu supaya bisa melapor aktivitas.</Card>
       )}
       {pengajuan.length > 0 && (
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-muted">Pengajuan Anda</p>
+          <p className="text-sm font-semibold text-muted">Pengajuanmu</p>
           {pengajuan.map((t) => (
             <Card key={t.id} className="!p-4">
               <div className="flex items-start justify-between gap-3">
@@ -109,7 +109,7 @@ function Form({ onDone, lokasi, initialId }) {
     if (!form.titik_biopori_id) local.titik_biopori_id = `Pilih lokasi ${metode}.`;
     if (!(keAngka(form.berat_kg) > 0)) local.berat_kg = 'Isi perkiraan berat lebih dari 0 kg.';
     else if (keAngka(form.berat_kg) > 100) local.berat_kg = 'Berat maksimal 100 kg.';
-    if (!foto) local.foto_bukti = 'Foto bukti wajib diunggah.';
+    if (!foto) local.foto_bukti = 'Foto buktinya wajib diunggah ya.';
     setErrors(local);
     if (Object.keys(local).length) return;
 
@@ -163,7 +163,7 @@ function Form({ onDone, lokasi, initialId }) {
 
       {message && <p className="rounded-2xl bg-danger-tint p-3 text-sm text-danger" role="alert">{message}</p>}
       <Button type="submit" size="lg" className="w-full" loading={busy}>Kirim aktivitas</Button>
-      <p className="text-center text-xs text-muted">Aktivitas akan diperiksa petugas dan berstatus Menunggu sampai disetujui atau ditolak.</p>
+      <p className="text-center text-xs text-muted">Aktivitasmu akan diperiksa petugas. Statusnya "Menunggu" sampai disetujui atau ditolak.</p>
     </form>
   );
 }
@@ -174,7 +174,7 @@ function Detail({ item }) {
       <AuthImage id={item.id} alt={`Foto bukti ${item.jenis_sampah}`} className="h-56 w-full rounded-2xl" />
       <div className="flex items-center justify-between"><p className="font-bold">{item.jenis_sampah} · {kg(item.berat_kg)}</p><StatusBadge status={item.status} /></div>
       <dl className="divide-y divide-line text-sm">
-        {[['Lokasi', item.lokasi], ['Waktu', tanggal(item.tanggal_pemasukan, true)], ['Catatan Anda', item.catatan || '-'], ['Diperiksa', item.waktu_diperiksa ? tanggal(item.waktu_diperiksa, true) : 'Belum diperiksa'], ['Catatan petugas', item.catatan_petugas || '-']]
+        {[['Lokasi', item.lokasi], ['Waktu', tanggal(item.tanggal_pemasukan, true)], ['Catatanmu', item.catatan || '-'], ['Diperiksa', item.waktu_diperiksa ? tanggal(item.waktu_diperiksa, true) : 'Belum diperiksa'], ['Catatan petugas', item.catatan_petugas || '-']]
           .map(([k, v]) => <div key={k} className="flex justify-between gap-4 py-2.5"><dt className="text-muted">{k}</dt><dd className="text-right font-medium">{v}</dd></div>)}
       </dl>
     </div>
@@ -228,7 +228,7 @@ export default function Organik() {
       {done && <p className="flex items-center gap-2 rounded-2xl bg-tint p-3.5 text-sm font-semibold text-primary-deep" role="status"><CheckCircle2 className="h-5 w-5" aria-hidden />Aktivitas terkirim. Menunggu pemeriksaan petugas.</p>}
       <OrganikFlow />
       <h3 className="-mb-2 pt-1 font-bold leading-snug">Aktivitas Terbaru</h3>
-      <PagedList list={list} empty={{ icon: Leaf, title: 'Belum ada aktivitas', message: 'Tambahkan aktivitas organik pertama Anda dengan foto bukti.', action: <Button size="sm" onClick={tambah}>Tambah Aktivitas</Button> }}
+      <PagedList list={list} empty={{ icon: Leaf, title: 'Belum ada aktivitas', message: 'Tambahkan aktivitas organik pertamamu, lengkap dengan foto bukti.', action: <Button size="sm" onClick={tambah}>Tambah Aktivitas</Button> }}
         renderItem={(a) => (a.jenis === 'setoran'
           ? <OrganikRow item={a.raw} />
           : <ActivityCard onClick={() => setSheet(a.raw)} title={a.raw.jenis_sampah} subtitle={`${a.raw.metode ?? 'Biopori'} · ${a.raw.lokasi ?? 'Lokasi'} · ${tanggal(a.raw.tanggal_pemasukan)}`} status={a.raw.status} right={<p className="text-sm font-bold tabular-nums">{kg(a.raw.berat_kg)}</p>} />)} />

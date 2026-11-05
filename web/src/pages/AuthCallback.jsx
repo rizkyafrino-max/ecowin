@@ -21,7 +21,7 @@ export default function AuthCallback() {
 
     exchange(code)
       .then(() => navigate('/', { replace: true }))
-      .catch((e) => setError(e.message || 'Login gagal.'));
+      .catch((e) => setError(e.message || 'Login belum berhasil.'));
   }, [exchange, navigate]);
 
   return (

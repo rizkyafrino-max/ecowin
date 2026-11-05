@@ -32,7 +32,7 @@ export default function Penarikan() {
 
   const validate = () => {
     if (!(nominal > 0)) return 'Isi nominal penarikan.';
-    if (tersedia !== undefined && nominal > tersedia) return `Melebihi saldo tersedia (${rupiah(tersedia)}).`;
+    if (tersedia !== undefined && nominal > tersedia) return `Nominalnya melebihi saldo yang tersedia (${rupiah(tersedia)}).`;
     return null;
   };
 
@@ -59,7 +59,7 @@ export default function Penarikan() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Tarik saldo" subtitle="Ajukan penarikan. Petugas akan memeriksa dan menyetujuinya." />
+      <PageHeader title="Tarik saldo" subtitle="Ajukan penarikan dulu, nanti petugas yang memeriksa dan menyetujuinya." />
       <VerifikasiBanner compact />
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1.2fr]">
         <Card>
@@ -74,17 +74,17 @@ export default function Penarikan() {
             <Textarea label="Catatan (opsional)" value={catatan} onChange={(e) => setCatatan(e.target.value)} maxLength={500} />
             <Button type="submit" size="lg" className="w-full" icon={ArrowUpFromLine} disabled={belumVerifikasi}>Ajukan penarikan</Button>
           </form>
-          {ok && <p className="mt-4 flex items-center gap-2 rounded-2xl bg-tint p-3.5 text-sm font-semibold text-primary-deep" role="status"><CheckCircle2 className="h-5 w-5" aria-hidden />Pengajuan terkirim, menunggu petugas.</p>}
+          {ok && <p className="mt-4 flex items-center gap-2 rounded-2xl bg-tint p-3.5 text-sm font-semibold text-primary-deep" role="status"><CheckCircle2 className="h-5 w-5" aria-hidden />Pengajuan terkirim. Tunggu petugas memeriksanya ya.</p>}
         </Card>
 
         <div>
           <h3 className="mb-3 font-bold">Riwayat penarikan</h3>
-          <PagedList list={list} empty={{ icon: ArrowUpFromLine, title: 'Belum ada penarikan', message: 'Pengajuan penarikan Anda akan tampil di sini.' }}
+          <PagedList list={list} empty={{ icon: ArrowUpFromLine, title: 'Belum ada penarikan', message: 'Pengajuan penarikanmu akan muncul di sini.' }}
             renderItem={(p) => <TransactionCard title="Penarikan saldo" subtitle={p.catatan} amount={p.jumlah} kind="debit" date={p.created_at} status={p.status} />} />
         </div>
       </div>
 
-      <ConfirmationDialog open={confirm} title="Ajukan penarikan?" message={`Anda akan mengajukan penarikan ${rupiah(nominal)}. Saldo dikurangi setelah petugas menyetujui.`}
+      <ConfirmationDialog open={confirm} title="Ajukan penarikan?" message={`Kamu akan mengajukan penarikan ${rupiah(nominal)}. Saldomu baru berkurang setelah petugas menyetujuinya.`}
         confirmLabel="Ajukan" loading={busy} onConfirm={send} onClose={() => setConfirm(false)} />
     </div>
   );

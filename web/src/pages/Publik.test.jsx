@@ -22,7 +22,7 @@ describe('halaman publik', () => {
     window.history.pushState({}, '', '/privasi');
     render(<App />);
     expect(await screen.findByRole('heading', { level: 1, name: 'Kebijakan Privasi' })).toBeInTheDocument();
-    for (const judul of [/Siapa pengelola data Anda/, /Data yang kami kumpulkan/, /Izin yang diminta aplikasi Android/, /Siapa yang dapat mengakses data Anda/, /Lama penyimpanan data/, /Keamanan data/, /Hak Anda/, /Kontak/]) {
+    for (const judul of [/Siapa pengelola datamu/, /Data yang kami kumpulkan/, /Izin yang diminta aplikasi Android/, /Siapa saja yang bisa melihat datamu/, /Berapa lama data disimpan/, /Keamanan data/, /Hak kamu/, /Kontak/]) {
       expect(screen.getByRole('heading', { level: 2, name: judul })).toBeInTheDocument();
     }
     // Daftar isi menaut ke setiap bagian.
@@ -52,7 +52,7 @@ describe('halaman publik', () => {
     render(<App />);
     expect(await screen.findByRole('heading', { level: 1, name: 'Hapus Akun EcoWin' })).toBeInTheDocument();
     expect(screen.getAllByText(/Hapus akun saya/).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Saldo Anda harus/)).toBeInTheDocument();
+    expect(screen.getByText(/Saldomu harus/)).toBeInTheDocument();
     for (const tautan of screen.getAllByRole('link', { name: 'Kebijakan Privasi' })) expect(tautan).toHaveAttribute('href', '/privasi');
     expect(window.location.pathname).toBe('/hapus-akun');
   });
