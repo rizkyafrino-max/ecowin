@@ -67,6 +67,23 @@ Bila folder `deploy/` pernah disalin manual ke server (belum dari Git), hapus du
 cd /var/www/ecowin && bash deploy/skrip/04-rilis.sh api.contoh.sch.id
 ```
 
+## Cadangan harian
+
+`skrip/05-cadangan.sh` menyimpan dump database (`db-*.sql.gz`) dan berkas unggahan `storage/app` tanpa kunci Firebase (`berkas-*.tar.gz`) ke `~/cadangan-ecowin`, 14 hari terakhir. Sandi database dibaca dari `backend/.env`; jalankan sebagai pengguna biasa pemilik `.env`, bukan root.
+
+```bash
+cp /var/www/ecowin/deploy/skrip/05-cadangan.sh ~/ && bash ~/05-cadangan.sh     # uji sekali
+(crontab -l 2>/dev/null; echo '30 2 * * * bash /home/rizki/05-cadangan.sh >> /home/rizki/cadangan-ecowin/log.txt 2>&1') | crontab -
+```
+
+Ganti `rizki` dengan nama pengguna Anda. Salin cadangan terbaru ke komputer lain secara berkala (cadangan di server yang sama tidak menolong bila server rusak). Dari laptop:
+
+```powershell
+scp -P 1610 rizki@IP-SERVER:/home/rizki/cadangan-ecowin/db-*.sql.gz .
+```
+
+Pulihkan: `gunzip -c db-AAAAMMDD-JJMMSS.sql.gz | mysql -u ecowin -p NAMA_DATABASE`. Berkas cadangan berisi data nasabah: jangan di-commit dan jangan dibagikan.
+
 ## Pengecekan setelah selesai
 
 ```bash
