@@ -60,6 +60,7 @@ export function AuthProvider({ children }) {
   const refreshUser = useCallback(async () => {
     const res = await EcoApi.me();
     setState((s) => ({ ...s, user: res.data }));
+    return res.data;
   }, []);
 
   const value = useMemo(() => ({ ...state, exchange, signOut, refreshUser }), [state, exchange, signOut, refreshUser]);

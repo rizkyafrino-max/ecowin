@@ -103,5 +103,10 @@ class TransaksiService
         if (! $nasabah->isActive()) {
             throw ValidationException::withMessages(['nasabah_id' => ['Nasabah tidak aktif.']]);
         }
+
+        // Nasabah yang mendaftar sendiri belum boleh bertransaksi sebelum petugas memverifikasi datanya.
+        if ($nasabah->status_verifikasi !== 'verified') {
+            throw ValidationException::withMessages(['nasabah_id' => ['Nasabah ini belum diverifikasi. Verifikasi dulu datanya sebelum mencatat transaksi.']]);
+        }
     }
 }

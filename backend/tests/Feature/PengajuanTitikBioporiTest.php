@@ -161,8 +161,17 @@ class PengajuanTitikBioporiTest extends TestCase
     {
         $this->nasabah->forceFill(['status_verifikasi' => 'pending'])->save();
 
+        // Ditolak lebih awal oleh penjaga rute (403); layanan pengajuan titik tetap punya pemeriksaan sendiri sebagai lapis kedua.
         $this->actingAsApi($this->nasabah->user)->postJson('/api/organik/biopori/lokasi', $this->payload())
-            ->assertStatus(422)->assertJsonValidationErrors('nama_lokasi');
+            ->assertForbidden()->assertJsonPath('code', 'belum_diverifikasi');
+        $this->assertSame(0, TitikBiopori::query()->count());
+
+        try {
+            app(\App\Services\BioporiService::class)->ajukanTitik($this->nasabah->user, $this->payload());
+            $this->fail('Layanan pengajuan titik seharusnya menolak nasabah belum diverifikasi.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->assertArrayHasKey('nama_lokasi', $e->errors());
+        }
     }
 
     public function test_requires_authentication(): void
