@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\NasabahService;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -105,11 +106,15 @@ class NasabahResource extends Resource
                     ->visible(fn (Nasabah $record): bool => $record->status_verifikasi === 'pending' && $record->status === 'aktif' && (auth()->user()?->can('update', $record) ?? false))
                     ->requiresConfirmation()
                     ->modalHeading('Verifikasi nasabah ini?')
-                    ->modalDescription('Pastikan nama, nomor HP, dan alamat sudah sesuai. Setelah diverifikasi, nasabah dapat mengajukan penarikan saldo.')
+                    ->modalDescription('Pastikan nama, nomor HP, dan alamat sudah sesuai. Setelah diverifikasi, nasabah bisa bertransaksi dan memakai semua fitur (saldo, penarikan, organik, dan peta Biopori).')
                     ->action(function (Nasabah $record): void {
                         app(NasabahService::class)->verifikasi(auth()->user(), $record);
                         Notification::make()->title('Nasabah diverifikasi')->success()->send();
                     }),
+                // Hanya aksi yang paling sering dipakai yang terlihat; sisanya di menu titik tiga supaya kolom aksi
+                // tidak melebar dan menutupi kolom Verifikasi, Status, dan Bank Sampah.
+                EditAction::make(),
+                ActionGroup::make([
                 Action::make('tolak')
                     ->label('Tolak')
                     ->icon('heroicon-o-x-circle')
@@ -122,7 +127,6 @@ class NasabahResource extends Resource
                         app(NasabahService::class)->tolak(auth()->user(), $record, $data['alasan']);
                         Notification::make()->title('Pendaftaran ditolak')->success()->send();
                     }),
-                EditAction::make(),
                 Action::make('hapus_data')
                     ->label('Hapus data')
                     ->icon('heroicon-o-trash')
@@ -144,6 +148,7 @@ class NasabahResource extends Resource
                     }),
                 Action::make('cetak_kartu')->label('QR Card')->icon('heroicon-o-qr-code')
                     ->url(fn (Nasabah $record): string => route('admin.nasabah.kartu', $record))->openUrlInNewTab(),
+                ])->icon('heroicon-m-ellipsis-vertical')->tooltip('Aksi lainnya')->color('gray'),
             ])
             ->headerActions([
                 Action::make('scan_kartu')->label('Scan QR')->icon('heroicon-o-qr-code')->url(fn (): string => route('admin.scan-kartu')),
