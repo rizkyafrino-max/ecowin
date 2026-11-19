@@ -44,30 +44,40 @@ Route::middleware(['auth:sanctum', 'active', 'abilities:access'])->name('api.')-
     Route::post('/profile/foto', [\App\Http\Controllers\Api\FotoProfilController::class, 'store'])->middleware('throttle:uploads')->name('profile.foto.store');
     Route::delete('/profile/foto', [\App\Http\Controllers\Api\FotoProfilController::class, 'destroy'])->middleware('throttle:uploads')->name('profile.foto.destroy');
 
-    Route::get('/dashboard', [DashboardController::class, 'summary'])->name('dashboard.alias');
-    Route::get('/dashboard/summary', [DashboardController::class, 'summary'])->name('dashboard.summary');
-    Route::get('/dashboard/statistics', [DashboardController::class, 'statistics'])->name('dashboard.statistics');
+    // Rute bertanda "nasabah.terverifikasi" ditolak (403, code "belum_diverifikasi") untuk nasabah yang belum diverifikasi petugas.
+    // Profil, notifikasi, lapor bug, hapus akun, dan keluar sengaja tetap terbuka.
+    Route::middleware('nasabah.terverifikasi')->group(function (): void {
+        Route::get('/dashboard', [DashboardController::class, 'summary'])->name('dashboard.alias');
+        Route::get('/dashboard/summary', [DashboardController::class, 'summary'])->name('dashboard.summary');
+        Route::get('/dashboard/statistics', [DashboardController::class, 'statistics'])->name('dashboard.statistics');
 
-    // Harga
-    Route::get('/harga', [HargaSampahController::class, 'index'])->name('harga.index');
-    Route::get('/harga/jenis/{jenisSampah}', [HargaSampahController::class, 'show'])->name('harga.show');
-    Route::get('/harga/jenis/{jenisSampah}/riwayat', [HargaSampahController::class, 'riwayat'])->middleware('role:admin')->name('harga.riwayat');
-    Route::post('/harga', [HargaSampahController::class, 'store'])->middleware('role:admin')->name('harga.store');
+        // Harga
+        Route::get('/harga', [HargaSampahController::class, 'index'])->name('harga.index');
+        Route::get('/harga/jenis/{jenisSampah}', [HargaSampahController::class, 'show'])->name('harga.show');
+        Route::get('/harga/jenis/{jenisSampah}/riwayat', [HargaSampahController::class, 'riwayat'])->middleware('role:admin')->name('harga.riwayat');
+        Route::post('/harga', [HargaSampahController::class, 'store'])->middleware('role:admin')->name('harga.store');
+    });
 
     // Nasabah (data milik nasabah yang login)
     Route::middleware('role:nasabah')->prefix('me')->name('me.')->group(function (): void {
-        Route::get('/saldo', [NasabahController::class, 'saldo'])->name('saldo');
-        Route::get('/mutasi-saldo', [NasabahController::class, 'mutasi'])->name('mutasi');
-        Route::get('/qr', [NasabahController::class, 'qr'])->name('qr');
+        Route::middleware('nasabah.terverifikasi')->group(function (): void {
+            Route::get('/saldo', [NasabahController::class, 'saldo'])->name('saldo');
+            Route::get('/mutasi-saldo', [NasabahController::class, 'mutasi'])->name('mutasi');
+            Route::get('/qr', [NasabahController::class, 'qr'])->name('qr');
+        });
         Route::post('/akun/hapus', [\App\Http\Controllers\Api\AkunController::class, 'hapus'])->middleware('throttle:5,1')->name('akun.hapus');
     });
 
     // Alias singkat untuk aplikasi Web & Android Nasabah (kontrak sama dengan endpoint /me/* dan /organik/biopori)
     Route::middleware('role:nasabah')->group(function (): void {
-        Route::get('/saldo', [NasabahController::class, 'saldo'])->name('alias.saldo');
-        Route::get('/saldo/history', [NasabahController::class, 'mutasi'])->name('alias.saldo.history');
-        Route::get('/qr', [NasabahController::class, 'qr'])->name('alias.qr');
-        Route::get('/transaksi', [TransaksiAnorganikController::class, 'index'])->name('alias.transaksi');
+        Route::middleware('nasabah.terverifikasi')->group(function (): void {
+            Route::get('/saldo', [NasabahController::class, 'saldo'])->name('alias.saldo');
+            Route::get('/saldo/history', [NasabahController::class, 'mutasi'])->name('alias.saldo.history');
+            Route::get('/qr', [NasabahController::class, 'qr'])->name('alias.qr');
+            Route::get('/transaksi', [TransaksiAnorganikController::class, 'index'])->name('alias.transaksi');
+            Route::get('/biopori', [BioporiController::class, 'index'])->name('alias.biopori.index');
+            Route::post('/biopori', [BioporiController::class, 'store'])->middleware('throttle:uploads')->name('alias.biopori.store');
+        });
         // Notifikasi dalam aplikasi (hanya milik pengguna yang login)
         // Token FCM perangkat (hanya untuk membangunkan aplikasi; isi notifikasi tetap diambil lewat API ini)
         Route::post('/perangkat', [\App\Http\Controllers\Api\PerangkatController::class, 'store'])->middleware('throttle:30,1')->name('perangkat.store');
@@ -78,8 +88,6 @@ Route::middleware(['auth:sanctum', 'active', 'abilities:access'])->name('api.')-
         Route::delete('/notifikasi/{id}', [NotifikasiController::class, 'hapus'])->whereNumber('id')->name('notifikasi.hapus');
         Route::delete('/notifikasi', [NotifikasiController::class, 'hapusSemua'])->name('notifikasi.hapus-semua');
         Route::post('/notifikasi/{id}/baca', [NotifikasiController::class, 'baca'])->whereNumber('id')->name('notifikasi.baca');
-        Route::get('/biopori', [BioporiController::class, 'index'])->name('alias.biopori.index');
-        Route::post('/biopori', [BioporiController::class, 'store'])->middleware('throttle:uploads')->name('alias.biopori.store');
     });
 
     // Nasabah (manajemen oleh admin/petugas)
@@ -90,36 +98,38 @@ Route::middleware(['auth:sanctum', 'active', 'abilities:access'])->name('api.')-
     });
     Route::get('/nasabah/{nasabah}', [NasabahController::class, 'show'])->name('nasabah.show');
 
-    // Anorganik
-    Route::get('/transaksi/anorganik', [TransaksiAnorganikController::class, 'index'])->name('anorganik.index');
-    Route::get('/transaksi/anorganik/{transaksi}', [TransaksiAnorganikController::class, 'show'])->name('anorganik.show');
-    Route::post('/transaksi/anorganik', [TransaksiAnorganikController::class, 'store'])->middleware('role:admin,petugas')->name('anorganik.store');
+    Route::middleware('nasabah.terverifikasi')->group(function (): void {
+        // Anorganik
+        Route::get('/transaksi/anorganik', [TransaksiAnorganikController::class, 'index'])->name('anorganik.index');
+        Route::get('/transaksi/anorganik/{transaksi}', [TransaksiAnorganikController::class, 'show'])->name('anorganik.show');
+        Route::post('/transaksi/anorganik', [TransaksiAnorganikController::class, 'store'])->middleware('role:admin,petugas')->name('anorganik.store');
 
-    // Organik
-    Route::get('/organik', [TransaksiOrganikController::class, 'index'])->name('organik.index');
-    Route::get('/organik/{transaksi}', [TransaksiOrganikController::class, 'show'])->whereNumber('transaksi')->name('organik.show');
-    Route::post('/organik', [TransaksiOrganikController::class, 'store'])->middleware('role:admin,petugas')->name('organik.store');
+        // Organik
+        Route::get('/organik', [TransaksiOrganikController::class, 'index'])->name('organik.index');
+        Route::get('/organik/{transaksi}', [TransaksiOrganikController::class, 'show'])->whereNumber('transaksi')->name('organik.show');
+        Route::post('/organik', [TransaksiOrganikController::class, 'store'])->middleware('role:admin,petugas')->name('organik.store');
 
-    // Organik (satu fitur): setoran + aktivitas dengan metode BioporiPrint
-    Route::get('/organik/biopori/lokasi', [BioporiController::class, 'titik'])->name('biopori.titik');
-    Route::post('/organik/biopori/lokasi', [BioporiController::class, 'ajukanTitik'])->middleware(['role:nasabah', 'throttle:uploads'])->name('biopori.titik.store');
-    Route::post('/organik/biopori/lokasi/{titik}/approve', [BioporiController::class, 'approveTitik'])->middleware('role:admin,petugas')->whereNumber('titik')->name('biopori.titik.approve');
-    Route::post('/organik/biopori/lokasi/{titik}/reject', [BioporiController::class, 'rejectTitik'])->middleware('role:admin,petugas')->whereNumber('titik')->name('biopori.titik.reject');
-    Route::get('/organik/biopori', [BioporiController::class, 'index'])->name('biopori.index');
-    Route::post('/organik/biopori', [BioporiController::class, 'store'])->middleware(['role:nasabah', 'throttle:uploads'])->name('biopori.store');
-    Route::get('/organik/biopori/{aktivitas}', [BioporiController::class, 'show'])->name('biopori.show');
-    Route::get('/organik/biopori/{aktivitas}/foto', [BioporiController::class, 'foto'])->name('biopori.foto');
-    Route::post('/organik/biopori/{aktivitas}/approve', [BioporiController::class, 'approve'])->middleware('role:admin,petugas')->name('biopori.approve');
-    Route::post('/organik/biopori/{aktivitas}/reject', [BioporiController::class, 'reject'])->middleware('role:admin,petugas')->name('biopori.reject');
+        // Organik (satu fitur): setoran + aktivitas dengan metode BioporiPrint
+        Route::get('/organik/biopori/lokasi', [BioporiController::class, 'titik'])->name('biopori.titik');
+        Route::post('/organik/biopori/lokasi', [BioporiController::class, 'ajukanTitik'])->middleware(['role:nasabah', 'throttle:uploads'])->name('biopori.titik.store');
+        Route::post('/organik/biopori/lokasi/{titik}/approve', [BioporiController::class, 'approveTitik'])->middleware('role:admin,petugas')->whereNumber('titik')->name('biopori.titik.approve');
+        Route::post('/organik/biopori/lokasi/{titik}/reject', [BioporiController::class, 'rejectTitik'])->middleware('role:admin,petugas')->whereNumber('titik')->name('biopori.titik.reject');
+        Route::get('/organik/biopori', [BioporiController::class, 'index'])->name('biopori.index');
+        Route::post('/organik/biopori', [BioporiController::class, 'store'])->middleware(['role:nasabah', 'throttle:uploads'])->name('biopori.store');
+        Route::get('/organik/biopori/{aktivitas}', [BioporiController::class, 'show'])->name('biopori.show');
+        Route::get('/organik/biopori/{aktivitas}/foto', [BioporiController::class, 'foto'])->name('biopori.foto');
+        Route::post('/organik/biopori/{aktivitas}/approve', [BioporiController::class, 'approve'])->middleware('role:admin,petugas')->name('biopori.approve');
+        Route::post('/organik/biopori/{aktivitas}/reject', [BioporiController::class, 'reject'])->middleware('role:admin,petugas')->name('biopori.reject');
 
-    // Penarikan
-    Route::get('/penarikan', [PenarikanSaldoController::class, 'index'])->name('penarikan.index');
-    Route::post('/penarikan', [PenarikanSaldoController::class, 'store'])->name('penarikan.store');
-    Route::get('/penarikan/{penarikan}', [PenarikanSaldoController::class, 'show'])->name('penarikan.show');
-    Route::middleware('role:admin,petugas')->group(function (): void {
-        Route::post('/penarikan/{penarikan}/approve', [PenarikanSaldoController::class, 'approve'])->name('penarikan.approve');
-        Route::post('/penarikan/{penarikan}/reject', [PenarikanSaldoController::class, 'reject'])->name('penarikan.reject');
-        Route::post('/penarikan/{penarikan}/complete', [PenarikanSaldoController::class, 'complete'])->name('penarikan.complete');
+        // Penarikan
+        Route::get('/penarikan', [PenarikanSaldoController::class, 'index'])->name('penarikan.index');
+        Route::post('/penarikan', [PenarikanSaldoController::class, 'store'])->name('penarikan.store');
+        Route::get('/penarikan/{penarikan}', [PenarikanSaldoController::class, 'show'])->name('penarikan.show');
+        Route::middleware('role:admin,petugas')->group(function (): void {
+            Route::post('/penarikan/{penarikan}/approve', [PenarikanSaldoController::class, 'approve'])->name('penarikan.approve');
+            Route::post('/penarikan/{penarikan}/reject', [PenarikanSaldoController::class, 'reject'])->name('penarikan.reject');
+            Route::post('/penarikan/{penarikan}/complete', [PenarikanSaldoController::class, 'complete'])->name('penarikan.complete');
+        });
     });
 
     // Koreksi transaksi: Admin atau Petugas (di Bank Sampahnya) mengajukan dan memutuskan, tercatat di audit log

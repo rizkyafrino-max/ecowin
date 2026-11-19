@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import LaunchScreen from './components/LaunchScreen';
+import TerkunciVerifikasi from './components/TerkunciVerifikasi';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import AppLayout from './layouts/AppLayout';
 import Dashboard from './pages/Dashboard';
@@ -16,6 +17,7 @@ import Privasi from './pages/Privasi';
 import Profil from './pages/Profil';
 import Saldo from './pages/Saldo';
 import Transaksi from './pages/Transaksi';
+import { akunTerkunci } from './utils/verifikasi';
 
 /** Halaman di balik login: sesi valid langsung masuk, selain itu kembali ke Login Google. */
 function Protected({ polos = false }) {
@@ -24,6 +26,15 @@ function Protected({ polos = false }) {
   if (status !== 'authed') return <Navigate to="/masuk" replace />;
   // "polos": layar penuh tanpa menu dan bilah atas (mis. Kartu Nasabah).
   return polos ? <Outlet /> : <AppLayout />;
+}
+
+/**
+ * Gerbang verifikasi: akun nasabah yang belum diverifikasi petugas melihat layar terkunci, bukan halaman data/layanan.
+ * Profil, notifikasi, lapor bug, dan menu Semua Fitur sengaja berada di luar gerbang ini.
+ */
+function Gerbang({ polos = false }) {
+  const { user } = useAuth();
+  return akunTerkunci(user) ? <TerkunciVerifikasi polos={polos} /> : <Outlet />;
 }
 
 export default function App() {
@@ -38,19 +49,23 @@ export default function App() {
           <Route path="/privasi" element={<Privasi />} />
           <Route path="/hapus-akun" element={<HapusAkunInfo />} />
           <Route element={<Protected />}>
-            <Route index element={<Dashboard />} />
-            <Route path="transaksi" element={<Transaksi />} />
-            <Route path="organik" element={<Organik />} />
+            <Route element={<Gerbang />}>
+              <Route index element={<Dashboard />} />
+              <Route path="transaksi" element={<Transaksi />} />
+              <Route path="organik" element={<Organik />} />
+              <Route path="saldo" element={<Saldo />} />
+              <Route path="penarikan" element={<Penarikan />} />
+            </Route>
             <Route path="biopori" element={<Navigate to="/organik" replace />} />
             <Route path="fitur" element={<Fitur />} />
-            <Route path="saldo" element={<Saldo />} />
-            <Route path="penarikan" element={<Penarikan />} />
             <Route path="profil" element={<Profil />} />
             <Route path="notifikasi" element={<Notifikasi />} />
             <Route path="lapor-bug" element={<LaporBug />} />
           </Route>
           <Route element={<Protected polos />}>
-            <Route path="kartu" element={<KartuLayarPenuh />} />
+            <Route element={<Gerbang polos />}>
+              <Route path="kartu" element={<KartuLayarPenuh />} />
+            </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

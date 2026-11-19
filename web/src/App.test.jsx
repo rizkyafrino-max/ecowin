@@ -139,10 +139,12 @@ describe('sesi tersimpan', () => {
     expect(localStorage.getItem('ecowin.session')).toBeNull();
   });
 
-  it('akun menunggu verifikasi melihat banner dan tombol penarikan terkunci', async () => {
+  it('akun menunggu verifikasi melihat layar terkunci, bukan saldo dan data lain', async () => {
     saveSession({ access_token: 'A', access_expires_at: future(3_600_000), refresh_token: 'R', refresh_expires_at: future(86_400_000) });
     mockApi({ ...nasabah, nasabah: { ...nasabah.nasabah, status_verifikasi: 'pending' } });
     render(<App />);
-    expect(await screen.findByText('Akun menunggu verifikasi petugas')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Halaman ini terkunci' })).toBeInTheDocument();
+    expect(screen.getByText(/menunggu verifikasi petugas Bank Sampah/)).toBeInTheDocument();
+    expect(screen.queryByText('Tarik saldo')).toBeNull(); // isi Beranda tidak tampil
   });
 });

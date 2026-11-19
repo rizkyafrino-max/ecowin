@@ -29,6 +29,11 @@ class BioporiService
             throw new AuthorizationException('Hanya nasabah yang dapat melaporkan aktivitas Biopori.');
         }
 
+        // Aktivitas yang dilaporkan akan dicatat dan dinilai petugas, jadi akun harus sudah diverifikasi lebih dulu.
+        if ($nasabah->status_verifikasi !== 'verified') {
+            throw ValidationException::withMessages(['titik_biopori_id' => ['Akunmu belum diverifikasi petugas, jadi belum bisa melapor aktivitas.']]);
+        }
+
         $titik = TitikBiopori::query()->findOrFail($data['titik_biopori_id']);
 
         if ((int) $titik->bank_sampah_id !== (int) $nasabah->bank_sampah_id || $titik->status !== 'aktif' || $titik->verifikasi !== TitikBiopori::VERIFIKASI_APPROVED) {

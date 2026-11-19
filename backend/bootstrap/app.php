@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureAccountIsActive;
+use App\Http\Middleware\EnsureNasabahVerified;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => EnsureUserHasRole::class,
             'active' => EnsureAccountIsActive::class,
+            'nasabah.terverifikasi' => EnsureNasabahVerified::class,
             'abilities' => CheckAbilities::class,
             'ability' => CheckForAnyAbility::class,
         ]);
@@ -36,6 +38,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prependToPriorityList(AuthenticatesRequests::class, EnsureAccountIsActive::class);
         // Cek role sebelum route model binding: tidak membocorkan keberadaan ID ke role yang tidak berhak.
         $middleware->prependToPriorityList(SubstituteBindings::class, EnsureUserHasRole::class);
+        // Nasabah belum diverifikasi ditolak juga sebelum route model binding (tidak membocorkan keberadaan ID).
+        $middleware->prependToPriorityList(SubstituteBindings::class, EnsureNasabahVerified::class);
         $middleware->throttleApi('api');
         // Tamu yang membuka halaman web terproteksi (scan kartu, cetak laporan, dll.) diarahkan ke halaman masuk, bukan error.
         $middleware->redirectGuestsTo(fn (\Illuminate\Http\Request $request) => route('filament.admin.auth.login'));

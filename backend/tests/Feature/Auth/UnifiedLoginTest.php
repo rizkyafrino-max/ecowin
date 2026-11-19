@@ -275,8 +275,15 @@ class UnifiedLoginTest extends TestCase
         $nasabah = Nasabah::factory()->create(['saldo' => 50000]);
         $nasabah->forceFill(['status_verifikasi' => 'pending'])->save();
 
+        // Ditolak lebih awal oleh penjaga rute (403); layanan penarikan tetap punya pemeriksaan sendiri sebagai lapis kedua.
         $this->actingAsApi($nasabah->user)->postJson('/api/penarikan', ['jumlah' => 10000])
-            ->assertStatus(422)->assertJsonValidationErrors('jumlah');
+            ->assertForbidden()->assertJsonPath('code', 'belum_diverifikasi');
+        try {
+            app(\App\Services\PenarikanService::class)->ajukan($nasabah->user, $nasabah->fresh(), 10000);
+            $this->fail('Layanan penarikan seharusnya menolak nasabah belum diverifikasi.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->assertArrayHasKey('jumlah', $e->errors());
+        }
 
         $nasabah->forceFill(['status_verifikasi' => 'verified'])->save();
         $this->actingAsApi($nasabah->user->fresh())->postJson('/api/penarikan', ['jumlah' => 10000])->assertCreated();

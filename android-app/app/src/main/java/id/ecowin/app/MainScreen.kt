@@ -97,6 +97,18 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
         if (NavAwal.permintaan) { tab = Tab.Notifikasi.ordinal; NavAwal.permintaan = false }
     }
     val current = Tab.entries[tab]
+    // Akun yang belum diverifikasi petugas: halaman data disensor, dan statusnya dicek ulang tiap menit (juga saat aplikasi dibuka)
+    // supaya halaman terbuka sendiri begitu petugas memverifikasi.
+    val terkunci = akunTerkunci(user)
+    LaunchedEffect(lifecycleOwner, terkunci) {
+        if (!terkunci) return@LaunchedEffect
+        lifecycleOwner.lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+            while (true) {
+                runCatching { onUserChanged(client.api.me().data) }
+                kotlinx.coroutines.delay(60_000)
+            }
+        }
+    }
     // Lapor bug bisa dibuka dari mana saja (menu atau goyang); layar asalnya diingat untuk tombol kembali dan ikut dilaporkan.
     var sebelumLapor by rememberSaveable { mutableIntStateOf(Tab.Pengaturan.ordinal) }
     val bukaLapor: () -> Unit = { if (tab != Tab.LaporBug.ordinal) { sebelumLapor = tab; tab = Tab.LaporBug.ordinal } }
@@ -135,14 +147,14 @@ fun MainScreen(user: UserDto, client: ApiClient, onUserChanged: (UserDto) -> Uni
 
     Scaffold(containerColor = Canvas) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
-            if (current == Tab.Kartu) {
+            if (current == Tab.Kartu && !terkunci) {
                 KartuNasabahScreen(client, user, onTutup = { tab = sebelumKartu })
             } else {
             Column(Modifier.fillMaxSize().nestedScroll(scrollWatcher)) {
                 TopBar(user, current, belumDibaca, onRefresh = { refreshKey++ }, onNotif = { go(Tab.Notifikasi) }, onProfile = { go(Tab.Profil) })
 
                 androidx.compose.runtime.CompositionLocalProvider(LocalJudulHalaman provides current.takeIf { it != Tab.Beranda }) {
-                when (current) {
+                if (terkunci && tabTerkunci(current)) LayarTerkunci(client, onUserChanged) else when (current) {
                     Tab.Beranda -> BerandaTab(client, user, refreshKey, go)
                     Tab.Transaksi -> TransaksiTab(client, refreshKey)
                     Tab.Fitur -> FiturTab(go)
