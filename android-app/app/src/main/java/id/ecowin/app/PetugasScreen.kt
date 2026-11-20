@@ -1,6 +1,11 @@
 package id.ecowin.app
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +36,12 @@ fun adalahPetugas(user: UserDto): Boolean = user.role == "petugas"
 @Composable
 fun PetugasScreen(user: UserDto, client: ApiClient, onLogout: () -> Unit) {
     val ringkasan = rememberLoadable(client) { client.api.petugasRingkasan() }
+    var verifikasi by remember { mutableStateOf(false) }
+
+    if (verifikasi) {
+        VerifikasiNasabahScreen(client, onBack = { verifikasi = false }, onBerubah = { ringkasan.reload() })
+        return
+    }
 
     Column(
         Modifier.fillMaxSize().background(Color(0xFFF8FAFC)).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 24.dp),
@@ -42,14 +53,15 @@ fun PetugasScreen(user: UserDto, client: ApiClient, onLogout: () -> Unit) {
         LoadableContent(ringkasan) { r ->
             r.bankSampah?.let { Text("Bank Sampah ${it.nama.orEmpty()}", color = Slate500, fontSize = 13.sp) }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                StatTile("Menunggu verifikasi", r.menungguVerifikasi.toString(), Modifier.weight(1f), warn = r.menungguVerifikasi > 0)
+                StatTile("Menunggu verifikasi", r.menungguVerifikasi.toString(), Modifier.weight(1f).clickable { verifikasi = true }, hint = "Ketuk untuk memeriksa", warn = r.menungguVerifikasi > 0)
                 StatTile("Penarikan menunggu", r.penarikanMenunggu.toString(), Modifier.weight(1f), warn = r.penarikanMenunggu > 0)
             }
             StatTile("Setoran hari ini", "${r.setoranHariIni.jumlah} setoran", Modifier.fillMaxWidth(), hint = rupiah(r.setoranHariIni.nilaiRupiah))
         }
 
         Spacer(Modifier.height(4.dp))
-        Text("Verifikasi nasabah, scan QR, dan persetujuan penarikan segera hadir di aplikasi ini.", color = Slate500, fontSize = 13.sp)
+        Text("Scan QR dan persetujuan penarikan segera hadir di aplikasi ini.", color = Slate500, fontSize = 13.sp)
+        PrimaryButton("Verifikasi nasabah", onClick = { verifikasi = true })
         PrimaryButton("Keluar", onClick = onLogout)
     }
 }
