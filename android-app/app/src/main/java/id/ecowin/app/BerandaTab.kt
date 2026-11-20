@@ -109,7 +109,7 @@ fun BerandaTab(client: ApiClient, user: UserDto, refreshKey: Int, onNavigate: (T
     }
 }
 
-private fun sapaan(): String = when (java.time.LocalTime.now().hour) {
+fun sapaan(): String = when (java.time.LocalTime.now().hour) {
     in 0..10 -> "Selamat pagi"
     in 11..14 -> "Selamat siang"
     in 15..17 -> "Selamat sore"

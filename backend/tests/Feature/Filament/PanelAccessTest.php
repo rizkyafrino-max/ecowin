@@ -70,6 +70,15 @@ class PanelAccessTest extends TestCase
             ->assertDontSee('Control Center EcoWin');
     }
 
+    public function test_petugas_dashboard_has_no_link_to_admin_only_price_page(): void
+    {
+        $harga = \App\Filament\Resources\HargaSampahs\HargaSampahResource::getUrl('index');
+
+        $this->actingAs($this->petugas)->get('/admin')->assertOk()->assertDontSee('href="'.$harga.'"', false);
+        $this->actingAs($this->petugas)->get($harga)->assertForbidden();
+        $this->actingAs(User::query()->where('role', 'admin')->first())->get('/admin')->assertOk()->assertSee('href="'.$harga.'"', false);
+    }
+
     public function test_petugas_menu_and_direct_urls_for_admin_resources_are_blocked(): void
     {
         $this->actingAs($this->petugas);

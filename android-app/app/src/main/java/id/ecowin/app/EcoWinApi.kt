@@ -53,6 +53,9 @@ interface EcoWinApi {
     @POST("me/akun/hapus")
     suspend fun hapusAkun(@Body body: HapusAkunRequest)
 
+    @GET("petugas/ringkasan")
+    suspend fun petugasRingkasan(): PetugasRingkasanDto
+
     @GET("dashboard/summary")
     suspend fun dashboard(): DashboardDto
 

@@ -130,9 +130,9 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
         if (state is AppState.Checking) {
             state = try {
                 val user = client.api.me().data
-                if (user.role == "nasabah") AppState.LoggedIn(user) else {
+                if (peranBolehMasuk(user.role)) AppState.LoggedIn(user) else {
                     session.clear()
-                    AppState.LoggedOut("Aplikasi ini khusus nasabah. Admin/Petugas gunakan dashboard web.")
+                    AppState.LoggedOut("Admin memakai dashboard web ya. Aplikasi ini untuk nasabah dan petugas.")
                 }
             } catch (e: HttpException) {
                 if (e.code() == 401 || e.code() == 403) {
@@ -160,12 +160,12 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
             initialMessage = s.message,
             onGoogleToken = { idToken ->
                 val response = client.api.loginGoogle(GoogleLoginRequest(idToken, android.os.Build.MODEL ?: "android"))
-                if (response.user.role != "nasabah") {
+                if (!peranBolehMasuk(response.user.role)) {
                     // Simpan sementara agar bisa dicabut di server, lalu langsung logout.
                     session.save(response.tokens())
                     runCatching { client.api.logout() }
                     session.clear()
-                    throw IllegalStateException("Aplikasi ini khusus nasabah. Admin/Petugas gunakan dashboard web.")
+                    throw IllegalStateException("Admin memakai dashboard web ya. Aplikasi ini untuk nasabah dan petugas.")
                 }
                 session.save(response.tokens())
                 state = AppState.LoggedIn(response.user)
@@ -177,7 +177,18 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
                 state = AppState.LoggedIn(response.user)
             },
         )
-        is AppState.LoggedIn -> MainScreen(
+        is AppState.LoggedIn -> if (adalahPetugas(s.user)) PetugasScreen(
+            user = s.user,
+            client = client,
+            onLogout = {
+                scope.launch {
+                    runCatching { client.api.logout() }
+                    session.clear()
+                    googleAuth.signOut()
+                    state = AppState.LoggedOut()
+                }
+            },
+        ) else MainScreen(
             user = s.user,
             client = client,
             onUserChanged = { state = AppState.LoggedIn(it) },
