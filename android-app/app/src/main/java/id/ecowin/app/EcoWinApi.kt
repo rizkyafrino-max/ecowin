@@ -67,6 +67,13 @@ interface EcoWinApi {
     @POST("nasabah/{id}/tolak")
     suspend fun tolakNasabah(@retrofit2.http.Path("id") id: Long, @Body body: TolakNasabahRequest): DataWrapper<NasabahDto>
 
+    /** Petugas memindai QR Card: isi QR hanya token acak, server mencari nasabah di Bank Sampah petugas. */
+    @GET("nasabah/scan/{token}")
+    suspend fun scanNasabah(@retrofit2.http.Path("token") token: String): DataWrapper<NasabahDto>
+
+    @POST("transaksi/anorganik")
+    suspend fun catatSetoran(@Body body: SetoranAnorganikRequest): DataWrapper<SetoranAnorganikDto>
+
     @GET("petugas/ringkasan")
     suspend fun petugasRingkasan(): PetugasRingkasanDto
 

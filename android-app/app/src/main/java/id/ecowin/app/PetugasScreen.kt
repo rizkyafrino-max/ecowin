@@ -37,6 +37,12 @@ fun adalahPetugas(user: UserDto): Boolean = user.role == "petugas"
 fun PetugasScreen(user: UserDto, client: ApiClient, onLogout: () -> Unit) {
     val ringkasan = rememberLoadable(client) { client.api.petugasRingkasan() }
     var verifikasi by remember { mutableStateOf(false) }
+    var setor by remember { mutableStateOf(false) }
+
+    if (setor) {
+        SetorScreen(client, onBack = { setor = false }, onBerubah = { ringkasan.reload() })
+        return
+    }
 
     if (verifikasi) {
         VerifikasiNasabahScreen(client, onBack = { verifikasi = false }, onBerubah = { ringkasan.reload() })
@@ -60,7 +66,8 @@ fun PetugasScreen(user: UserDto, client: ApiClient, onLogout: () -> Unit) {
         }
 
         Spacer(Modifier.height(4.dp))
-        Text("Scan QR dan persetujuan penarikan segera hadir di aplikasi ini.", color = Slate500, fontSize = 13.sp)
+        Text("Persetujuan penarikan segera hadir di aplikasi ini.", color = Slate500, fontSize = 13.sp)
+        PrimaryButton("Scan QR dan catat setoran", icon = Lucide.QrCode, onClick = { setor = true })
         PrimaryButton("Verifikasi nasabah", onClick = { verifikasi = true })
         PrimaryButton("Keluar", onClick = onLogout)
     }

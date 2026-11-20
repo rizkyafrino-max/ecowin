@@ -224,3 +224,15 @@ data class PetugasRingkasanDto(
     val penarikanMenunggu: Int = 0,
     val setoranHariIni: PetugasSetoranHariIniDto = PetugasSetoranHariIniDto(),
 )
+
+/** Petugas mencatat setoran anorganik. Harga dihitung server (klien tidak pernah memilih harga). */
+data class SetoranAnorganikRequest(val nasabahId: Long, val jenisSampahId: Long, val beratKg: Double)
+
+data class SetoranAnorganikDto(
+    val id: Long,
+    val nasabah: String? = null,
+    val jenisSampah: String? = null,
+    val beratKg: Double = 0.0,
+    val hargaPerKg: Double = 0.0,
+    val nilaiRupiah: Long = 0,
+)
