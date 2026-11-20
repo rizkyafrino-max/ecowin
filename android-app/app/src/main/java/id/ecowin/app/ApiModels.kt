@@ -212,3 +212,12 @@ data class PerangkatRequest(val token: String)
 
 /** Hasil kirim laporan bug; pelapor, bank sampah, dan status ditentukan server dari akun yang login. */
 data class LaporanKendalaDto(val id: Long = 0, val punyaFoto: Boolean = false)
+
+data class PetugasSetoranHariIniDto(val jumlah: Int = 0, val nilaiRupiah: Long = 0)
+
+data class PetugasRingkasanDto(
+    val bankSampah: BankSampahDto? = null,
+    val menungguVerifikasi: Int = 0,
+    val penarikanMenunggu: Int = 0,
+    val setoranHariIni: PetugasSetoranHariIniDto = PetugasSetoranHariIniDto(),
+)

@@ -24,10 +24,15 @@ class NasabahController extends Controller
         $this->authorize('viewAny', Nasabah::class);
 
         $search = trim((string) $request->query('search'));
+        // Filter opsional untuk daftar kerja petugas, mis. ?status_verifikasi=pending (nasabah menunggu verifikasi).
+        $statusVerifikasi = in_array($request->query('status_verifikasi'), ['pending', 'verified'], true) ? $request->query('status_verifikasi') : null;
+        $status = in_array($request->query('status'), ['aktif', 'nonaktif'], true) ? $request->query('status') : null;
 
         $nasabah = Nasabah::query()
             ->visibleTo($request->user())
             ->with('bankSampah')
+            ->when($statusVerifikasi !== null, fn ($q) => $q->where('status_verifikasi', $statusVerifikasi))
+            ->when($status !== null, fn ($q) => $q->where('status', $status))
             ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q
                 ->where('nama', 'like', '%'.addcslashes($search, '%_\\').'%')
                 ->orWhere('no_hp', 'like', '%'.addcslashes($search, '%_\\').'%')
@@ -43,6 +48,20 @@ class NasabahController extends Controller
         $nasabah = $service->daftarkan($request->user(), $request->validated());
 
         return (new NasabahResource($nasabah->load('bankSampah')))->response()->setStatusCode(201);
+    }
+
+    /** Petugas/Admin memverifikasi pendaftaran mandiri. Hak akses (Bank Sampah yang sama) diperiksa di NasabahService. */
+    public function verifikasi(Request $request, Nasabah $nasabah, NasabahService $service): NasabahResource
+    {
+        return new NasabahResource($service->verifikasi($request->user(), $nasabah)->load('bankSampah'));
+    }
+
+    /** Petugas/Admin menolak pendaftaran mandiri: akun dinonaktifkan dan alasannya dicatat serta dikirim ke nasabah. */
+    public function tolak(Request $request, Nasabah $nasabah, NasabahService $service): NasabahResource
+    {
+        $data = $request->validate(['alasan' => ['required', 'string', 'min:5', 'max:500']]);
+
+        return new NasabahResource($service->tolak($request->user(), $nasabah, trim($data['alasan']))->load('bankSampah'));
     }
 
     public function show(Request $request, Nasabah $nasabah): NasabahResource

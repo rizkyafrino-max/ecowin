@@ -129,7 +129,7 @@
         <div class="eco-cols">
             {{-- Jenis sampah --}}
             <section aria-label="Jenis sampah teratas">
-                <div class="eco-sec-head"><h2>Jenis sampah teratas</h2><a href="{{ \App\Filament\Resources\HargaSampahs\HargaSampahResource::getUrl('index') }}">Lihat semua</a></div>
+                <div class="eco-sec-head"><h2>Jenis sampah teratas</h2>{{-- Halaman Harga Sampah khusus Admin: Petugas tidak diberi tautan yang berujung 403. --}}@if (\App\Filament\Resources\HargaSampahs\HargaSampahResource::canViewAny())<a href="{{ \App\Filament\Resources\HargaSampahs\HargaSampahResource::getUrl('index') }}">Lihat semua</a>@endif</div>
                 <div class="eco-items">
                     @forelse ($jenis as $j)
                         <article class="eco-item">

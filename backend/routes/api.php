@@ -95,6 +95,9 @@ Route::middleware(['auth:sanctum', 'active', 'abilities:access'])->name('api.')-
         Route::get('/nasabah', [NasabahController::class, 'index'])->name('nasabah.index');
         Route::post('/nasabah', [NasabahController::class, 'store'])->name('nasabah.store');
         Route::get('/nasabah/scan/{token}', [NasabahController::class, 'scan'])->name('nasabah.scan');
+        Route::post('/nasabah/{nasabah}/verifikasi', [NasabahController::class, 'verifikasi'])->whereNumber('nasabah')->name('nasabah.verifikasi');
+        Route::post('/nasabah/{nasabah}/tolak', [NasabahController::class, 'tolak'])->whereNumber('nasabah')->name('nasabah.tolak');
+        Route::get('/petugas/ringkasan', [\App\Http\Controllers\Api\PetugasController::class, 'ringkasan'])->name('petugas.ringkasan');
     });
     Route::get('/nasabah/{nasabah}', [NasabahController::class, 'show'])->name('nasabah.show');
 
