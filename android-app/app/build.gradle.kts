@@ -107,6 +107,8 @@ dependencies {
 
     // Rotasi foto kamera sebelum kompresi
     implementation("androidx.exifinterface:exifinterface:1.3.7")
+    // Pemindai QR bawaan Google Play Services: tanpa izin kamera di aplikasi, model dimuat Play Services.
+    implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
 
     // Pemberitahuan di HP: pengecekan berkala (tanpa layanan pihak ketiga).
     implementation("androidx.work:work-runtime-ktx:2.9.1")
