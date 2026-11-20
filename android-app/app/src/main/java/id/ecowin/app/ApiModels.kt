@@ -69,7 +69,10 @@ data class NasabahDto(
     val status: String?,
     val statusVerifikasi: String? = null,
     val bankSampah: BankSampahDto?,
+    val createdAt: String? = null,
 )
+
+data class TolakNasabahRequest(val alasan: String)
 
 data class SaldoDto(
     val saldo: Double,

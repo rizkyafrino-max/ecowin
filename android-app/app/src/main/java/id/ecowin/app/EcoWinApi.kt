@@ -53,6 +53,20 @@ interface EcoWinApi {
     @POST("me/akun/hapus")
     suspend fun hapusAkun(@Body body: HapusAkunRequest)
 
+    /** Daftar nasabah untuk petugas/admin, bisa difilter (mis. status_verifikasi=pending). */
+    @GET("nasabah")
+    suspend fun daftarNasabah(
+        @Query("status_verifikasi") statusVerifikasi: String? = null,
+        @Query("status") status: String? = null,
+        @Query("per_page") perHalaman: Int = 50,
+    ): Paged<NasabahDto>
+
+    @POST("nasabah/{id}/verifikasi")
+    suspend fun verifikasiNasabah(@retrofit2.http.Path("id") id: Long): DataWrapper<NasabahDto>
+
+    @POST("nasabah/{id}/tolak")
+    suspend fun tolakNasabah(@retrofit2.http.Path("id") id: Long, @Body body: TolakNasabahRequest): DataWrapper<NasabahDto>
+
     @GET("petugas/ringkasan")
     suspend fun petugasRingkasan(): PetugasRingkasanDto
 
