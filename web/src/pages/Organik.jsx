@@ -1,4 +1,4 @@
-import { Camera, CheckCircle2, ImagePlus, Leaf, MapPin, MapPinPlus, Plus, Recycle } from 'lucide-react';
+import { Camera, CheckCircle2, ImagePlus, Leaf, MapPin, Plus, Recycle } from 'lucide-react';
 import { lazy, Suspense, useRef, useState } from 'react';
 import { EcoApi } from '../api/endpoints';
 import AuthImage from '../components/AuthImage';
@@ -30,7 +30,8 @@ function Lokasi({ lokasi, onLapor, onAjukan }) {
   // Peta & daftar resmi hanya memuat titik yang sudah disetujui; pengajuan milik sendiri ditampilkan terpisah.
   const resmi = semua.filter((t) => (t.verifikasi ?? 'approved') === 'approved');
   const pengajuan = semua.filter((t) => t.diajukan_saya && t.verifikasi && t.verifikasi !== 'approved');
-  const tombol = <Button size="sm" variant="soft" icon={MapPinPlus} onClick={onAjukan}>Ajukan titik baru</Button>;
+  // Sama dengan tombol "Tambah" di atas, supaya dua aksi ini terlihat sejenis.
+  const tombol = <Button size="sm" icon={Plus} onClick={onAjukan}>Ajukan titik</Button>;
   return (
     <section className="space-y-4">
       {resmi.length > 0 && (
@@ -227,13 +228,20 @@ export default function Organik() {
       </Card>
       {done && <p className="flex items-center gap-2 rounded-2xl bg-tint p-3.5 text-sm font-semibold text-primary-deep" role="status"><CheckCircle2 className="h-5 w-5" aria-hidden />Aktivitas terkirim. Menunggu pemeriksaan petugas.</p>}
       <OrganikFlow />
-      <h3 className="-mb-2 pt-1 font-bold leading-snug">Aktivitas Terbaru</h3>
-      <PagedList list={list} empty={{ icon: Leaf, title: 'Belum ada aktivitas', message: 'Tambahkan aktivitas organik pertamamu, lengkap dengan foto bukti.', action: <Button size="sm" onClick={tambah}>Tambah Aktivitas</Button> }}
-        renderItem={(a) => (a.jenis === 'setoran'
-          ? <OrganikRow item={a.raw} />
-          : <ActivityCard onClick={() => setSheet(a.raw)} title={a.raw.jenis_sampah} subtitle={`${a.raw.metode ?? 'Biopori'} · ${a.raw.lokasi ?? 'Lokasi'} · ${tanggal(a.raw.tanggal_pemasukan)}`} status={a.raw.status} right={<p className="text-sm font-bold tabular-nums">{kg(a.raw.berat_kg)}</p>} />)} />
-      {titikTerkirim && <p className="flex items-center gap-2 rounded-2xl bg-tint p-3.5 text-sm font-semibold text-primary-deep" role="status"><CheckCircle2 className="h-5 w-5" aria-hidden />Titik diajukan. Menunggu persetujuan petugas.</p>}
-      <Lokasi lokasi={lokasi} onLapor={(t) => { setDone(false); setPilihLokasi(t.id); setSheet('baru'); }} onAjukan={() => { setTitikTerkirim(false); setSheet('titik'); }} />
+      {/* Layar lebar (xl): aktivitas di kiri, lokasi dan peta di kanan; di bawah itu bertumpuk. */}
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] xl:items-start">
+        <section className="space-y-3">
+          <h3 className="pt-1 font-bold leading-snug">Aktivitas Terbaru</h3>
+          <PagedList list={list} empty={{ icon: Leaf, title: 'Belum ada aktivitas', message: 'Tambahkan aktivitas organik pertamamu, lengkap dengan foto bukti.', action: <Button size="sm" onClick={tambah}>Tambah Aktivitas</Button> }}
+            renderItem={(a) => (a.jenis === 'setoran'
+              ? <OrganikRow item={a.raw} />
+              : <ActivityCard onClick={() => setSheet(a.raw)} title={a.raw.jenis_sampah} subtitle={`${a.raw.metode ?? 'Biopori'} · ${a.raw.lokasi ?? 'Lokasi'} · ${tanggal(a.raw.tanggal_pemasukan)}`} status={a.raw.status} right={<p className="text-sm font-bold tabular-nums">{kg(a.raw.berat_kg)}</p>} />)} />
+        </section>
+        <div className="space-y-6">
+          {titikTerkirim && <p className="flex items-center gap-2 rounded-2xl bg-tint p-3.5 text-sm font-semibold text-primary-deep" role="status"><CheckCircle2 className="h-5 w-5" aria-hidden />Titik diajukan. Menunggu persetujuan petugas.</p>}
+          <Lokasi lokasi={lokasi} onLapor={(t) => { setDone(false); setPilihLokasi(t.id); setSheet('baru'); }} onAjukan={() => { setTitikTerkirim(false); setSheet('titik'); }} />
+        </div>
+      </div>
 
       <BottomSheet open={sheet === 'baru'} onClose={() => setSheet(null)} title="Tambah aktivitas organik">
         <Form lokasi={lokasi} initialId={pilihLokasi} onDone={() => { setSheet(null); setDone(true); list.reloadBiopori(); }} />

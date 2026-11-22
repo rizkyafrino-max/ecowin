@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.painterResource
@@ -146,6 +147,9 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
         }
     }
 
+    // Di tablet, layar lipat, atau HP mode mendatar, isi dibatasi 640dp dan diletakkan di tengah (Web juga membatasi lebarnya).
+    androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(Canvas), contentAlignment = Alignment.TopCenter) {
+    androidx.compose.foundation.layout.Box(Modifier.widthIn(max = 640.dp).fillMaxSize()) {
     when (val s = state) {
         AppState.Checking -> CenteredProgress()
         is AppState.Offline -> Column(
@@ -203,6 +207,8 @@ private fun EcoWinRoot(session: SessionStore, client: ApiClient, googleAuth: Goo
                 }
             },
         )
+    }
+    }
     }
 }
 

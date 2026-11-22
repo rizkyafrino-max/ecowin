@@ -67,8 +67,7 @@ export default function Notifikasi() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Notifikasi" subtitle="Kabar terbaru tentang setoran, penarikan, dan aktivitasmu."
-        action={adaBelum ? <Button size="sm" variant="soft" icon={CheckCheck} onClick={bacaSemua}>Tandai dibaca</Button> : null} />
+      <PageHeader title="Notifikasi" subtitle="Kabar terbaru tentang setoran, penarikan, dan aktivitasmu." />
 
       {daftar.loading && !daftar.data ? <LoadingState rows={4} /> : null}
       {daftar.error && !daftar.data ? <ErrorState error={daftar.error} onRetry={daftar.reload} /> : null}
@@ -77,13 +76,14 @@ export default function Notifikasi() {
       ) : null}
 
       {items.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex max-w-3xl flex-wrap items-center gap-2">
+          {adaBelum && <Button size="sm" variant="soft" icon={CheckCheck} onClick={bacaSemua}>Tandai dibaca</Button>}
           {adaDibaca && <Button size="sm" variant="outline" icon={Trash2} onClick={() => setKonfirmasi('dibaca')}>Hapus yang sudah dibaca</Button>}
           <Button size="sm" variant="ghost" icon={Trash2} onClick={() => setKonfirmasi('semua')}>Hapus semua</Button>
         </div>
       )}
       {konfirmasi && (
-        <div role="alertdialog" aria-label="Konfirmasi hapus notifikasi" className="flex flex-wrap items-center gap-3 rounded-2xl border border-danger/30 bg-danger-tint p-4 text-sm">
+        <div role="alertdialog" aria-label="Konfirmasi hapus notifikasi" className="flex max-w-3xl flex-wrap items-center gap-3 rounded-2xl border border-danger/30 bg-danger-tint p-4 text-sm">
           <span className="flex-1 font-semibold text-danger">{konfirmasi === 'semua' ? 'Hapus semua notifikasi? Ini tidak bisa dibatalkan ya.' : 'Hapus semua notifikasi yang sudah dibaca?'}</span>
           <Button size="sm" variant="danger" onClick={hapusBanyak}>Ya, hapus</Button>
           <Button size="sm" variant="outline" onClick={() => setKonfirmasi(null)}>Batal</Button>
@@ -92,7 +92,7 @@ export default function Notifikasi() {
       {galatHapus && <p role="alert" className="text-sm font-semibold text-danger">{galatHapus}</p>}
 
       {items.length > 0 && (
-        <ul className="space-y-3" aria-label="Daftar notifikasi">
+        <ul className="max-w-3xl space-y-3" aria-label="Daftar notifikasi">
           {items.map((n) => {
             const { Icon, kelas } = gaya(n.tipe);
             return (

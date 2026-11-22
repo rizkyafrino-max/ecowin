@@ -16,6 +16,6 @@ class ListTitikBioporis extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [CreateAction::make()];
+        return [CreateAction::make()->label('Tambah lokasi')->icon('heroicon-o-plus')];
     }
 }

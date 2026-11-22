@@ -62,7 +62,7 @@ import org.osmdroid.views.overlay.Marker
  * selain sebagai koordinat titik yang diajukan.
  */
 @Composable
-fun AjukanTitikForm(client: ApiClient, onDone: () -> Unit, onCancel: () -> Unit) {
+fun AjukanTitikForm(client: ApiClient, onDone: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var nama by rememberSaveable { mutableStateOf("") }
@@ -117,8 +117,7 @@ fun AjukanTitikForm(client: ApiClient, onDone: () -> Unit, onCancel: () -> Unit)
         else izin.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
     }
 
-    EcoCard {
-        Text("Ajukan titik Biopori baru", fontWeight = FontWeight.Bold)
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("Titik diperiksa petugas Bank Sampah. Setelah disetujui, titik tampil di peta dan bisa dipakai untuk melapor.", color = Slate500, fontSize = 12.sp)
 
         EcoTextField(
@@ -177,7 +176,6 @@ fun AjukanTitikForm(client: ApiClient, onDone: () -> Unit, onCancel: () -> Unit)
                 }
             }
         }
-        TextButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) { Text("Batal") }
     }
 }
 
