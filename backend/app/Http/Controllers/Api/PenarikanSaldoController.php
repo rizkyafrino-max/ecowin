@@ -24,6 +24,7 @@ class PenarikanSaldoController extends Controller
         return PenarikanSaldoResource::collection(
             PenarikanSaldo::query()
                 ->visibleTo($request->user())
+                ->when($request->user()->isStaff(), fn ($q) => $q->with('nasabah:id,nama,nomor_nasabah'))
                 ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
                 ->latest('id')
                 ->paginate(25)

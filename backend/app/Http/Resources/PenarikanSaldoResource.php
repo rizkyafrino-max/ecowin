@@ -17,6 +17,9 @@ class PenarikanSaldoResource extends JsonResource
         return [
             'id' => $this->id,
             'nasabah_id' => $this->nasabah_id,
+            // Nama dan nomor hanya ikut bila relasinya dimuat (daftar untuk petugas), tanpa data pribadi lain.
+            'nasabah' => $this->whenLoaded('nasabah', fn () => $this->nasabah?->nama),
+            'nomor_nasabah' => $this->whenLoaded('nasabah', fn () => $this->nasabah?->nomor_nasabah),
             'bank_sampah_id' => $this->bank_sampah_id,
             'jumlah' => (int) $this->jumlah,
             'status' => $this->status,

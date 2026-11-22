@@ -158,7 +158,12 @@ data class PenarikanDto(
     val catatan: String?,
     val diprosesAt: String?,
     val createdAt: String?,
+    /** Hanya terisi pada daftar untuk petugas. */
+    val nasabah: String? = null,
+    val nomorNasabah: String? = null,
 )
+
+data class TolakPenarikanRequest(val catatan: String)
 
 data class PenarikanRequest(val jumlah: Long, val catatan: String?)
 
