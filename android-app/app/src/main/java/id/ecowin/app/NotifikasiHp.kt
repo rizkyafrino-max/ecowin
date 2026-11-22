@@ -117,12 +117,14 @@ object NotifikasiHp {
 
     private fun siapkanKanal(app: Context): String {
         val n = nada(app)
-        val id = "${KANAL}_${n.kode}"
+        // v2: kanal lama berprioritas biasa (hanya masuk bayangan notifikasi, tanpa banner). Importance kanal tidak bisa
+        // dinaikkan setelah dibuat, jadi kanal baru dengan id baru; kanal lama terhapus oleh baris di bawah (awalan sama).
+        val id = "${KANAL}_v2_${n.kode}"
         if (Build.VERSION.SDK_INT < 26) return id
         val nm = app.getSystemService(NotificationManager::class.java)
         nm.notificationChannels.filter { it.id.startsWith(KANAL) && it.id != id }.forEach { nm.deleteNotificationChannel(it.id) }
         if (nm.getNotificationChannel(id) == null) {
-            val kanal = NotificationChannel(id, "Kabar EcoWin", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            val kanal = NotificationChannel(id, "Kabar EcoWin", NotificationManager.IMPORTANCE_HIGH).apply {
                 description = "Setoran, penarikan, dan aktivitas akunmu."
                 lockscreenVisibility = android.app.Notification.VISIBILITY_PRIVATE
                 setShowBadge(true)
@@ -167,6 +169,8 @@ object NotifikasiHp {
             .setContentTitle(judul)
             .setContentText(isi)
             .setStyle(NotificationCompat.BigTextStyle().bigText(isi))
+            .setPriority(NotificationCompat.PRIORITY_HIGH) // Android 7.1 ke bawah: banner ditentukan prioritas, bukan kanal
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .setPublicVersion(umum)
             .setContentIntent(tujuan)
