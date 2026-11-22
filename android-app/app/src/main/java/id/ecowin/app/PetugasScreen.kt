@@ -30,14 +30,20 @@ fun peranBolehMasuk(role: String?): Boolean = role == "nasabah" || role == "petu
 fun adalahPetugas(user: UserDto): Boolean = user.role == "petugas"
 
 /**
- * Beranda petugas (tahap 1): ringkasan pekerjaan yang menunggu. Verifikasi nasabah, scan QR + catat setoran,
- * dan persetujuan penarikan menyusul di tahap berikutnya.
+ * Beranda petugas: ringkasan pekerjaan yang menunggu, lalu verifikasi nasabah, scan QR + catat setoran,
+ * dan persetujuan penarikan saldo.
  */
 @Composable
 fun PetugasScreen(user: UserDto, client: ApiClient, onLogout: () -> Unit) {
     val ringkasan = rememberLoadable(client) { client.api.petugasRingkasan() }
     var verifikasi by remember { mutableStateOf(false) }
     var setor by remember { mutableStateOf(false) }
+    var penarikan by remember { mutableStateOf(false) }
+
+    if (penarikan) {
+        PenarikanPetugasScreen(client, onBack = { penarikan = false }, onBerubah = { ringkasan.reload() })
+        return
+    }
 
     if (setor) {
         SetorScreen(client, onBack = { setor = false }, onBerubah = { ringkasan.reload() })
@@ -60,15 +66,15 @@ fun PetugasScreen(user: UserDto, client: ApiClient, onLogout: () -> Unit) {
             r.bankSampah?.let { Text("Bank Sampah ${it.nama.orEmpty()}", color = Slate500, fontSize = 13.sp) }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 StatTile("Menunggu verifikasi", r.menungguVerifikasi.toString(), Modifier.weight(1f).clickable { verifikasi = true }, hint = "Ketuk untuk memeriksa", warn = r.menungguVerifikasi > 0)
-                StatTile("Penarikan menunggu", r.penarikanMenunggu.toString(), Modifier.weight(1f), warn = r.penarikanMenunggu > 0)
+                StatTile("Penarikan menunggu", r.penarikanMenunggu.toString(), Modifier.weight(1f).clickable { penarikan = true }, hint = "Ketuk untuk memeriksa", warn = r.penarikanMenunggu > 0)
             }
             StatTile("Setoran hari ini", "${r.setoranHariIni.jumlah} setoran", Modifier.fillMaxWidth(), hint = rupiah(r.setoranHariIni.nilaiRupiah))
         }
 
         Spacer(Modifier.height(4.dp))
-        Text("Persetujuan penarikan segera hadir di aplikasi ini.", color = Slate500, fontSize = 13.sp)
         PrimaryButton("Scan QR dan catat setoran", icon = Lucide.QrCode, onClick = { setor = true })
         PrimaryButton("Verifikasi nasabah", onClick = { verifikasi = true })
+        PrimaryButton("Penarikan saldo", onClick = { penarikan = true })
         PrimaryButton("Keluar", onClick = onLogout)
     }
 }

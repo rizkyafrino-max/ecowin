@@ -143,6 +143,19 @@ interface EcoWinApi {
     @GET("penarikan")
     suspend fun penarikan(): Paged<PenarikanDto>
 
+    /** Daftar penarikan untuk petugas (Bank Sampahnya sendiri), difilter menurut status. */
+    @GET("penarikan")
+    suspend fun daftarPenarikanPetugas(@Query("status") status: String): Paged<PenarikanDto>
+
+    @POST("penarikan/{id}/approve")
+    suspend fun setujuiPenarikan(@retrofit2.http.Path("id") id: Long): DataWrapper<PenarikanDto>
+
+    @POST("penarikan/{id}/reject")
+    suspend fun tolakPenarikan(@retrofit2.http.Path("id") id: Long, @Body body: TolakPenarikanRequest): DataWrapper<PenarikanDto>
+
+    @POST("penarikan/{id}/complete")
+    suspend fun selesaikanPenarikan(@retrofit2.http.Path("id") id: Long): DataWrapper<PenarikanDto>
+
     @POST("penarikan")
     suspend fun ajukanPenarikan(@Body body: PenarikanRequest): DataWrapper<PenarikanDto>
 
