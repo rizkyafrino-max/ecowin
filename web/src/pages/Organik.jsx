@@ -1,4 +1,4 @@
-import { Camera, CheckCircle2, ImagePlus, Leaf, MapPin, MapPinPlus, Plus, Recycle } from 'lucide-react';
+import { Camera, CheckCircle2, ImagePlus, Leaf, MapPin, Plus, Recycle } from 'lucide-react';
 import { lazy, Suspense, useRef, useState } from 'react';
 import { EcoApi } from '../api/endpoints';
 import AuthImage from '../components/AuthImage';
@@ -30,7 +30,8 @@ function Lokasi({ lokasi, onLapor, onAjukan }) {
   // Peta & daftar resmi hanya memuat titik yang sudah disetujui; pengajuan milik sendiri ditampilkan terpisah.
   const resmi = semua.filter((t) => (t.verifikasi ?? 'approved') === 'approved');
   const pengajuan = semua.filter((t) => t.diajukan_saya && t.verifikasi && t.verifikasi !== 'approved');
-  const tombol = <Button size="sm" variant="soft" icon={MapPinPlus} onClick={onAjukan}>Ajukan titik baru</Button>;
+  // Sama dengan tombol "Tambah" di atas, supaya dua aksi ini terlihat sejenis.
+  const tombol = <Button size="sm" icon={Plus} onClick={onAjukan}>Ajukan titik</Button>;
   return (
     <section className="space-y-4">
       {resmi.length > 0 && (

@@ -9,7 +9,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,6 +52,24 @@ fun OrganikTab(client: ApiClient, refreshKey: Int) {
                     androidx.compose.material3.IconButton(onClick = { formOpen = false }) { Icon(Lucide.X, contentDescription = "Tutup", tint = Slate500) }
                 }
                 TambahAktivitasForm(client, lokasi, onDone = { formOpen = false; localRefresh++ }, onCancel = { formOpen = false })
+            }
+        }
+    }
+
+    if (titikFormOpen) {
+        // Layar penuh (bukan lembar bawah) karena peta di dalamnya bisa digeser tanpa menarik lembar.
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { titikFormOpen = false },
+            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) {
+            androidx.compose.material3.Surface(Modifier.fillMaxSize(), color = androidx.compose.ui.graphics.Color.White) {
+                Column(Modifier.fillMaxSize().systemBarsPadding().verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("Ajukan titik Biopori baru", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Slate900, modifier = Modifier.weight(1f))
+                        androidx.compose.material3.IconButton(onClick = { titikFormOpen = false }) { Icon(Lucide.X, contentDescription = "Tutup", tint = Slate500) }
+                    }
+                    AjukanTitikForm(client, onDone = { titikFormOpen = false; titikTerkirim = true; localRefresh++ })
+                }
             }
         }
     }
@@ -98,11 +118,6 @@ fun OrganikTab(client: ApiClient, refreshKey: Int) {
             }
         }
 
-        if (titikFormOpen) {
-            item {
-                AjukanTitikForm(client, onDone = { titikFormOpen = false; titikTerkirim = true; localRefresh++ }, onCancel = { titikFormOpen = false })
-            }
-        }
         if (titikTerkirim) {
             item {
                 Text("Titik diajukan. Menunggu persetujuan petugas.", color = Emerald, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
@@ -118,13 +133,11 @@ fun OrganikTab(client: ApiClient, refreshKey: Int) {
                     if (resmi.isNotEmpty()) PetaBioporiCard(resmi)
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         SectionTitle("Lokasi BioporiPrint")
-                        Text(
-                            "+ Ajukan titik", color = Emerald, fontWeight = FontWeight.SemiBold, fontSize = 13.sp,
-                            modifier = Modifier
-                                .background(EmeraldSoft, androidx.compose.foundation.shape.RoundedCornerShape(50))
-                                .clickable { titikTerkirim = false; titikFormOpen = true }
-                                .padding(horizontal = 14.dp, vertical = 8.dp),
-                        )
+                        // Sama dengan tombol "Tambah" di atas, supaya dua aksi ini terlihat sejenis.
+                        androidx.compose.material3.Button(onClick = { titikTerkirim = false; titikFormOpen = true }, modifier = Modifier.height(36.dp), shape = RoundedCornerShape(50), contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp)) {
+                            Icon(Lucide.Plus, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Text(" Ajukan titik", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        }
                     }
                     if (resmi.isEmpty() && pengajuan.isEmpty()) EmptyText("Belum ada lokasi di Bank Sampahmu. Ajukan titik pertama dulu supaya bisa melapor aktivitas.")
                     if (pengajuan.isNotEmpty()) {
