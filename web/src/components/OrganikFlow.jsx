@@ -1,8 +1,13 @@
-import { ChevronRight, Leaf, Printer, Recycle } from 'lucide-react';
+import { ChevronDown, ChevronRight, Leaf, Printer, Recycle } from 'lucide-react';
+import { useState } from 'react';
 import Card from './Card';
 
-/** Menjelaskan hubungan Organik → metode (Biopori / BioporiPrint); bukan kategori terpisah. */
+/**
+ * Menjelaskan hubungan Organik → metode (Biopori / BioporiPrint); bukan kategori terpisah.
+ * Di HP penjelasan ini diciutkan supaya aktivitas yang sebenarnya tidak terdorong ke bawah layar; di layar lebar selalu terbuka.
+ */
 export default function OrganikFlow({ compact = false }) {
+  const [buka, setBuka] = useState(false);
   const steps = [
     { icon: Recycle, title: 'Organik', text: 'Satu fitur untuk semua aktivitas sampah organik. Tidak menjadi saldo rupiah.' },
     { icon: Leaf, title: 'Pilih metode', text: 'Pilih Biopori atau BioporiPrint, lalu isi data dan unggah foto bukti.' },
@@ -10,8 +15,12 @@ export default function OrganikFlow({ compact = false }) {
   ];
   return (
     <Card className="bg-tint/60">
-      <p className="text-sm font-bold">Cara kerja jalur Organik</p>
-      <ol className={`mt-3 grid gap-3 ${compact ? '' : 'sm:grid-cols-3'}`}>
+      <button type="button" onClick={() => setBuka((b) => !b)} aria-expanded={buka}
+        className="flex w-full items-center justify-between text-left sm:pointer-events-none">
+        <span className="text-sm font-bold">Cara kerja jalur Organik</span>
+        <ChevronDown className={`h-4 w-4 text-muted transition sm:hidden ${buka ? 'rotate-180' : ''}`} aria-hidden />
+      </button>
+      <ol className={`mt-3 gap-3 ${buka ? 'grid' : 'hidden'} sm:grid ${compact ? '' : 'sm:grid-cols-3'}`}>
         {steps.map((s, i) => (
           <li key={s.title} className="flex items-start gap-3 rounded-2xl bg-surface p-3.5">
             <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-tint text-primary-deep"><s.icon className="h-5 w-5" aria-hidden /></span>

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -63,13 +64,15 @@ fun OrganikTab(client: ApiClient, refreshKey: Int) {
             properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
         ) {
             androidx.compose.material3.Surface(Modifier.fillMaxSize(), color = androidx.compose.ui.graphics.Color.White) {
-                Column(Modifier.fillMaxSize().systemBarsPadding().verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+              androidx.compose.foundation.layout.Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+                Column(Modifier.widthIn(max = 640.dp).fillMaxSize().systemBarsPadding().verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                         Text("Ajukan titik Biopori baru", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Slate900, modifier = Modifier.weight(1f))
                         androidx.compose.material3.IconButton(onClick = { titikFormOpen = false }) { Icon(Lucide.X, contentDescription = "Tutup", tint = Slate500) }
                     }
                     AjukanTitikForm(client, onDone = { titikFormOpen = false; titikTerkirim = true; localRefresh++ })
                 }
+              }
             }
         }
     }

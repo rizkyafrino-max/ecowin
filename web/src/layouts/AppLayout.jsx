@@ -32,7 +32,7 @@ export default function AppLayout() {
       <Sidebar pathname={pathname} />
       <div className="md:pl-20 lg:pl-64">
         <TopBar title={title} />
-        <main className="mx-auto max-w-6xl px-4 pb-32 pt-5 sm:px-6 md:pt-7">
+        <main className="mx-auto max-w-6xl px-4 pb-32 pt-5 sm:px-6 md:pb-10 md:pt-7">
           <div key={pathname} className="ew-page"><Outlet /></div>
         </main>
       </div>

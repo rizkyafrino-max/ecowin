@@ -58,7 +58,7 @@ export function BottomNav({ pathname, hidden = false }) {
   };
 
   return (
-    <nav className={`pb-safe fixed bottom-2 left-1/2 z-30 flex min-h-[60px] w-[min(760px,calc(100vw-16px))] items-center justify-around gap-2 rounded-[18px] border border-line bg-white/95 px-2 pt-2 shadow-[0_8px_24px_rgba(15,23,42,0.10)] backdrop-blur transition duration-200 sm:bottom-3.5 sm:min-h-16 sm:rounded-[20px] sm:px-3.5 ${hidden ? 'pointer-events-none -translate-x-1/2 translate-y-[calc(100%+28px)] opacity-0' : '-translate-x-1/2'}`} aria-label="Navigasi bawah" aria-hidden={hidden}>
+    <nav className={`pb-safe fixed bottom-2 left-1/2 z-30 flex md:hidden min-h-[60px] w-[min(760px,calc(100vw-16px))] items-center justify-around gap-2 rounded-[18px] border border-line bg-white/95 px-2 pt-2 shadow-[0_8px_24px_rgba(15,23,42,0.10)] backdrop-blur transition duration-200 sm:bottom-3.5 sm:min-h-16 sm:rounded-[20px] sm:px-3.5 ${hidden ? 'pointer-events-none -translate-x-1/2 translate-y-[calc(100%+28px)] opacity-0' : '-translate-x-1/2'}`} aria-label="Navigasi bawah" aria-hidden={hidden}>
       {FOOTER_LEFT.map(link)}
       <NavLink to="/fitur" aria-label="Semua Fitur"
         className={({ isActive: a }) => `-mt-6 flex h-[52px] w-[52px] flex-none items-center justify-center rounded-[18px] border-[5px] border-canvas text-white shadow-[0_6px_16px_rgba(5,150,105,0.3)] transition sm:h-14 sm:w-14 ${a ? 'bg-primary-deep' : 'bg-primary hover:bg-primary-deep'}`}>

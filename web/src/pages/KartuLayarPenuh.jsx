@@ -88,7 +88,7 @@ export default function KartuLayarPenuh() {
       </div>
 
       {/* Lebar kartu: mengisi lebar layar, tetapi tidak lebih tinggi dari layar (rasio kartu 1,586). */}
-      <div className="kartu-cetak w-full" style={{ maxWidth: 'min(94vw, calc((100dvh - 110px) * 1.586))' }}>
+      <div className="kartu-cetak w-full" style={{ maxWidth: 'min(94vw, 720px, calc((100dvh - 110px) * 1.586))' }}>
         {qr.error && !qr.data ? <ErrorState error={qr.error} onRetry={qr.reload} /> : <QRCard data={qr.data} loading={qr.loading} bank={bank} tanpaCatatan />}
       </div>
 

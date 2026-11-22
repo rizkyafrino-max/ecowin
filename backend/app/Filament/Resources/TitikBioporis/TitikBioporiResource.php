@@ -11,6 +11,7 @@ use App\Models\TitikBiopori;
 use App\Services\BioporiService;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -130,13 +131,6 @@ class TitikBioporiResource extends Resource
                         app(BioporiService::class)->setujuiTitik(auth()->user(), $record);
                         Notification::make()->success()->title('Titik disetujui.')->send();
                     }),
-                Action::make('tolak')->label('Tolak')->icon('heroicon-o-x-circle')->color('danger')
-                    ->visible(fn (TitikBiopori $r): bool => $r->isPendingVerifikasi() && (auth()->user()?->can('verify', $r) ?? false))
-                    ->schema([TextInput::make('catatan')->label('Alasan penolakan')->required()->maxLength(500)])
-                    ->action(function (TitikBiopori $record, array $data): void {
-                        app(BioporiService::class)->tolakTitik(auth()->user(), $record, $data['catatan']);
-                        Notification::make()->success()->title('Titik ditolak.')->send();
-                    }),
                 Action::make('panen')->label('Catat panen')->icon('heroicon-o-check-badge')->color('success')
                     ->visible(fn (TitikBiopori $r): bool => $r->verifikasi === TitikBiopori::VERIFIKASI_APPROVED && $r->statusPanenEfektif() !== TitikBiopori::PANEN_SUDAH && (auth()->user()?->can('update', $r) ?? false))
                     ->schema([DecimalInput::make('hasil_kompos_kg')->label('Hasil kompos')->suffix('kg')->batasMin(0)->batasMax(10000)->required()])
@@ -145,6 +139,16 @@ class TitikBioporiResource extends Resource
                         Notification::make()->success()->title('Panen dicatat.')->send();
                     }),
                 EditAction::make(),
+                // Aksi yang jarang dipakai disimpan di menu titik tiga supaya kolom aksi tidak melebar dan menutupi kolom lain.
+                ActionGroup::make([
+                Action::make('tolak')->label('Tolak')->icon('heroicon-o-x-circle')->color('danger')
+                    ->visible(fn (TitikBiopori $r): bool => $r->isPendingVerifikasi() && (auth()->user()?->can('verify', $r) ?? false))
+                    ->schema([TextInput::make('catatan')->label('Alasan penolakan')->required()->maxLength(500)])
+                    ->action(function (TitikBiopori $record, array $data): void {
+                        app(BioporiService::class)->tolakTitik(auth()->user(), $record, $data['catatan']);
+                        Notification::make()->success()->title('Titik ditolak.')->send();
+                    }),
+                ])->icon('heroicon-m-ellipsis-vertical')->tooltip('Aksi lainnya')->color('gray'),
             ]);
     }
 

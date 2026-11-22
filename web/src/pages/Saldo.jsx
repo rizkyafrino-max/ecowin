@@ -31,9 +31,11 @@ export default function Saldo() {
           </div>
         </div>
       )}
-      <h3 className="pt-1 font-bold">Riwayat saldo</h3>
-      <PagedList list={mutasi} empty={{ icon: Wallet, title: 'Belum ada mutasi saldo', message: 'Setoran dan penarikan akan tercatat di sini.' }}
-        renderItem={(m) => <TransactionCard title={m.keterangan || (m.tipe === 'kredit' ? 'Saldo masuk' : 'Saldo keluar')} subtitle={`Saldo ${rupiah(m.saldo_sesudah)}`} amount={m.jumlah} kind={m.tipe} date={m.created_at} />} />
+      <div className="max-w-3xl space-y-3">
+        <h3 className="pt-1 font-bold">Riwayat saldo</h3>
+        <PagedList list={mutasi} empty={{ icon: Wallet, title: 'Belum ada mutasi saldo', message: 'Setoran dan penarikan akan tercatat di sini.' }}
+          renderItem={(m) => <TransactionCard title={m.keterangan || (m.tipe === 'kredit' ? 'Saldo masuk' : 'Saldo keluar')} subtitle={`Saldo ${rupiah(m.saldo_sesudah)}`} amount={m.jumlah} kind={m.tipe} date={m.created_at} />} />
+      </div>
     </div>
   );
 }

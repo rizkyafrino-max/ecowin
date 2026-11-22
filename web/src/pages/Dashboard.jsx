@@ -8,7 +8,7 @@ import { EmptyState, ErrorState, LoadingState } from '../components/States';
 import VerifikasiBanner from '../components/VerifikasiBanner';
 import { useAuth } from '../context/AuthContext';
 import { useQuery } from '../hooks/useQuery';
-import { inisial, kg, sapaan, tanggal } from '../utils/format';
+import { kg, sapaan, tanggal } from '../utils/format';
 
 function MonthlyChart({ stat }) {
   const max = Math.max(1, ...stat.berat);
@@ -42,10 +42,8 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Foto profil sudah ada di bilah atas, jadi tidak diulang di sini. */}
       <div className="flex items-center gap-3.5">
-        {user?.avatar
-          ? <img src={user.avatar} alt="" referrerPolicy="no-referrer" className="h-12 w-12 rounded-full object-cover md:hidden" />
-          : <span className="flex h-12 w-12 items-center justify-center rounded-full bg-tint font-bold text-primary-deep md:hidden">{inisial(user?.nama)}</span>}
         <div>
           <p className="text-sm text-muted">{sapaan()},</p>
           <h2 className="text-2xl font-extrabold leading-tight">{user?.nama}</h2>
@@ -67,7 +65,8 @@ export default function Dashboard() {
                 <p className="text-sm font-bold">Aksi cepat</p>
                 <Link to="/fitur" className="text-xs font-semibold text-muted hover:text-primary-deep">Lihat semua</Link>
               </div>
-              <div className="-mx-5 mt-3 flex gap-2.5 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {/* HP: satu baris yang bisa digeser. Layar lebar: dibungkus ke baris berikutnya supaya tidak terpotong. */}
+              <div className="-mx-5 mt-3 flex gap-2.5 overflow-x-auto px-5 pb-1 [scrollbar-width:none] lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden">
                 {[
                   { to: '/kartu', icon: QrCode, label: 'Setor sampah' },
                   { to: '/organik', icon: Recycle, label: 'Organik' },

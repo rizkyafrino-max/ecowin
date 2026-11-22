@@ -109,7 +109,7 @@ export default function Masuk({ daftar = false }) {
           </p>
           <p className="mt-4 text-center text-xs text-muted">
             Dengan melanjutkan, kamu setuju dengan <Link className="font-semibold text-primary-deep hover:underline" to="/privasi">Kebijakan Privasi</Link> kami.
-            {' '}<Link className="font-semibold text-primary-deep hover:underline" to="/hapus-akun">Hapus akun</Link>
+            {' '}<Link className="whitespace-nowrap font-semibold text-primary-deep hover:underline" to="/hapus-akun">Hapus akun</Link>
           </p>
           <p className="mt-3 text-center text-xs text-slate-400">© {new Date().getFullYear()} EcoWin · Bank Sampah Digital Berkelanjutan</p>
         </div>
